@@ -69,6 +69,7 @@
         "supertest": "^1.0.0"
     },
     "scripts": {
-        "start": "nodemon functions/app_dev.js"
+        "start": "nodemon functions/app_dev.js",
+        "deploy": "firebase deploy --only functions,hosting"
     }
 }
