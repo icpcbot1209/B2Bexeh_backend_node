@@ -1,4 +1,5 @@
 const app = require("./app");
+process.env.NODE_ENV = process.env.NODE_ENV || "local"; //local server
 const config = require("./app/config/config.js").get(process.env.NODE_ENV);
 
 var port = process.env.PORT || config.port;
