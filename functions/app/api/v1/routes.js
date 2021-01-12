@@ -40,5 +40,7 @@ module.exports = function (express) {
   //admin setting
   require("./modules/admin_settings/admin_settings_routes")(router);
 
+  /****** New version */
+  require("./modules/my_offers/my_offers_routes")(router);
   return router;
 };
