@@ -1,16 +1,39 @@
 var bookshelf = __rootRequire("app/config/bookshelf");
-var loader = __rootRequire("app/api/v1/loader");
-
-var CategoryModel = loader.loadModel("/category/models/category_models");
-
-var constant = require("../../../../../utils/constants");
-var common_query = require("../../../../../utils/commonQuery");
-var Response = require("../../../../../utils/response");
-const uuidv4 = require("uuid/v4");
 
 module.exports = {
-  getMyOffers: getMyOffers,
+  getMyOffers,
+  getLatestOffers,
 };
+
+async function getLatestOffers(req, res) {
+  try {
+    let { categoryId, subcategoryId } = req.body;
+
+    let query = `
+    SELECT o.*, 
+    d.user_name AS dealer_name,
+    p."productName" AS product_name,
+    o.producttype AS product_type,
+    c."categoryName" AS sport_name,
+    p."releaseDate" as release_date
+    FROM bid_and_ask o
+    LEFT OUTER JOIN products p ON p.id=o."productId"
+    LEFT OUTER JOIN users d ON d.id=o."createdbyId"
+    LEFT OUTER JOIN category c ON c.id=p."categoryId"
+    WHERE (
+      p."categoryId"=${categoryId}
+    ) AND (
+      p."subcategoryId"=${subcategoryId}
+    )
+    `;
+
+    let data = await bookshelf.knex.raw(query);
+    res.status(200).json({ data });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal error." });
+  }
+}
 
 async function getMyOffers(req, res) {
   try {

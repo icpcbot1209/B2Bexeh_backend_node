@@ -16,9 +16,7 @@ var mkdirp = require("mkdirp");
 var ProductModel = loader.loadModel("/product/models/product_models");
 var cartModel = require("../../cart/models/cart_model");
 var CounterModel = loader.loadModel("/product/models/counteroffer_models");
-var CatSubcatMappingModel = loader.loadModel(
-  "/product/models/catsubcatmapping_models"
-);
+var CatSubcatMappingModel = loader.loadModel("/product/models/catsubcatmapping_models");
 var imageModel = loader.loadModel("/images/models/image_models");
 var categoryModel = require("../../category/models/category_models");
 var subcategoryModel = require("../../subcategory/models/subcategory_models");
@@ -100,20 +98,9 @@ function exportcsvBulkUpload(req, res) {
         .then((productData) => {
           let products = productData.toJSON();
           if (products.length) {
-            return res.json(
-              Response(
-                constant.statusCode.ok,
-                constant.messages.recordFetchedSuccessfully,
-                products
-              )
-            );
+            return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, products));
           } else {
-            return res.json(
-              Response(
-                constant.statusCode.notFound,
-                constant.validateMsg.noRecordFound
-              )
-            );
+            return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
           }
         });
 
@@ -132,20 +119,13 @@ function exportcsvBulkUpload(req, res) {
       // })
     } catch (error) {
       console.log("errorerrorerror", error);
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
 
     function _filter(qb) {
       // qb.joinRaw(`LEFT JOIN users ON (cart."user_id" = users.id)`);
       qb.joinRaw(`LEFT JOIN category ON (products."categoryId" = category.id)`);
-      qb.joinRaw(
-        `LEFT JOIN subcategory ON (products."subcategoryId" = subcategory.id)`
-      );
+      qb.joinRaw(`LEFT JOIN subcategory ON (products."subcategoryId" = subcategory.id)`);
     }
   }
   async_fun();
@@ -160,34 +140,14 @@ function productFeatureChange(req, res) {
       id: req.body.id,
     };
     try {
-      let updateUserData = await common_query.updateRecord(
-        ProductModel,
-        updatedata,
-        condition
-      );
+      let updateUserData = await common_query.updateRecord(ProductModel, updatedata, condition);
       if (updateUserData.code == 200) {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.UpdateSuccess,
-            updateUserData
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData));
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.internalservererror,
-            constant.validateMsg.internalError
-          )
-        );
+        return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
       }
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   productFeatureChangeMethod().then((data) => {});
@@ -206,10 +166,7 @@ function createCounter(req, res) {
        *
        *
        */
-      console.log(
-        "req req+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
-        req.body
-      );
+      console.log("req req+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", req.body);
       let reqType = Array.isArray(req.body);
       if (reqType) {
         console.log("array");
@@ -403,11 +360,9 @@ function createCounter(req, res) {
             data.total_amount = qty * amount;
             console.log("data---", data);
 
-            let counterData = await common_query
-              .saveRecord(CounterModel, data)
-              .catch((err) => {
-                throw err;
-              });
+            let counterData = await common_query.saveRecord(CounterModel, data).catch((err) => {
+              throw err;
+            });
             let counterArr = {};
             let cntrData = {};
             let userinfo = {};
@@ -462,10 +417,7 @@ function createCounter(req, res) {
               if (err) {
                 console.log("Error adding notification", err);
               } else {
-                console.log(
-                  "response after calling common add notification",
-                  resp
-                );
+                console.log("response after calling common add notification", resp);
               }
             });
             console.log("counterData---", counterData);
@@ -479,18 +431,12 @@ function createCounter(req, res) {
               bidask_id: parseInt(value.bid_and_ask_id),
             };
             console.log("conditionForCheckout---", conditionForCheckout);
-            const findDatainCart = await common_query
-              .findAllData(cartModel, conditionForCheckout)
-              .catch((err) => {
-                throw err;
-              });
+            const findDatainCart = await common_query.findAllData(cartModel, conditionForCheckout).catch((err) => {
+              throw err;
+            });
             if (findDatainCart.data.length) {
               let test = await common_query
-                .updateRecord(
-                  cartModel,
-                  updateCheckoutdata,
-                  conditionForCheckout
-                )
+                .updateRecord(cartModel, updateCheckoutdata, conditionForCheckout)
                 .catch((err) => {
                   throw err;
                 });
@@ -500,14 +446,7 @@ function createCounter(req, res) {
           },
           function (err) {
             if (err) throw err;
-            else
-              return res.json(
-                Response(
-                  constant.statusCode.ok,
-                  "Offer sent successfully",
-                  orderArr
-                )
-              );
+            else return res.json(Response(constant.statusCode.ok, "Offer sent successfully", orderArr));
             // configs is now a map of JSON data
             // doSomethingWith(configs);
           }
@@ -718,14 +657,8 @@ function createCounter(req, res) {
         data.created_at = createdAt;
         data.total_amount = qty * amount;
         console.log("data in counter offer is!!!!!!!!!!!!!!!!!!", data);
-        const counterDataSaved = await common_query.saveRecord(
-          CounterModel,
-          data
-        );
-        console.log(
-          "counterData!!!!!!!!!!!!!!!!!!!!!",
-          counterDataSaved.success.toJSON()
-        );
+        const counterDataSaved = await common_query.saveRecord(CounterModel, data);
+        console.log("counterData!!!!!!!!!!!!!!!!!!!!!", counterDataSaved.success.toJSON());
 
         if (data.type_of == "ask") {
           var notObj = {
@@ -745,10 +678,7 @@ function createCounter(req, res) {
           if (err) {
             console.log("Error adding notification in counter offer", err);
           } else {
-            console.log(
-              "response after calling common add notification in counter offer",
-              resp
-            );
+            console.log("response after calling common add notification in counter offer", resp);
           }
         });
         let updateCheckoutdata = {
@@ -760,9 +690,7 @@ function createCounter(req, res) {
           bidask_id: parseInt(bid_and_ask_id),
         };
         let respMsg =
-          req.body.type_of_offer == "Accept"
-            ? "Offer accepted Successfully"
-            : "Counter Offer sent successfully";
+          req.body.type_of_offer == "Accept" ? "Offer accepted Successfully" : "Counter Offer sent successfully";
         // console.log('updateCheckoutdata', conditionForCheckout)
         // const findDatainCart = await common_query.findAllData(cartModel, conditionForCheckout).catch(err => {
         //   throw err
@@ -772,31 +700,16 @@ function createCounter(req, res) {
         //     throw err
         //   })
         // }
-        console.log(
-          "counterData&&&&&&&&&&&&&&&&&&",
-          counterDataSaved.success.toJSON()
-        );
+        console.log("counterData&&&&&&&&&&&&&&&&&&", counterDataSaved.success.toJSON());
         if (counterDataSaved.code == 200) {
-          return res.json(
-            Response(constant.statusCode.ok, respMsg, counterDataSaved)
-          );
+          return res.json(Response(constant.statusCode.ok, respMsg, counterDataSaved));
         } else if (counterData.code == 409) {
-          return res.json(
-            Response(
-              constant.statusCode.internalservererror,
-              constant.validateMsg.internalError
-            )
-          );
+          return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
         }
       }
     } catch (err) {
       console.log("erorrrrrr", err);
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   createCounter().then((res) => {});
@@ -818,22 +731,16 @@ group by P.id, i."imageUrl" order by P."productName" limit 12
         ;`;
 
       let popularList = await bookshelf.knex.raw(condition);
-      if (popularList.rows.length > 0) {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            popularList
-          )
-        );
-      } else {
-        return res.json(
-          Response(
-            constant.statusCode.notFound,
-            constant.validateMsg.noRecordFound
-          )
-        );
-      }
+      // if (popularList.rows.length > 0) {
+      return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, popularList));
+      // } else {
+      //   return res.json(
+      //     Response(
+      //       constant.statusCode.notFound,
+      //       constant.validateMsg.noRecordFound
+      //     )
+      //   );
+      // }
     } catch (err) {
       console.log("error in getPopularProduct");
     }
@@ -861,11 +768,7 @@ function editProduct(req, res) {
       id: req.body.id,
     };
 
-    let updateUserData = await common_query.updateRecord(
-      ProductModel,
-      updatedata,
-      condition
-    );
+    let updateUserData = await common_query.updateRecord(ProductModel, updatedata, condition);
     if (updateUserData.code == 200) {
       saveCategoryMapping(req, res);
       let timeStamp = JSON.stringify(Date.now());
@@ -874,13 +777,7 @@ function editProduct(req, res) {
       let extension;
       mkdirp(config.ARTICLEIMAGE).then(async function (data, err) {
         if (err) {
-          return res.json(
-            Response(
-              constant.statusCode.internalservererror,
-              constant.validateMsg.internalError,
-              err
-            )
-          );
+          return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err));
         } else {
           if (req.files) {
             extension = req.files.file.name.split(".");
@@ -893,10 +790,7 @@ function editProduct(req, res) {
               let format = extension[extension.length - 1];
               if (extensionArray.includes(format)) {
                 // const result = await common_query.fileUpload(path, (req.files.file.data));
-                const result = await s3file_upload.uploadProductImage(
-                  req.files.file.data,
-                  db_path
-                );
+                const result = await s3file_upload.uploadProductImage(req.files.file.data, db_path);
                 var updata = {
                   productId: req.body.id,
                   imageUrl: result.url,
@@ -907,65 +801,35 @@ function editProduct(req, res) {
                   id: req.body.imageId,
                 };
                 if (req.body.imageId == "null") {
-                  const updateImage = await common_query.saveRecord(
-                    imageModel,
-                    {
-                      productId: req.body.id,
-                      imageUrl: result.url,
-                      imageId: uuidv4(),
-                      updatedAt: newdate,
-                      createdAt: newdate,
-                      createdById: req.user._id,
-                    }
-                  );
+                  const updateImage = await common_query.saveRecord(imageModel, {
+                    productId: req.body.id,
+                    imageUrl: result.url,
+                    imageId: uuidv4(),
+                    updatedAt: newdate,
+                    createdAt: newdate,
+                    createdById: req.user._id,
+                  });
                   if (updateImage.code == 200) {
                     return res.json(
-                      Response(
-                        constant.statusCode.ok,
-                        constant.messages.categoryFetchedSuccessfully,
-                        updateImage
-                      )
+                      Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage)
                     );
                   } else {
                     console.log("updateImage error");
-                    return res.json(
-                      Response(
-                        constant.statusCode.alreadyExist,
-                        constant.validateMsg.emailAlreadyExist
-                      )
-                    );
+                    return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                   }
                 } else {
-                  const updateImage = await common_query.updateRecord(
-                    imageModel,
-                    updata,
-                    cond
-                  );
+                  const updateImage = await common_query.updateRecord(imageModel, updata, cond);
                   if (updateImage.code == 200) {
                     return res.json(
-                      Response(
-                        constant.statusCode.ok,
-                        constant.messages.categoryFetchedSuccessfully,
-                        updateImage
-                      )
+                      Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage)
                     );
                   } else {
                     console.log("updateImage error");
-                    return res.json(
-                      Response(
-                        constant.statusCode.alreadyExist,
-                        constant.validateMsg.emailAlreadyExist
-                      )
-                    );
+                    return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                   }
                 }
               } else {
-                return res.json(
-                  Response(
-                    constant.statusCode.unauth,
-                    constant.validateMsg.notSupportedType
-                  )
-                );
+                return res.json(Response(constant.statusCode.unauth, constant.validateMsg.notSupportedType));
               }
             }
           }
@@ -973,11 +837,7 @@ function editProduct(req, res) {
       });
     } else {
       return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError,
-          result.req.body
-        )
+        Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)
       );
     }
   }
@@ -987,12 +847,7 @@ function editProduct(req, res) {
 function saveProduct(req, res) {
   async function saveProductMethod() {
     try {
-      const {
-        productName,
-        releaseDate,
-        category_id,
-        subcategory_name,
-      } = req.body;
+      const { productName, releaseDate, category_id, subcategory_name } = req.body;
       let isDuplictate = false;
       let condition = `select * from products where "productName" iLike '${productName}' and "categoryId" = '${category_id}' and "subcategoryId" = '${subcategory_name}' and "isdeleted"=false;`;
       let checkDuplicate = await bookshelf.knex.raw(condition);
@@ -1011,9 +866,7 @@ function saveProduct(req, res) {
         var day = dateObj.getUTCDate();
         var year = dateObj.getUTCFullYear();
         // console.log('releaseDate', releaseDate)
-        var reqReleaseDate = `${moment(new Date(releaseDate))
-          .utc()
-          .format("YYYY-MM-DD")}`;
+        var reqReleaseDate = `${moment(new Date(releaseDate)).utc().format("YYYY-MM-DD")}`;
         // console.log('reqReleaseDate', reqReleaseDate)
 
         // var reqReleaseDate = ''
@@ -1025,15 +878,10 @@ function saveProduct(req, res) {
           categoryId: category_id ? category_id : null,
           releaseDate: reqReleaseDate ? reqReleaseDate : null,
           isdeleted: false,
-          subcategoryId: req.body.subcategory_name
-            ? req.body.subcategory_name
-            : null,
+          subcategoryId: req.body.subcategory_name ? req.body.subcategory_name : null,
           product_id: uuidv4(),
         };
-        let savePrtoductData = await common_query.saveRecord(
-          ProductModel,
-          data
-        );
+        let savePrtoductData = await common_query.saveRecord(ProductModel, data);
         if (savePrtoductData.code == 200) {
           saveCategoryMapping(req, res);
           let timeStamp = JSON.stringify(Date.now());
@@ -1043,11 +891,7 @@ function saveProduct(req, res) {
           mkdirp(config.ARTICLEIMAGE).then(async function (data, err) {
             if (err) {
               return res.json(
-                Response(
-                  constant.statusCode.internalservererror,
-                  constant.validateMsg.internalError,
-                  err
-                )
+                Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err)
               );
             } else {
               if (req.body) {
@@ -1076,27 +920,13 @@ function saveProduct(req, res) {
                   createdAt: newdate,
                   createdById: req.user._id,
                 };
-                const updateImage = await common_query.saveRecord(
-                  imageModel,
-                  imgData
-                );
+                const updateImage = await common_query.saveRecord(imageModel, imgData);
                 if (updateImage.code == 200) {
                   // return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage));
-                  return res.json(
-                    Response(
-                      constant.statusCode.ok,
-                      constant.messages.Addproduct,
-                      savePrtoductData
-                    )
-                  );
+                  return res.json(Response(constant.statusCode.ok, constant.messages.Addproduct, savePrtoductData));
                 } else {
                   console.log("updateImage error");
-                  return res.json(
-                    Response(
-                      constant.statusCode.alreadyExist,
-                      constant.validateMsg.emailAlreadyExist
-                    )
-                  );
+                  return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                 }
                 //
                 // else {
@@ -1108,12 +938,7 @@ function saveProduct(req, res) {
           });
           // return res.json(Response(constant.statusCode.ok, constant.messages.Addproduct, savePrtoductData));
         } else if (savePrtoductData.code == 409) {
-          return res.json(
-            Response(
-              constant.statusCode.alreadyExist,
-              constant.validateMsg.emailAlreadyExist
-            )
-          );
+          return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
         }
       }
     } catch (err) {}
@@ -1130,14 +955,8 @@ function bulkUpload(req, res) {
       let csvOriginalName = req.files.csvfile.name;
       db_path = timeStamp + "_" + csvOriginalName;
 
-      let result_s3 = await s3file_upload.uploadBulkUploadImage(
-        req.files.csvfile.data,
-        db_path
-      );
-      console.log(
-        "resultresultresultresultresult::::::::::::::::::",
-        result_s3
-      );
+      let result_s3 = await s3file_upload.uploadBulkUploadImage(req.files.csvfile.data, db_path);
+      console.log("resultresultresultresultresult::::::::::::::::::", result_s3);
       let streamData;
       let arrStreamData = [];
       let extensionArray = ["csv"];
@@ -1169,26 +988,20 @@ function bulkUpload(req, res) {
               };
               // console.log('condition1', condition1)
               // return true
-              const productExist = await common_query
-                .findAllData(ProductModel, condition1)
-                .catch((err) => {
-                  throw err;
-                });
+              const productExist = await common_query.findAllData(ProductModel, condition1).catch((err) => {
+                throw err;
+              });
 
               console.log("product exists:::::", productExist.data.toJSON());
 
               let productData_exist = productExist.data.toJSON();
-              if (
-                productData_exist.length &&
-                productData_exist[0].productName
-              ) {
+              if (productData_exist.length && productData_exist[0].productName) {
                 const findCat = await common_query.findAllData(categoryModel, {
                   categoryName: data.Category,
                 });
-                const findSubCat = await common_query.findAllData(
-                  subcategoryModel,
-                  { subcategory_name: data.SubCategory }
-                );
+                const findSubCat = await common_query.findAllData(subcategoryModel, {
+                  subcategory_name: data.SubCategory,
+                });
                 let findCatJson = findCat.data.toJSON();
                 let findSubCatJson = findSubCat.data.toJSON();
                 if (findCatJson.length && findSubCatJson.length) {
@@ -1212,18 +1025,11 @@ function bulkUpload(req, res) {
                   subcategoryData.rows.forEach((row) => {
                     subcatobj[row.subcategory_name] = row.id;
                   });
-                  console.log(
-                    "${catobj[data.Category]}",
-                    `${catobj[data.Category]}`
-                  );
+                  console.log("${catobj[data.Category]}", `${catobj[data.Category]}`);
 
-                  let condition = `select * from products where "productName" iLike '${
-                    data.Product_Name
-                  }'
+                  let condition = `select * from products where "productName" iLike '${data.Product_Name}'
                    and "categoryId" = '${catobj[data.Category]}' 
-                   and "subcategoryId" = '${
-                     subcatobj[data.SubCategory]
-                   }' and "isdeleted"=false;`;
+                   and "subcategoryId" = '${subcatobj[data.SubCategory]}' and "isdeleted"=false;`;
                   let checkDuplicate = await bookshelf.knex.raw(condition);
 
                   if (checkDuplicate.rowCount > 0) {
@@ -1236,9 +1042,7 @@ function bulkUpload(req, res) {
                     var day = dateObj.getUTCDate();
                     var year = dateObj.getUTCFullYear();
 
-                    var reqReleaseDate = `${moment(data.ReleaseDate)
-                      .utc()
-                      .format("YYYY-MM-DD")}`;
+                    var reqReleaseDate = `${moment(data.ReleaseDate).utc().format("YYYY-MM-DD")}`;
 
                     newdate = year + "-" + month + "-" + day;
 
@@ -1249,9 +1053,7 @@ function bulkUpload(req, res) {
                       categoryId: catobj ? catobj[data.Category] : null,
                       releaseDate: reqReleaseDate ? reqReleaseDate : null,
                       isdeleted: false,
-                      subcategoryId: subcatobj
-                        ? subcatobj[data.SubCategory]
-                        : null,
+                      subcategoryId: subcatobj ? subcatobj[data.SubCategory] : null,
                       product_id: uuidv4(),
                     };
                     // console.log(data);return;
@@ -1262,11 +1064,7 @@ function bulkUpload(req, res) {
                       code: 409,
                     };
                     if (data && data.isUpdated != "0") {
-                      savePrtoductData = await common_query.updateRecord(
-                        ProductModel,
-                        data2,
-                        pCondiiton
-                      );
+                      savePrtoductData = await common_query.updateRecord(ProductModel, data2, pCondiiton);
                     }
 
                     console.log("save record status", savePrtoductData.code);
@@ -1276,20 +1074,13 @@ function bulkUpload(req, res) {
                       req.body.subcategory_id = subcatobj[data.SubCategory];
                       saveCategoryMapping(req, res);
                       totalRecord++;
-                      console.log(
-                        "total recorddata on save product data 123",
-                        totalRecord
-                      );
+                      console.log("total recorddata on save product data 123", totalRecord);
 
                       console.log("total record 2nd 123", totalRecord);
                     } else if (savePrtoductData.code == 409) {
                       duplicateRecord++;
                       fail++;
-                      console.log(
-                        "duplicate record 3rd",
-                        duplicateRecord,
-                        fail
-                      );
+                      console.log("duplicate record 3rd", duplicateRecord, fail);
                     }
                   }
                 } else {
@@ -1300,10 +1091,9 @@ function bulkUpload(req, res) {
                   categoryName: data.Category,
                 });
 
-                const findSubCat1 = await common_query.findAllData(
-                  subcategoryModel,
-                  { subcategory_name: data.SubCategory }
-                );
+                const findSubCat1 = await common_query.findAllData(subcategoryModel, {
+                  subcategory_name: data.SubCategory,
+                });
 
                 let findCatJson1 = findCat1.data.toJSON();
                 let findSubCatJson1 = findSubCat1.data.toJSON();
@@ -1326,18 +1116,11 @@ function bulkUpload(req, res) {
                   subcategoryData.rows.forEach((row) => {
                     subcatobj[row.subcategory_name] = row.id;
                   });
-                  console.log(
-                    "${catobj[data.Category]}",
-                    `${catobj[data.Category]}`
-                  );
+                  console.log("${catobj[data.Category]}", `${catobj[data.Category]}`);
 
-                  let condition = `select * from products where "productName" iLike '${
-                    data.Product_Name
-                  }'
+                  let condition = `select * from products where "productName" iLike '${data.Product_Name}'
                    and "categoryId" = '${catobj[data.Category]}' 
-                   and "subcategoryId" = '${
-                     subcatobj[data.SubCategory]
-                   }' and "isdeleted"=false;`;
+                   and "subcategoryId" = '${subcatobj[data.SubCategory]}' and "isdeleted"=false;`;
                   let checkDuplicate = await bookshelf.knex.raw(condition);
 
                   if (checkDuplicate.rowCount > 0) {
@@ -1350,9 +1133,7 @@ function bulkUpload(req, res) {
                     var day = dateObj.getUTCDate();
                     var year = dateObj.getUTCFullYear();
 
-                    var reqReleaseDate = `${moment(data.ReleaseDate)
-                      .utc()
-                      .format("YYYY-MM-DD")}`;
+                    var reqReleaseDate = `${moment(data.ReleaseDate).utc().format("YYYY-MM-DD")}`;
 
                     newdate = year + "-" + month + "-" + day;
 
@@ -1363,16 +1144,11 @@ function bulkUpload(req, res) {
                       categoryId: catobj ? catobj[data.Category] : null,
                       releaseDate: reqReleaseDate ? reqReleaseDate : null,
                       isdeleted: false,
-                      subcategoryId: subcatobj
-                        ? subcatobj[data.SubCategory]
-                        : null,
+                      subcategoryId: subcatobj ? subcatobj[data.SubCategory] : null,
                       product_id: uuidv4(),
                     };
                     // console.log(data);return;
-                    let savePrtoductData = await common_query.saveRecord(
-                      ProductModel,
-                      data2
-                    );
+                    let savePrtoductData = await common_query.saveRecord(ProductModel, data2);
                     console.log("save record status", savePrtoductData.code);
 
                     if (savePrtoductData.code == 200) {
@@ -1380,49 +1156,27 @@ function bulkUpload(req, res) {
                       req.body.subcategory_id = subcatobj[data.SubCategory];
                       saveCategoryMapping(req, res);
                       totalRecord++;
-                      console.log(
-                        "total recorddata on save product data",
-                        totalRecord
-                      );
+                      console.log("total recorddata on save product data", totalRecord);
 
                       console.log("total record 2nd", totalRecord);
                     } else if (savePrtoductData.code == 409) {
                       duplicateRecord++;
                       fail++;
-                      console.log(
-                        "duplicate record 3rd",
-                        duplicateRecord,
-                        fail
-                      );
+                      console.log("duplicate record 3rd", duplicateRecord, fail);
                     }
                   }
                   console.log("countDatacountDatacountData", countData);
                   console.log("totalRecordtotalRecord", totalRecord);
-                  console.log(
-                    "duplicateRecordduplicateRecord",
-                    duplicateRecord
-                  );
+                  console.log("duplicateRecordduplicateRecord", duplicateRecord);
                 } else {
                   norecordFound++;
                 }
               }
               if (countData == totalRecord + duplicateRecord + norecordFound) {
-                console.log(
-                  "ops end here now",
-                  countData,
-                  totalRecord,
-                  duplicateRecord,
-                  norecordFound
-                );
+                console.log("ops end here now", countData, totalRecord, duplicateRecord, norecordFound);
                 result_s3["totalRecord"] = totalRecord;
                 result_s3["duplicateRecord"] = duplicateRecord;
-                return res.json(
-                  Response(
-                    constant.statusCode.ok,
-                    constant.messages.bulkUploadSuccessfully,
-                    result_s3
-                  )
-                );
+                return res.json(Response(constant.statusCode.ok, constant.messages.bulkUploadSuccessfully, result_s3));
               }
             })
             .on("end", () => {
@@ -1444,17 +1198,10 @@ function bulkUpload(req, res) {
           //  console.log("result in bulkupload is",result)
         } else {
           console.log("updateCSV error");
-          return res.json(
-            Response(
-              constant.statusCode.alreadyExist,
-              constant.validateMsg.emailAlreadyExist
-            )
-          );
+          return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
         }
       } else {
-        return res.json(
-          Response(constant.statusCode.alreadyExist, "Invalid format")
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, "Invalid format"));
       }
     }
 
@@ -1688,26 +1435,14 @@ function getProductDetails(req, res) {
     let condition = {
       producr_id: producr_id,
     };
-    let getProductDetails = await common_query.findAllData(
-      ProductModel,
-      condition
-    );
+    let getProductDetails = await common_query.findAllData(ProductModel, condition);
     //   console.log(saveUserData);
     if (getProductDetails.code == 200) {
       return res.json(
-        Response(
-          constant.statusCode.ok,
-          constant.messages.productDetailsFetchedSuccessfully,
-          getProductDetails
-        )
+        Response(constant.statusCode.ok, constant.messages.productDetailsFetchedSuccessfully, getProductDetails)
       );
     } else if (getProductDetails.code == 409) {
-      return res.json(
-        Response(
-          constant.statusCode.alreadyExist,
-          constant.validateMsg.emailAlreadyExist
-        )
-      );
+      return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
     }
   }
   getProductDetailsMethod().then((data) => {});
@@ -1724,29 +1459,11 @@ function getProduct(req, res) {
       bookshelf.knex
         .raw(sql)
         .then((data) => {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.recordFetchedSuccessfully,
-              data.rows[0]
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, data.rows[0]));
         })
-        .catch((err) =>
-          res.json(
-            Response(
-              constant.statusCode.notFound,
-              constant.validateMsg.noRecordFound
-            )
-          )
-        );
+        .catch((err) => res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound)));
     } catch (err) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.commonError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError));
     }
   }
   getProductMethod().then((data) => {});
@@ -1784,35 +1501,15 @@ function getAllProducts(req, res) {
       LEFT OUTER JOIN category C on C.id = P."categoryId"
       LEFT OUTER JOIN subcategory S on S.id = P."subcategoryId"
       WHERE ${searchChar ? searchChar : ""} 
-      P.isdeleted=? ORDER BY ${
-        orderQuery ? orderQuery : ""
-      } ${sortingOrder} OFFSET ? LIMIT ?`;
+      P.isdeleted=? ORDER BY ${orderQuery ? orderQuery : ""} ${sortingOrder} OFFSET ? LIMIT ?`;
       bookshelf.knex
         .raw(sql, [isdeleted, offset, limit])
         .then((data) => {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.categoryFetchedSuccessfully,
-              data
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data));
         })
-        .catch((err) =>
-          res.json(
-            Response(
-              constant.statusCode.notFound,
-              constant.validateMsg.noRecordFound
-            )
-          )
-        );
+        .catch((err) => res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound)));
     } catch (err) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.commonError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError));
     }
   }
   getAllProductsMethod().then((data) => {});
@@ -1825,20 +1522,9 @@ function getAllProductsByCategorys(req, res) {
       category_id: category_id,
     });
     if (productList.code == 200) {
-      return res.json(
-        Response(
-          constant.statusCode.ok,
-          constant.messages.categoryFetchedSuccessfully,
-          productList
-        )
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, productList));
     } else if (productList.code == 409) {
-      return res.json(
-        Response(
-          constant.statusCode.alreadyExist,
-          constant.validateMsg.emailAlreadyExist
-        )
-      );
+      return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
     }
   }
   getAllProductsByCategorysMethod().then((data) => {});
@@ -1862,21 +1548,10 @@ function getAllCategorysYears(req, res) {
           years.push(output1.years.match(/\(([^)]+)\)/)[1]);
         });
         console.log("res", years);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            years
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, years));
       })
       .catch(function (err) {
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllCategorysYearsMethod().then(function (params) {});
@@ -1967,26 +1642,12 @@ function deleteProduct(req, res) {
     let condition = {
       id: req.body.id,
     };
-    let updateUserData = await common_query.updateRecord(
-      ProductModel,
-      updatedata,
-      condition
-    );
+    let updateUserData = await common_query.updateRecord(ProductModel, updatedata, condition);
     if (updateUserData.code == 200) {
-      return res.json(
-        Response(
-          constant.statusCode.ok,
-          constant.messages.DeleteSuccess,
-          updateUserData
-        )
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.DeleteSuccess, updateUserData));
     } else {
       return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError,
-          result.req.body
-        )
+        Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)
       );
     }
   }
@@ -2002,13 +1663,7 @@ function updateProductImage(req, res) {
     let extension;
     mkdirp(config.ARTICLEIMAGE).then(async function (data, err) {
       if (err) {
-        return res.json(
-          Response(
-            constant.statusCode.internalservererror,
-            constant.validateMsg.internalError,
-            err
-          )
-        );
+        return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err));
       } else {
         if (req.body) {
           extension = req.files.file.name.split(".");
@@ -2019,34 +1674,20 @@ function updateProductImage(req, res) {
             let extensionArray = ["jpg", "jpeg", "png", "jfif"];
             let format = extension[extension.length - 1];
             if (extensionArray.includes(format)) {
-              const result = await common_query.fileUpload(
-                path,
-                req.files.file.data
-              );
+              const result = await common_query.fileUpload(path, req.files.file.data);
               const updateImage = await common_query.updateRecord(
                 imageModel,
                 { imageUrl: db_path },
                 { productId: producr_id }
               );
             } else {
-              return res.json(
-                Response(
-                  constant.statusCode.unauth,
-                  constant.validateMsg.notSupportedType
-                )
-              );
+              return res.json(Response(constant.statusCode.unauth, constant.validateMsg.notSupportedType));
             }
           }
         }
       }
     });
-    return res.json(
-      Response(
-        constant.statusCode.ok,
-        constant.messages.Addproduct,
-        savePrtoductData
-      )
-    );
+    return res.json(Response(constant.statusCode.ok, constant.messages.Addproduct, savePrtoductData));
   }
   updateProductImageMethod().then(function (params) {});
 }
@@ -2071,13 +1712,7 @@ function getAllCategorysYearstest(req, res, next) {
       .then(function (getDraftListResult) {
         getDraftListResult = getDraftListResult.toJSON();
         //console.log(getDraftListResult)
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.loginSuccess,
-            getDraftListResult
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
       })
       .catch(function (err) {
         console.log(err);
@@ -2090,9 +1725,7 @@ function getAllCategorysYearstest(req, res, next) {
       });
     function _filter(qb) {
       qb.joinRaw(`LEFT JOIN images ON (products.id = images."productId")`);
-      qb.joinRaw(
-        `LEFT JOIN bid_and_ask ON (products.id = bid_and_ask."productId")`
-      );
+      qb.joinRaw(`LEFT JOIN bid_and_ask ON (products.id = bid_and_ask."productId")`);
       //qb.whereRaw(' bid_and_ask.request = ?',['bids'])
       // qb.whereRaw('(MAX(bid_and_ask.amount) AND bid_and_ask =',['bids']);
       // qb.whereRaw(' MAX(bid_and_ask.amount)', [options.providerId]);
@@ -2114,28 +1747,14 @@ LEFT OUTER JOIN bid_and_ask t on p.id = t."productId"
 LEFT OUTER JOIN images i on P.id = i."productId"
 where (P."subcategoryId"= ? AND P."categoryId"=? AND P."isdeleted" = false) 
 group by P.id, i."imageUrl" order by P."productName" ;`;
-    var raw2 = bookshelf.knex.raw(sql, [
-      req.body.subcategory_id,
-      req.body.category_id,
-    ]);
+    var raw2 = bookshelf.knex.raw(sql, [req.body.subcategory_id, req.body.category_id]);
     raw2
       .then(function (result) {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllproductByYearsMethod().then(function (params) {});
@@ -2169,22 +1788,11 @@ function getSearchList(req, res) {
     raw2
       .then(function (result) {
         if (result) {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.searchresultsuccess,
-              result
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.searchresultsuccess, result));
         }
       })
       .catch(function (err) {
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getSearchListMethod().then(function (params) {});
@@ -2217,22 +1825,11 @@ LEFT OUTER JOIN images i on P.id = i."productId"
     raw2
       .then(function (result) {
         //console.log(result);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllNewProductMethod().then(function (params) {});
@@ -2257,22 +1854,11 @@ function getProductById(req, res) {
       var raw2 = bookshelf.knex.raw(sql, [req.body.id]);
       raw2
         .then(function (result) {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.categoryFetchedSuccessfully,
-              result
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
         })
         .catch(function (err) {
           console.log(err);
-          return res.json(
-            Response(
-              constant.statusCode.alreadyExist,
-              constant.validateMsg.emailAlreadyExist
-            )
-          );
+          return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
         });
     }
   }
@@ -2298,22 +1884,11 @@ LEFT OUTER JOIN images i on P.id = i."productId"
     raw2
       .then(function (result) {
         //console.log(result);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllNewProductTodayMethod().then(function (params) {});
@@ -2338,22 +1913,11 @@ LEFT OUTER JOIN images i on P.id = i."productId"
     raw2
       .then(function (result) {
         //console.log(result);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllNewProductTwodaysMethod().then(function (params) {});
@@ -2378,22 +1942,11 @@ LEFT OUTER JOIN images i on P.id = i."productId"
     raw2
       .then(function (result) {
         //console.log(result);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllNewProductThreedaysMethod().then(function (params) {});
@@ -2408,22 +1961,11 @@ function getNewListingProduct(req, res) {
     raw2
       .then(function (result) {
         console.log("varun------------->", result);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getNewListingProductMethod().then(function (params) {});
@@ -2457,18 +1999,10 @@ function saveCategoryMapping(req, res) {
         status: 1,
       };
       try {
-        let saveCategoryData = await common_query.saveRecord(
-          CatSubcatMappingModel,
-          data
-        );
+        let saveCategoryData = await common_query.saveRecord(CatSubcatMappingModel, data);
         console.log("scategory map", saveCategoryData);
       } catch (error) {
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       }
     }
   }
