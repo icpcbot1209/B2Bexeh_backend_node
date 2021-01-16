@@ -1,9 +1,32 @@
-var bookshelf = __rootRequire("app/config/bookshelf");
+var bookshelf = __rootRequire('app/config/bookshelf');
 
 module.exports = {
   getMyOffers,
   getLatestOffers,
+  getOffersByProductId,
 };
+
+async function getOffersByProductId(req, res) {
+  try {
+    let { productId } = req.body;
+    let query = `
+    SELECT o.*, 
+    d.user_name AS dealer_name,
+    o.producttype AS product_type
+    FROM bid_and_ask o
+    LEFT OUTER JOIN users d ON d.id=o."createdbyId"
+    WHERE (
+      o."productId"=${productId}
+    )
+    `;
+
+    let data = await bookshelf.knex.raw(query);
+    res.status(200).json({ data });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
 
 async function getLatestOffers(req, res) {
   try {
@@ -31,7 +54,7 @@ async function getLatestOffers(req, res) {
     res.status(200).json({ data });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Internal error." });
+    res.status(500).json({ message: 'Internal error.' });
   }
 }
 
@@ -44,7 +67,7 @@ async function getMyOffers(req, res) {
     res.status(200).json({ data });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Internal error." });
+    res.status(500).json({ message: 'Internal error.' });
   }
 }
 
@@ -116,10 +139,10 @@ function makeQuery(userId, tag) {
   )
   `;
 
-  if (tag === "active-received") return my_received_active;
-  if (tag === "closed-received") return my_received_closed;
-  if (tag === "active-sent") return my_sent_active;
-  if (tag === "closed-sent") return my_sent_closed;
+  if (tag === 'active-received') return my_received_active;
+  if (tag === 'closed-received') return my_received_closed;
+  if (tag === 'active-sent') return my_sent_active;
+  if (tag === 'closed-sent') return my_sent_closed;
 
   //   !offer.track_no &&
   //     (!offer.bidder_feedback || !offer.seller_feedback) &&
