@@ -11,5 +11,9 @@ module.exports = function (express) {
   const user = require('./controllers/user');
   router.post('/user/getUserById', middlewares, user.getUserById);
   router.post('/user/getTenUsers', middlewares, user.getTenUsers);
+
+  const offer = require('./controllers/offer');
+  router.post('/offer/createOffer', middlewares, offer.createOffer);
+
   return router;
 };
