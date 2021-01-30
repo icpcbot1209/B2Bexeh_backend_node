@@ -1,39 +1,37 @@
-var bookshelf = __rootRequire("app/config/bookshelf");
-var config = __rootRequire("app/config/constant");
-var Joi = require("joi");
-var moment = require("moment");
-var crypto = __rootRequire("app/utils/crypto");
-var loader = __rootRequire("app/api/v1/loader");
-var santize = __rootRequire("app/utils/santize");
-var i18n = require("i18n");
-var _ = require("lodash");
-var __ = require("underscore");
-var text = __rootRequire("app/utils/text");
-var async = require("async");
-var UserModel = loader.loadModel("/user/models/user_models");
-var TxnHistoryModel = loader.loadModel(
-  "/user/models/transaction_history_model"
-);
-var NotificationModel = loader.loadModel("/user/models/notification_models");
-var OrderModel = loader.loadModel("/user/models/order_models");
-var EmailBlastModel = loader.loadModel("/user/models/emailblast_models");
-var CounterModel = loader.loadModel("/product/models/counteroffer_models");
-var WatchListModel = loader.loadModel("/user/models/watchlist_models");
-var imageModel = loader.loadModel("/images/models/image_models");
-var settingModel = require("../../admin_settings/models/admin_setting_models");
-var ChatModel = require("../../chat/models/chat_models");
-var roomModel = require("../../bidsAsks/models/room_models");
-var contactModel = require("../../bidsAsks/models/contact_models");
-var mkdirp = require("mkdirp");
-var config1 = __rootRequire("app/config/config").get("local");
-var s3file_upload = require("../../../../../utils/fileUpload");
+var bookshelf = require('app/config/bookshelf');
+var config = require('app/config/constant');
+var Joi = require('joi');
+var moment = require('moment');
+var crypto = require('app/utils/crypto');
+var loader = require('app/api/v1/loader');
+var santize = require('app/utils/santize');
+var i18n = require('i18n');
+var _ = require('lodash');
+var __ = require('underscore');
+var text = require('app/utils/text');
+var async = require('async');
+var UserModel = loader.loadModel('/user/models/user_models');
+var TxnHistoryModel = loader.loadModel('/user/models/transaction_history_model');
+var NotificationModel = loader.loadModel('/user/models/notification_models');
+var OrderModel = loader.loadModel('/user/models/order_models');
+var EmailBlastModel = loader.loadModel('/user/models/emailblast_models');
+var CounterModel = loader.loadModel('/product/models/counteroffer_models');
+var WatchListModel = loader.loadModel('/user/models/watchlist_models');
+var imageModel = loader.loadModel('/images/models/image_models');
+var settingModel = require('../../admin_settings/models/admin_setting_models');
+var ChatModel = require('../../chat/models/chat_models');
+var roomModel = require('../../bidsAsks/models/room_models');
+var contactModel = require('../../bidsAsks/models/contact_models');
+var mkdirp = require('mkdirp');
+var config1 = require('app/config/config').get('local');
+var s3file_upload = require('../../../../../utils/fileUpload');
 // var AddressModel = loader.loadModel('/address/models/address_models');
-var jwt = require("jsonwebtoken");
+var jwt = require('jsonwebtoken');
 // var MetricesSettingProviderModel = loader.loadModel('/metrices_setting_provider/models/metrices_setting_provider_model');
 // var MetricesSettingModel = loader.loadModel('/metrices_setting/models/metrices_setting_model');
-var constant = require("../../../../../utils/constants");
-var common_query = require("../../../../../utils/commonQuery");
-var Response = require("../../../../../utils/response");
+var constant = require('../../../../../utils/constants');
+var common_query = require('../../../../../utils/commonQuery');
+var Response = require('../../../../../utils/response');
 module.exports = {
   getAcceptOfferByUserId,
   getRecievedOffers,
@@ -71,7 +69,7 @@ function getAcceptOfferByUserIds(req, res) {
 
       if (groupbyBid[0].length > 0) {
         for (let eachobj of groupbyBid[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlbid = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -99,13 +97,13 @@ function getAcceptOfferByUserIds(req, res) {
               result.acceptBid.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
       if (groupbyAsk[0].length > 0) {
         for (let eachobj of groupbyAsk[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlask = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -132,7 +130,7 @@ function getAcceptOfferByUserIds(req, res) {
               result.acceptAsk.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
@@ -151,7 +149,7 @@ function getAcceptOfferByUserIds(req, res) {
         }
       }
 
-      console.log("searchArray no search ***************************");
+      console.log('searchArray no search ***************************');
       let result1 = {
         selling: [],
         buying: [],
@@ -163,7 +161,7 @@ function getAcceptOfferByUserIds(req, res) {
       //and type_of_offer='Accept'
       //and type_of='bid'
 
-      console.log("userid is", req.body.loggedUser);
+      console.log('userid is', req.body.loggedUser);
       // const sData = await common_query.findAllData(CounterModel, { "id": 6318 })
       // console.log('sDatatatatataat', sData.data.toJSON())
       let groupbySellingsql = `select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status
@@ -183,7 +181,7 @@ function getAcceptOfferByUserIds(req, res) {
 
       if (groupbyBuying[0].length > 0) {
         for (let eachobj of groupbyBuying[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlbid = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -214,13 +212,13 @@ function getAcceptOfferByUserIds(req, res) {
               result1.buying.push(data);
             })
             .catch((err) => {
-              console.log("err in buy query", err);
+              console.log('err in buy query', err);
             });
         }
       }
       if (groupbySelling[0].length > 0) {
         for (let eachobj of groupbySelling[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlask = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -250,7 +248,7 @@ function getAcceptOfferByUserIds(req, res) {
               result1.selling.push(data);
             })
             .catch((err) => {
-              console.log("err in sell query", err);
+              console.log('err in sell query', err);
             });
         }
       }
@@ -295,7 +293,7 @@ function getAcceptOfferByUserIds(req, res) {
           result2.counterBid = data;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
       sqlask = `select c.*,
@@ -322,7 +320,7 @@ function getAcceptOfferByUserIds(req, res) {
           result2.counterAsk = data;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
       var sell1 = result2.counterAsk;
@@ -360,7 +358,7 @@ function getAcceptOfferByUserIds(req, res) {
       });
       if (groupbyBid2[0].length > 0) {
         for (let eachobj of groupbyBid2[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlbid = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -388,13 +386,13 @@ function getAcceptOfferByUserIds(req, res) {
               result4.acceptBid.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
       if (groupbyAsk1[0].length > 0) {
         for (let eachobj of groupbyAsk1[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlask = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -421,7 +419,7 @@ function getAcceptOfferByUserIds(req, res) {
               result4.acceptAsk.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
@@ -445,12 +443,10 @@ function getAcceptOfferByUserIds(req, res) {
       result.acceptAsk = temp;
       result.acceptBid = temp1;
 
-      return res.json(
-        Response(constant.statusCode.ok, "Active Offer fetched", result)
-      );
+      return res.json(Response(constant.statusCode.ok, 'Active Offer fetched', result));
       // return res.json(Response(constant.statusCode.ok, "Active Offer fetched", result));
     } catch (err) {
-      console.log("err in getAcceptOfferByUserId");
+      console.log('err in getAcceptOfferByUserId');
     }
   }
   getAcceptOfferByUserIds().then((response) => {});
@@ -489,14 +485,12 @@ function getClosedOfferByUserId(req, res) {
           result = data.rows;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
-      return res.json(
-        Response(constant.statusCode.ok, "Closed Offer fetched", result)
-      );
+      return res.json(Response(constant.statusCode.ok, 'Closed Offer fetched', result));
     } catch (err) {
-      console.log("err in getActiveOfferByUserId");
+      console.log('err in getActiveOfferByUserId');
     }
   }
   getClosedOfferByUserId().then((respond) => {});
@@ -522,7 +516,7 @@ function getRecievedOffers(req, res) {
 
       if (groupbyBid[0].length > 0) {
         for (let eachobj of groupbyBid[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlbid = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -550,7 +544,7 @@ function getRecievedOffers(req, res) {
               result.acceptBid.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
@@ -566,7 +560,7 @@ function getRecievedOffers(req, res) {
         }
       }
 
-      console.log("searchArray no search ***************************");
+      console.log('searchArray no search ***************************');
       let result1 = {
         selling: [],
         buying: [],
@@ -578,7 +572,7 @@ function getRecievedOffers(req, res) {
       //and type_of_offer='Accept'
       //and type_of='bid'
 
-      console.log("userid is", req.body.loggedUser);
+      console.log('userid is', req.body.loggedUser);
 
       let groupbyBuyingsql = `select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status
         from counters where bidder_id=${req.body.loggedUser} and (status='accept' or status='decline') and is_deleted='false' 
@@ -590,7 +584,7 @@ function getRecievedOffers(req, res) {
 
       if (groupbyBuying[0].length > 0) {
         for (let eachobj of groupbyBuying[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlbid = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -621,7 +615,7 @@ function getRecievedOffers(req, res) {
               result1.buying.push(data);
             })
             .catch((err) => {
-              console.log("err in buy query", err);
+              console.log('err in buy query', err);
             });
         }
       }
@@ -659,7 +653,7 @@ function getRecievedOffers(req, res) {
           result2.counterBid = data;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
       var buy1 = result2.counterBid;
@@ -735,7 +729,7 @@ function getRecievedOffers(req, res) {
 
       if (groupbyAsk[0].length > 0) {
         for (let eachobj of groupbyAsk[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlask = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -762,7 +756,7 @@ function getRecievedOffers(req, res) {
               result.acceptAsk.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
@@ -778,12 +772,10 @@ function getRecievedOffers(req, res) {
       result.acceptAsk = temp;
       result.acceptBid = temp1;
 
-      return res.json(
-        Response(constant.statusCode.ok, "Active Offer fetched", result)
-      );
+      return res.json(Response(constant.statusCode.ok, 'Active Offer fetched', result));
       // return res.json(Response(constant.statusCode.ok, "Active Offer fetched", result));
     } catch (err) {
-      console.log("err in getRecievedOffers");
+      console.log('err in getRecievedOffers');
     }
   }
   getRecievedOffers().then((response) => {});
@@ -848,7 +840,7 @@ function getSentOffers(req, res) {
       //             }
       //         }
 
-      console.log("searchArray no search ***************************");
+      console.log('searchArray no search ***************************');
       let result1 = {
         selling: [],
         buying: [],
@@ -865,7 +857,7 @@ function getSentOffers(req, res) {
 
       if (groupbySelling[0].length > 0) {
         for (let eachobj of groupbySelling[0]) {
-          let create1 = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create1 = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlask = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -895,7 +887,7 @@ function getSentOffers(req, res) {
               result1.selling.push(data);
             })
             .catch((err) => {
-              console.log("err in sell query", err);
+              console.log('err in sell query', err);
             });
         }
       }
@@ -932,7 +924,7 @@ function getSentOffers(req, res) {
           result2.counterAsk = data;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
       var sell1 = result2.counterAsk;
@@ -957,7 +949,7 @@ function getSentOffers(req, res) {
       });
       if (groupbyAsk1[0].length > 0) {
         for (let eachobj of groupbyAsk1[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlask = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -984,7 +976,7 @@ function getSentOffers(req, res) {
               result4.acceptAsk.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
@@ -1012,7 +1004,7 @@ function getSentOffers(req, res) {
       });
       if (groupbyBid2[0].length > 0) {
         for (let eachobj of groupbyBid2[0]) {
-          let create = `${moment(eachobj.created_at).format("YYYY-MM-DD")}`;
+          let create = `${moment(eachobj.created_at).format('YYYY-MM-DD')}`;
           sqlbid = `select c.*,
                     i."imageUrl",
                     a.type,a."producttype",
@@ -1040,7 +1032,7 @@ function getSentOffers(req, res) {
               result4.acceptBid.push(data);
             })
             .catch((err) => {
-              console.log("err");
+              console.log('err');
             });
         }
       }
@@ -1058,12 +1050,10 @@ function getSentOffers(req, res) {
       result.acceptAsk = temp;
       result.acceptBid = temp1;
 
-      return res.json(
-        Response(constant.statusCode.ok, "Active Offer fetched", result)
-      );
+      return res.json(Response(constant.statusCode.ok, 'Active Offer fetched', result));
       // return res.json(Response(constant.statusCode.ok, "Active Offer fetched", result));
     } catch (err) {
-      console.log("err in getSentOffers");
+      console.log('err in getSentOffers');
     }
   }
   getSentOffers().then((response) => {});
@@ -1100,14 +1090,12 @@ function getAcceptOfferByUserId(req, res) {
           result = data.rows;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
-      return res.json(
-        Response(constant.statusCode.ok, "Closed Offer fetched", result)
-      );
+      return res.json(Response(constant.statusCode.ok, 'Closed Offer fetched', result));
     } catch (err) {
-      console.log("err in getActiveOfferByUserId");
+      console.log('err in getActiveOfferByUserId');
     }
   }
   getAcceptOfferByUserId().then((respond) => {});
@@ -1136,29 +1124,11 @@ function getCounters(req, res) {
       bookshelf.knex
         .raw(sql)
         .then((data) => {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.recordFetchedSuccessfully,
-              data.rows
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, data.rows));
         })
-        .catch((err) =>
-          res.json(
-            Response(
-              constant.statusCode.notFound,
-              constant.validateMsg.noRecordFound
-            )
-          )
-        );
+        .catch((err) => res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound)));
     } catch (err) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.commonError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError));
     }
   }
   getCounters().then((data) => {});
@@ -1166,11 +1136,8 @@ function getCounters(req, res) {
 
 async function getUsers(req, res) {
   const user_id = req.body.user_id;
-  const user_ids = await bookshelf
-    .knex("rooms")
-    .where({ sender_id: user_id })
-    .orWhere({ receiver_id: user_id });
-  const allUsers = await bookshelf.knex("users");
+  const user_ids = await bookshelf.knex('rooms').where({ sender_id: user_id }).orWhere({ receiver_id: user_id });
+  const allUsers = await bookshelf.knex('users');
   const ids = [];
   var filteredUsers = [];
   user_ids.forEach((user_id) => {
@@ -1191,17 +1158,12 @@ async function getUsers(req, res) {
   });
 
   for (i = 0; i < filteredUsers.length; i++) {
-    var last_message = [{ body: "" }];
-    const message_id = await bookshelf
-      .knex("messages")
-      .where({ room_id: filteredUsers[i].room_id })
-      .max("id");
+    var last_message = [{ body: '' }];
+    const message_id = await bookshelf.knex('messages').where({ room_id: filteredUsers[i].room_id }).max('id');
     if (message_id[0].max !== null) {
-      last_message = await bookshelf
-        .knex("messages")
-        .where({ id: message_id[0].max });
-      if (last_message[0].body.split("")[0] === "{") {
-        last_message[0].body = "Counter Offer";
+      last_message = await bookshelf.knex('messages').where({ id: message_id[0].max });
+      if (last_message[0].body.split('')[0] === '{') {
+        last_message[0].body = 'Counter Offer';
       }
     }
     filteredUsers[i].last_message = last_message[0].body;
@@ -1244,14 +1206,12 @@ function getChatOfferList(req, res) {
           result = data.rows;
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
-      return res.json(
-        Response(constant.statusCode.ok, "Closed Offer fetched", result)
-      );
+      return res.json(Response(constant.statusCode.ok, 'Closed Offer fetched', result));
     } catch (err) {
-      console.log("err in getActiveOfferByUserId");
+      console.log('err in getActiveOfferByUserId');
     }
   }
   getChatOfferList().then((respond) => {});

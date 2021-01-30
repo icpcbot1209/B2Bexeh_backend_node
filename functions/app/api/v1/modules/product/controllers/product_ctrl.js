@@ -1,48 +1,48 @@
-var bookshelf = __rootRequire("app/config/bookshelf");
-var config = __rootRequire("app/config/config").get("local");
-var Joi = require("joi");
-var moment = require("moment");
-var crypto = __rootRequire("app/utils/crypto");
-var loader = __rootRequire("app/api/v1/loader");
-var santize = __rootRequire("app/utils/santize");
-var i18n = require("i18n");
-var fs = require("fs");
-var _ = require("lodash");
-var __ = require("underscore");
-var text = __rootRequire("app/utils/text");
-var utility = require("../../../../../utils/utility");
-var async = require("async");
-var mkdirp = require("mkdirp");
-var ProductModel = loader.loadModel("/product/models/product_models");
-var cartModel = require("../../cart/models/cart_model");
-var CounterModel = loader.loadModel("/product/models/counteroffer_models");
-var CatSubcatMappingModel = loader.loadModel("/product/models/catsubcatmapping_models");
-var imageModel = loader.loadModel("/images/models/image_models");
-var categoryModel = require("../../category/models/category_models");
-var subcategoryModel = require("../../subcategory/models/subcategory_models");
-var ChatOfferModels = require("../../chat/models/chat_offer_models");
-var chatModels = require("../../chat/models/chat_models");
+var bookshelf = require('app/config/bookshelf');
+var config = require('app/config/config').get('local');
+var Joi = require('joi');
+var moment = require('moment');
+var crypto = require('app/utils/crypto');
+var loader = require('app/api/v1/loader');
+var santize = require('app/utils/santize');
+var i18n = require('i18n');
+var fs = require('fs');
+var _ = require('lodash');
+var __ = require('underscore');
+var text = require('app/utils/text');
+var utility = require('../../../../../utils/utility');
+var async = require('async');
+var mkdirp = require('mkdirp');
+var ProductModel = loader.loadModel('/product/models/product_models');
+var cartModel = require('../../cart/models/cart_model');
+var CounterModel = loader.loadModel('/product/models/counteroffer_models');
+var CatSubcatMappingModel = loader.loadModel('/product/models/catsubcatmapping_models');
+var imageModel = loader.loadModel('/images/models/image_models');
+var categoryModel = require('../../category/models/category_models');
+var subcategoryModel = require('../../subcategory/models/subcategory_models');
+var ChatOfferModels = require('../../chat/models/chat_offer_models');
+var chatModels = require('../../chat/models/chat_models');
 // var AddressModel = loader.loadModel('/address/models/address_models');
-var roomModel = require("../../bidsAsks/models/room_models");
-var contactModel = require("../../bidsAsks/models/contact_models");
-var chatModel = require("../../chat/models/chat_models");
-var jwt = require("jsonwebtoken");
+var roomModel = require('../../bidsAsks/models/room_models');
+var contactModel = require('../../bidsAsks/models/contact_models');
+var chatModel = require('../../chat/models/chat_models');
+var jwt = require('jsonwebtoken');
 // var MetricesSettingProviderModel = loader.loadModel('/metrices_setting_provider/models/metrices_setting_provider_model');
 // var MetricesSettingModel = loader.loadModel('/metrices_setting/models/metrices_setting_model');
-var constant = require("../../../../../utils/constants");
-var common_query = require("../../../../../utils/commonQuery");
-var Response = require("../../../../../utils/response");
-var s3file_upload = require("../../../../../utils/fileUpload");
+var constant = require('../../../../../utils/constants');
+var common_query = require('../../../../../utils/commonQuery');
+var Response = require('../../../../../utils/response');
+var s3file_upload = require('../../../../../utils/fileUpload');
 // var config = require('../../../../../config/config');
 // require('')
 // const uuidv4 = require('uuid/v4');
-const { v4: uuidv4 } = require("uuid");
-const csv = require("csv-parser");
-const formidable = require("formidable");
-const randomize = require("randomatic");
-var Config = __rootRequire("app/config/config").get("default");
+const { v4: uuidv4 } = require('uuid');
+const csv = require('csv-parser');
+const formidable = require('formidable');
+const randomize = require('randomatic');
+var Config = require('app/config/config').get('default');
 
-var AWS = require("aws-sdk");
+var AWS = require('aws-sdk');
 AWS.config.update({
   accessKeyId: Config.AWS_KEY.ACCESS_KEY_ID, // fetched from Config file based on the environment
   secretAccessKey: Config.AWS_KEY.SECRET_ACCESS_KEY,
@@ -78,21 +78,21 @@ function exportcsvBulkUpload(req, res) {
   async function async_fun() {
     try {
       const condition = {
-        "products.isdeleted": false,
+        'products.isdeleted': false,
       };
 
       new ProductModel()
         .where(condition)
         .query(_filter)
-        .where({ "category.isdeleted": false, "subcategory.isdeleted": false })
+        .where({ 'category.isdeleted': false, 'subcategory.isdeleted': false })
         .query(function (qb) {
           qb.columns([
-            "products.id as Product_No",
-            "products.productName as Product_Name",
-            "category.categoryName as Category",
-            "subcategory.subcategory_name as SubCategory",
+            'products.id as Product_No',
+            'products.productName as Product_Name',
+            'category.categoryName as Category',
+            'subcategory.subcategory_name as SubCategory',
           ]);
-          qb.orderBy("products.id", "ASC");
+          qb.orderBy('products.id', 'ASC');
         })
         .fetchAll()
         .then((productData) => {
@@ -118,7 +118,7 @@ function exportcsvBulkUpload(req, res) {
       //   })
       // })
     } catch (error) {
-      console.log("errorerrorerror", error);
+      console.log('errorerrorerror', error);
       return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
 
@@ -160,16 +160,15 @@ function createCounter(req, res) {
       if (req.body.is_private === true) {
         is_private = true;
       }
-      var transaction_number = "";
+      var transaction_number = '';
       /**
        * 1) check contact in if contact present if yes take the contact id
        *
        *
        */
-      console.log("req req+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", req.body);
       let reqType = Array.isArray(req.body);
       if (reqType) {
-        console.log("array");
+        console.log('array');
         let orderArr = [];
         async.forEachOf(
           req.body,
@@ -195,7 +194,7 @@ function createCounter(req, res) {
               // profile_image_url,
               // productName,
             } = value;
-            transaction_number = randomize("A", 2);
+            transaction_number = randomize('A', 2);
             var val = Math.floor(1000 + Math.random() * 9000);
             transaction_number = transaction_number + val.toString();
             let data = {
@@ -221,144 +220,15 @@ function createCounter(req, res) {
               // productName
             };
 
-            // let contact_id_for_chat;
-            // if (value.seller_id && value.bidder_id) {
-            //   let data = {
-            //     user_id1: value.seller_id,
-            //     user_id2: value.bidder_id,
-            //     status: true,
-            //     created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //     updated_at: `${moment().utc().format('YYYY-MM-DD')}`
-            //   };
-
-            //   let inRoom = await bookshelf.knex.raw(`select
-            //    "id" from rooms where ("user_id1"= '${value.seller_id}' and "user_id2"= '${value.bidder_id}') or
-            //    ("user_id2"= '${value.seller_id}' and "user_id1"= '${value.bidder_id}');`);
-            //   // console.log('offer_idoffer_id', req.body.offer_id)
-            //   if (inRoom.rowCount) {
-            //     console.log('2')
-            //     let rmCondition = {
-            //       id: inRoom.rows[0].id
-            //     }
-
-            //     console.log('5')
-
-            //     const update_rm = {
-            //       status: true,
-            //       updated_at: `${moment().utc().format('YYYY-MM-DD')}`
-            //     }
-            //     await common_query.updateRecord(roomModel, update_rm, rmCondition).catch(err => {
-            //       throw err
-            //     })
-
-            //     const contact_chat_condition = {
-            //       room_id: inRoom.rows[0].id,
-            //       my_id: value.seller_id,
-            //       my_contact_id: value.bidder_id
-            //     }
-            //     console.log('data contact_chat_condition id in line number 225', contact_chat_condition)
-
-            //     let contactInfo = await common_query.findAllData(contactModel,
-            //       contact_chat_condition).catch(err => {
-            //         throw err
-            //       })
-            //     console.log('data contact id in line number 230', contactInfo.data.toJSON())
-
-            //     if ((contactInfo.data.toJSON()).length) {
-            //       contactInfo = contactInfo.data.toJSON()
-            //       contact_id_for_chat = contactInfo[0].id;
-            //       console.log('data contact id in line number 234', contact_id_for_chat)
-            //     } else {
-            //       let data = {
-            //         my_id: req.body.seller_id,
-            //         my_contact_id: req.body.bidder_id,
-            //         isblocked: false,
-            //         created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //         updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //         room_id: inRoom.rows[0].id,
-            //       };
-            //       await common_query.saveRecord(contactModel, data).catch(err => {
-            //         throw err
-            //       }).then(async data => {
-            //         console.log('datata in line number 335');
-            //         const contact_chat_condition = {
-            //           room_id: inRoom.rows[0].id,
-            //           my_id: value.seller_id,
-            //           my_contact_id: value.bidder_id
-            //         }
-            //         console.log('datata in line number 343', contact_chat_condition);
-
-            //         let contactInfo = await common_query.findAllData(contactModel,
-            //           contact_chat_condition).catch(err => {
-            //             throw err
-            //           })
-            //         console.log('datata in line number 349', contactInfo.data);
-
-            //         contactInfo = contactInfo.data.toJSON()
-            //         contact_id_for_chat = contactInfo[0].id;
-            //         console.log('data contact id in line number 348', contact_id_for_chat)
-            //       });
-            //     }
-            //   } else {
-            //     console.log('datadatadatadata', data);
-            //     let saveRoom = await common_query.saveRecord(roomModel, data).catch(err => {
-            //       throw err
-            //     });
-            //     console.log('saveRoomsaveRoom', saveRoom.success.toJSON());
-            //     let resp = saveRoom.success.toJSON()
-            //     if (saveRoom) {
-            //       let data = {
-            //         my_id: value.seller_id,
-            //         my_contact_id: value.bidder_id,
-            //         isblocked: false,
-            //         created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //         updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //         room_id: resp.id
-            //       };
-            //       let c2 = await common_query.saveRecord(contactModel, data).catch(err => {
-            //         throw err
-            //       }).then(async data1 => {
-            //         console.log('datata in line number 335');
-            //         const contact_chat_condition = {
-            //           room_id: resp.id,
-            //           my_id: value.seller_id,
-            //           my_contact_id: value.bidder_id
-            //         }
-
-            //         let contactInfo = await common_query.findAllData(contactModel,
-            //           contact_chat_condition).catch(err => {
-            //             throw err
-            //           })
-            //         contactInfo = contactInfo.data.toJSON()
-            //         contact_id_for_chat = contactInfo[0].id;
-            //         console.log('data contact id in line number 348', contact_id_for_chat)
-
-            //       });
-            //       let data1 = {
-            //         my_contact_id: value.seller_id,
-            //         my_id: value.bidder_id,
-            //         isblocked: false,
-            //         created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //         updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
-            //         room_id: resp.id
-            //       };
-            //       let c1 = await common_query.saveRecord(contactModel, data1).catch(err => {
-            //         throw err
-            //       });
-
-            //     }
-            //   }
-
-            // }
             var expiredAt = moment()
               .utc()
-              .add(expiry_day * 24, "hours")
+              .add(expiry_day * 24, 'hours')
               .format();
-            var createdAt = `${moment().utc().format("YYYY-MM-DD")}`;
+            var createdAt = `${moment().utc().format('YYYY-MM-DD')}`;
             data.expiry_date = expiredAt;
             data.created_at = createdAt;
             data.total_amount = qty * amount;
-            console.log("data---", data);
+            console.log('data---', data);
 
             let counterData = await common_query.saveRecord(CounterModel, data).catch((err) => {
               throw err;
@@ -399,217 +269,56 @@ function createCounter(req, res) {
               userinfo: userinfo,
             };
             orderArr.push(finlArr);
-            if (data.type_of == "ask") {
+            if (data.type_of == 'ask') {
               var notObj = {
                 created_by: data.bidder_id,
-                content: "sent you an offer",
+                content: 'sent you an offer',
                 destnation_user_id: data.seller_id,
               };
             } else {
               var notObj = {
                 created_by: data.seller_id,
-                content: "sent you an offer",
+                content: 'sent you an offer',
                 destnation_user_id: data.bidder_id,
               };
             }
 
             utility.addNotification(notObj, function (err, resp) {
               if (err) {
-                console.log("Error adding notification", err);
+                console.log('Error adding notification', err);
               } else {
-                console.log("response after calling common add notification", resp);
+                console.log('response after calling common add notification', resp);
               }
             });
-            console.log("counterData---", counterData);
+            console.log('counterData---', counterData);
 
             let updateCheckoutdata = {
               isCheckout: true,
-              updatedAt: `${moment().utc().format("YYYY-MM-DD")}`,
+              updatedAt: `${moment().utc().format('YYYY-MM-DD')}`,
             };
             let conditionForCheckout = {
               user_id: parseInt(value.seller_id),
               bidask_id: parseInt(value.bid_and_ask_id),
             };
-            console.log("conditionForCheckout---", conditionForCheckout);
+            console.log('conditionForCheckout---', conditionForCheckout);
             const findDatainCart = await common_query.findAllData(cartModel, conditionForCheckout).catch((err) => {
               throw err;
             });
             if (findDatainCart.data.length) {
-              let test = await common_query
-                .updateRecord(cartModel, updateCheckoutdata, conditionForCheckout)
-                .catch((err) => {
-                  throw err;
-                });
+              let test = await common_query.updateRecord(cartModel, updateCheckoutdata, conditionForCheckout).catch((err) => {
+                throw err;
+              });
             }
-
-            // console.log('testttttttttttttttttttt', test)
           },
           function (err) {
             if (err) throw err;
-            else return res.json(Response(constant.statusCode.ok, "Offer sent successfully", orderArr));
-            // configs is now a map of JSON data
-            // doSomethingWith(configs);
+            else return res.json(Response(constant.statusCode.ok, 'Offer sent successfully', orderArr));
           }
         );
       } else {
-        console.log("not array");
-        // let contact_id_for_chat;
-        // if (req.body.seller_id && req.body.bidder_id) {
-        //   let data = {
-        //     user_id1: req.body.seller_id,
-        //     user_id2: req.body.bidder_id,
-        //     status: true,
-        //     created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //     updated_at: `${moment().utc().format('YYYY-MM-DD')}`
-        //   };
+        console.log('not array');
 
-        //   // const room_user = await common_query.findAllData(roomModel, rm_condition).catch(err => {
-        //   //   throw err
-        //   // })
-        //   let inRoom = await bookshelf.knex.raw(`select
-        //    "id" from rooms where ("user_id1"= '${req.body.seller_id}' and "user_id2"= '${req.body.bidder_id}') or
-        //    ("user_id2"= '${req.body.seller_id}' and "user_id1"= '${req.body.bidder_id}');`);
-        //   // console.log('offer_idoffer_id', req.body.offer_id)
-        //   if (inRoom.rowCount) {
-        //     console.log('2')
-        //     let rmCondition = {
-        //       id: inRoom.rows[0].id
-        //     }
-
-        //     console.log('5')
-
-        //     const update_rm = {
-        //       status: true,
-        //       updated_at: `${moment().utc().format('YYYY-MM-DD')}`
-        //     }
-        //     await common_query.updateRecord(roomModel, update_rm, rmCondition).catch(err => {
-        //       throw err
-        //     })
-
-        //     const contact_chat_condition = {
-        //       room_id: inRoom.rows[0].id,
-        //       my_id: req.body.seller_id,
-        //       my_contact_id: req.body.bidder_id
-        //     }
-        //     console.log('data contact_chat_condition id in line number 312', contact_chat_condition)
-
-        //     let contactInfo = await common_query.findAllData(contactModel,
-        //       contact_chat_condition).catch(err => {
-        //         throw err
-        //       })
-        //     console.log('data contact id in line number 317', contactInfo.data.toJSON())
-
-        //     if ((contactInfo.data.toJSON()).length) {
-        //       contactInfo = contactInfo.data.toJSON()
-        //       contact_id_for_chat = contactInfo[0].id;
-        //       console.log('data contact id in line number 318', contact_id_for_chat)
-        //     } else {
-        //       let data = {
-        //         my_id: req.body.seller_id,
-        //         my_contact_id: req.body.bidder_id,
-        //         isblocked: false,
-        //         created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         room_id: inRoom.rows[0].id,
-        //       };
-        //       await common_query.saveRecord(contactModel, data).catch(err => {
-        //         throw err
-        //       }).then(async data => {
-        //         console.log('datata in line number 335');
-        //         const contact_chat_condition = {
-        //           room_id: inRoom.rows[0].id,
-        //           my_id: req.body.seller_id,
-        //           my_contact_id: req.body.bidder_id
-        //         }
-        //         console.log('datata in line number 343', contact_chat_condition);
-
-        //         let contactInfo = await common_query.findAllData(contactModel,
-        //           contact_chat_condition).catch(err => {
-        //             throw err
-        //           })
-        //         console.log('datata in line number 349', contactInfo.data);
-
-        //         contactInfo = contactInfo.data.toJSON()
-        //         contact_id_for_chat = contactInfo[0].id;
-        //         console.log('data contact id in line number 348', contact_id_for_chat)
-        //       });
-        //     }
-        //     // const chatData = {
-        //     //   my_id: req.body.seller_id,
-        //     //   room_id: parseInt(inRoom.rows[0].id),
-        //     //   contact_id: req.body.bidder_id,
-        //     //   message: { msg: '.' },
-        //     //   type: 'text',
-        //     //   date_to_group: `${moment().utc().format('YYYY-MM-DD')}`,
-        //     //   created_at: `${moment().utc().format('YYYY-MM-DD HH:mm:ss')}`,
-        //     //   updated_at: `${moment().utc().format('YYYY-MM-DD HH:mm:ss')}`,
-        //     //   isdelete: false
-        //     // }
-        //     // let chatD = await common_query.saveRecord(chatModels, chatData)
-
-        //   } else {
-        //     console.log('datadatadatadata', data);
-        //     let saveRoom = await common_query.saveRecord(roomModel, data).catch(err => {
-        //       throw err
-        //     });
-        //     console.log('saveRoomsaveRoom', saveRoom.success.toJSON());
-        //     let resp = saveRoom.success.toJSON()
-        //     if (saveRoom) {
-        //       let data = {
-        //         my_id: req.body.seller_id,
-        //         my_contact_id: req.body.bidder_id,
-        //         isblocked: false,
-        //         created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         room_id: resp.id
-        //       };
-        //       let c2 = await common_query.saveRecord(contactModel, data).catch(err => {
-        //         throw err
-        //       }).then(async data => {
-        //         console.log('datata in line number 335');
-        //         const contact_chat_condition = {
-        //           room_id: resp.id,
-        //           my_id: req.body.seller_id,
-        //           my_contact_id: req.body.bidder_id
-        //         }
-
-        //         let contactInfo = await common_query.findAllData(contactModel,
-        //           contact_chat_condition).catch(err => {
-        //             throw err
-        //           })
-        //         contactInfo = contactInfo.data.toJSON()
-        //         contact_id_for_chat = contactInfo[0].id;
-        //         console.log('data contact id in line number 348', contact_id_for_chat)
-        //         // const chatData = {
-        //         //   my_id: req.body.seller_id,
-        //         //   room_id: parseInt(resp.id),
-        //         //   contact_id: req.body.bidder_id,
-        //         //   message: { msg: '.' },
-        //         //   type: 'text',
-        //         //   date_to_group: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         //   created_at: `${moment().utc().format('YYYY-MM-DD HH:mm:ss')}`,
-        //         //   updated_at: `${moment().utc().format('YYYY-MM-DD HH:mm:ss')}`,
-        //         //   isdelete: false
-        //         // }
-        //         // let chatD = await common_query.saveRecord(chatModels, chatData)
-        //       });
-        //       let data1 = {
-        //         my_contact_id: req.body.seller_id,
-        //         my_id: req.body.bidder_id,
-        //         isblocked: false,
-        //         created_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
-        //         room_id: resp.id
-        //       };
-        //       let c1 = await common_query.saveRecord(contactModel, data1).catch(err => {
-        //         throw err
-        //       });
-
-        //     }
-        //   }
-
-        // }
-        transaction_number = randomize("A", 2);
+        transaction_number = randomize('A', 2);
         var val = Math.floor(1000 + Math.random() * 9000);
         transaction_number = transaction_number + val.toString();
         const {
@@ -650,47 +359,46 @@ function createCounter(req, res) {
 
         var expiredAt = moment()
           .utc()
-          .add(expiry_day * 24, "hours")
+          .add(expiry_day * 24, 'hours')
           .format();
-        var createdAt = `${moment().utc().format("YYYY-MM-DD")}`;
+        var createdAt = `${moment().utc().format('YYYY-MM-DD')}`;
         data.expiry_date = expiredAt;
         data.created_at = createdAt;
         data.total_amount = qty * amount;
-        console.log("data in counter offer is!!!!!!!!!!!!!!!!!!", data);
+        console.log('data in counter offer is!!!!!!!!!!!!!!!!!!', data);
         const counterDataSaved = await common_query.saveRecord(CounterModel, data);
-        console.log("counterData!!!!!!!!!!!!!!!!!!!!!", counterDataSaved.success.toJSON());
+        console.log('counterData!!!!!!!!!!!!!!!!!!!!!', counterDataSaved.success.toJSON());
 
-        if (data.type_of == "ask") {
+        if (data.type_of == 'ask') {
           var notObj = {
             created_by: data.bidder_id,
-            content: "sent you an offer",
+            content: 'sent you an offer',
             destnation_user_id: data.seller_id,
           };
         } else {
           var notObj = {
             created_by: data.seller_id,
-            content: "sent you an offer",
+            content: 'sent you an offer',
             destnation_user_id: data.bidder_id,
           };
         }
 
         utility.addNotification(notObj, function (err, resp) {
           if (err) {
-            console.log("Error adding notification in counter offer", err);
+            console.log('Error adding notification in counter offer', err);
           } else {
-            console.log("response after calling common add notification in counter offer", resp);
+            console.log('response after calling common add notification in counter offer', resp);
           }
         });
         let updateCheckoutdata = {
           isCheckout: true,
-          updatedAt: `${moment().utc().format("YYYY-MM-DD")}`,
+          updatedAt: `${moment().utc().format('YYYY-MM-DD')}`,
         };
         let conditionForCheckout = {
           user_id: parseInt(seller_id),
           bidask_id: parseInt(bid_and_ask_id),
         };
-        let respMsg =
-          req.body.type_of_offer == "Accept" ? "Offer accepted Successfully" : "Counter Offer sent successfully";
+        let respMsg = req.body.type_of_offer == 'Accept' ? 'Offer accepted Successfully' : 'Counter Offer sent successfully';
         // console.log('updateCheckoutdata', conditionForCheckout)
         // const findDatainCart = await common_query.findAllData(cartModel, conditionForCheckout).catch(err => {
         //   throw err
@@ -700,7 +408,7 @@ function createCounter(req, res) {
         //     throw err
         //   })
         // }
-        console.log("counterData&&&&&&&&&&&&&&&&&&", counterDataSaved.success.toJSON());
+        console.log('counterData&&&&&&&&&&&&&&&&&&', counterDataSaved.success.toJSON());
         if (counterDataSaved.code == 200) {
           return res.json(Response(constant.statusCode.ok, respMsg, counterDataSaved));
         } else if (counterData.code == 409) {
@@ -708,7 +416,7 @@ function createCounter(req, res) {
         }
       }
     } catch (err) {
-      console.log("erorrrrrr", err);
+      console.log('erorrrrrr', err);
       return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
@@ -742,7 +450,7 @@ group by P.id, i."imageUrl" order by P."productName" limit 12
       //   );
       // }
     } catch (err) {
-      console.log("error in getPopularProduct");
+      console.log('error in getPopularProduct');
     }
   }
 
@@ -756,7 +464,7 @@ function editProduct(req, res) {
     var day = dateObj.getUTCDate();
     var year = dateObj.getUTCFullYear();
 
-    var newdate = year + "-" + month + "-" + day;
+    var newdate = year + '-' + month + '-' + day;
 
     let updatedata = {
       productName: req.body.productName ? req.body.productName : null,
@@ -772,21 +480,21 @@ function editProduct(req, res) {
     if (updateUserData.code == 200) {
       saveCategoryMapping(req, res);
       let timeStamp = JSON.stringify(Date.now());
-      let db_path = "";
-      let path = "";
+      let db_path = '';
+      let path = '';
       let extension;
       mkdirp(config.ARTICLEIMAGE).then(async function (data, err) {
         if (err) {
           return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err));
         } else {
           if (req.files) {
-            extension = req.files.file.name.split(".");
+            extension = req.files.file.name.split('.');
             let imgOriginalName = req.files.file.name;
-            path = config.PRODUCTIMAGE + timeStamp + "_" + imgOriginalName;
-            console.log("path---->", req.body);
-            db_path = timeStamp + "_" + imgOriginalName;
-            if (path != "") {
-              let extensionArray = ["jpg", "jpeg", "png", "jfif"];
+            path = config.PRODUCTIMAGE + timeStamp + '_' + imgOriginalName;
+            console.log('path---->', req.body);
+            db_path = timeStamp + '_' + imgOriginalName;
+            if (path != '') {
+              let extensionArray = ['jpg', 'jpeg', 'png', 'jfif'];
               let format = extension[extension.length - 1];
               if (extensionArray.includes(format)) {
                 // const result = await common_query.fileUpload(path, (req.files.file.data));
@@ -800,7 +508,7 @@ function editProduct(req, res) {
                 let cond = {
                   id: req.body.imageId,
                 };
-                if (req.body.imageId == "null") {
+                if (req.body.imageId == 'null') {
                   const updateImage = await common_query.saveRecord(imageModel, {
                     productId: req.body.id,
                     imageUrl: result.url,
@@ -810,21 +518,17 @@ function editProduct(req, res) {
                     createdById: req.user._id,
                   });
                   if (updateImage.code == 200) {
-                    return res.json(
-                      Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage)
-                    );
+                    return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage));
                   } else {
-                    console.log("updateImage error");
+                    console.log('updateImage error');
                     return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                   }
                 } else {
                   const updateImage = await common_query.updateRecord(imageModel, updata, cond);
                   if (updateImage.code == 200) {
-                    return res.json(
-                      Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage)
-                    );
+                    return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage));
                   } else {
-                    console.log("updateImage error");
+                    console.log('updateImage error');
                     return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                   }
                 }
@@ -836,9 +540,7 @@ function editProduct(req, res) {
         }
       });
     } else {
-      return res.json(
-        Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body));
     }
   }
   editProductMethod().then((data) => {});
@@ -853,12 +555,7 @@ function saveProduct(req, res) {
       let checkDuplicate = await bookshelf.knex.raw(condition);
       if (checkDuplicate.rowCount > 0) {
         isDuplictate = true;
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            "Product Name is already present with the given category and sub-category"
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, 'Product Name is already present with the given category and sub-category'));
       }
       if (!isDuplictate) {
         var dateObj = new Date();
@@ -866,11 +563,11 @@ function saveProduct(req, res) {
         var day = dateObj.getUTCDate();
         var year = dateObj.getUTCFullYear();
         // console.log('releaseDate', releaseDate)
-        var reqReleaseDate = `${moment(new Date(releaseDate)).utc().format("YYYY-MM-DD")}`;
+        var reqReleaseDate = `${moment(new Date(releaseDate)).utc().format('YYYY-MM-DD')}`;
         // console.log('reqReleaseDate', reqReleaseDate)
 
         // var reqReleaseDate = ''
-        newdate = year + "-" + month + "-" + day;
+        newdate = year + '-' + month + '-' + day;
         let data = {
           productName: productName ? productName : null,
           createdById: req.user._id,
@@ -885,33 +582,29 @@ function saveProduct(req, res) {
         if (savePrtoductData.code == 200) {
           saveCategoryMapping(req, res);
           let timeStamp = JSON.stringify(Date.now());
-          let db_path = "";
-          let path = "";
+          let db_path = '';
+          let path = '';
           let extension;
           mkdirp(config.ARTICLEIMAGE).then(async function (data, err) {
             if (err) {
-              return res.json(
-                Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err)
-              );
+              return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err));
             } else {
               if (req.body) {
-                extension = req.files.file.name.split(".");
+                extension = req.files.file.name.split('.');
                 let imgOriginalName = req.files.file.name;
-                path = config.PRODUCTIMAGE + timeStamp + "_" + imgOriginalName;
-                db_path = timeStamp + "_" + imgOriginalName;
-                let s3filename = timeStamp + "_" + extension[0] + ".jpg";
+                path = config.PRODUCTIMAGE + timeStamp + '_' + imgOriginalName;
+                db_path = timeStamp + '_' + imgOriginalName;
+                let s3filename = timeStamp + '_' + extension[0] + '.jpg';
                 // if (path != '') {
-                let extensionArray = ["jpg", "jpeg", "png", "jfif"];
+                let extensionArray = ['jpg', 'jpeg', 'png', 'jfif'];
                 let format = extension[extension.length - 1];
                 // if (extensionArray.includes(format)) {
                 // const result = await common_query.fileUpload(path, (req.files.file.data));
-                const s3Upload = await s3file_upload
-                  .uploadProductImage(req.files.file.data, s3filename)
-                  .catch((err) => {
-                    throw err;
-                  });
+                const s3Upload = await s3file_upload.uploadProductImage(req.files.file.data, s3filename).catch((err) => {
+                  throw err;
+                });
 
-                console.log("s3Upload", s3Upload);
+                console.log('s3Upload', s3Upload);
                 const imgData = {
                   productId: savePrtoductData.success.id,
                   imageUrl: s3Upload.url,
@@ -925,7 +618,7 @@ function saveProduct(req, res) {
                   // return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, updateImage));
                   return res.json(Response(constant.statusCode.ok, constant.messages.Addproduct, savePrtoductData));
                 } else {
-                  console.log("updateImage error");
+                  console.log('updateImage error');
                   return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                 }
                 //
@@ -948,18 +641,18 @@ function saveProduct(req, res) {
 
 function bulkUpload(req, res) {
   async function bulkUploadMethod() {
-    console.log("req.files:::::::::::::::::::::::", req.files);
+    console.log('req.files:::::::::::::::::::::::', req.files);
     if (req.files) {
       let timeStamp = JSON.stringify(Date.now());
-      extension = req.files.csvfile.name.split(".");
+      extension = req.files.csvfile.name.split('.');
       let csvOriginalName = req.files.csvfile.name;
-      db_path = timeStamp + "_" + csvOriginalName;
+      db_path = timeStamp + '_' + csvOriginalName;
 
       let result_s3 = await s3file_upload.uploadBulkUploadImage(req.files.csvfile.data, db_path);
-      console.log("resultresultresultresultresult::::::::::::::::::", result_s3);
+      console.log('resultresultresultresultresult::::::::::::::::::', result_s3);
       let streamData;
       let arrStreamData = [];
-      let extensionArray = ["csv"];
+      let extensionArray = ['csv'];
       let format = extension[extension.length - 1];
       if (extensionArray.includes(format)) {
         // const result = await common_query.fileUpload(path, (req.files.csvfile.data));
@@ -978,9 +671,9 @@ function bulkUpload(req, res) {
           s3.getObject(params)
             .createReadStream(result_s3.url)
             .pipe(csv())
-            .on("data", async (data) => {
+            .on('data', async (data) => {
               countData++;
-              console.log("sream data is", data);
+              console.log('sream data is', data);
               streamData = data;
               arrStreamData.push(streamData);
               const condition1 = {
@@ -992,7 +685,7 @@ function bulkUpload(req, res) {
                 throw err;
               });
 
-              console.log("product exists:::::", productExist.data.toJSON());
+              console.log('product exists:::::', productExist.data.toJSON());
 
               let productData_exist = productExist.data.toJSON();
               if (productData_exist.length && productData_exist[0].productName) {
@@ -1008,12 +701,8 @@ function bulkUpload(req, res) {
                   let isDuplictate = false;
                   let catobj = {};
                   let subcatobj = {};
-                  let categoryData = await bookshelf.knex.raw(
-                    `select "categoryName", "id" from category where isdeleted=false;`
-                  );
-                  let subcategoryData = await bookshelf.knex.raw(
-                    `select "subcategory_name", "id" from subcategory where isdeleted=false;`
-                  );
+                  let categoryData = await bookshelf.knex.raw(`select "categoryName", "id" from category where isdeleted=false;`);
+                  let subcategoryData = await bookshelf.knex.raw(`select "subcategory_name", "id" from subcategory where isdeleted=false;`);
 
                   // console.log('categoryData',categoryData)
                   // console.log('subcategoryData',subcategoryData)
@@ -1025,7 +714,7 @@ function bulkUpload(req, res) {
                   subcategoryData.rows.forEach((row) => {
                     subcatobj[row.subcategory_name] = row.id;
                   });
-                  console.log("${catobj[data.Category]}", `${catobj[data.Category]}`);
+                  console.log('${catobj[data.Category]}', `${catobj[data.Category]}`);
 
                   let condition = `select * from products where "productName" iLike '${data.Product_Name}'
                    and "categoryId" = '${catobj[data.Category]}' 
@@ -1035,16 +724,16 @@ function bulkUpload(req, res) {
                   if (checkDuplicate.rowCount > 0) {
                     isDuplictate = true;
                     duplicateRecord++;
-                    console.log("duplicate in if 1st", duplicateRecord);
+                    console.log('duplicate in if 1st', duplicateRecord);
                   } else {
                     var dateObj = new Date();
                     var month = dateObj.getUTCMonth() + 1; //months from 1-12
                     var day = dateObj.getUTCDate();
                     var year = dateObj.getUTCFullYear();
 
-                    var reqReleaseDate = `${moment(data.ReleaseDate).utc().format("YYYY-MM-DD")}`;
+                    var reqReleaseDate = `${moment(data.ReleaseDate).utc().format('YYYY-MM-DD')}`;
 
-                    newdate = year + "-" + month + "-" + day;
+                    newdate = year + '-' + month + '-' + day;
 
                     let data2 = {
                       productName: data.Product_Name ? data.Product_Name : null,
@@ -1063,24 +752,24 @@ function bulkUpload(req, res) {
                     let savePrtoductData = {
                       code: 409,
                     };
-                    if (data && data.isUpdated != "0") {
+                    if (data && data.isUpdated != '0') {
                       savePrtoductData = await common_query.updateRecord(ProductModel, data2, pCondiiton);
                     }
 
-                    console.log("save record status", savePrtoductData.code);
+                    console.log('save record status', savePrtoductData.code);
 
                     if (savePrtoductData.code == 200) {
                       req.body.category_id = catobj[data.Category];
                       req.body.subcategory_id = subcatobj[data.SubCategory];
                       saveCategoryMapping(req, res);
                       totalRecord++;
-                      console.log("total recorddata on save product data 123", totalRecord);
+                      console.log('total recorddata on save product data 123', totalRecord);
 
-                      console.log("total record 2nd 123", totalRecord);
+                      console.log('total record 2nd 123', totalRecord);
                     } else if (savePrtoductData.code == 409) {
                       duplicateRecord++;
                       fail++;
-                      console.log("duplicate record 3rd", duplicateRecord, fail);
+                      console.log('duplicate record 3rd', duplicateRecord, fail);
                     }
                   }
                 } else {
@@ -1102,12 +791,8 @@ function bulkUpload(req, res) {
                   let isDuplictate = false;
                   let catobj = {};
                   let subcatobj = {};
-                  let categoryData = await bookshelf.knex.raw(
-                    `select "categoryName", "id" from category where isdeleted=false;`
-                  );
-                  let subcategoryData = await bookshelf.knex.raw(
-                    `select "subcategory_name", "id" from subcategory where isdeleted=false;`
-                  );
+                  let categoryData = await bookshelf.knex.raw(`select "categoryName", "id" from category where isdeleted=false;`);
+                  let subcategoryData = await bookshelf.knex.raw(`select "subcategory_name", "id" from subcategory where isdeleted=false;`);
 
                   categoryData.rows.forEach((row) => {
                     catobj[row.categoryName] = row.id;
@@ -1116,7 +801,7 @@ function bulkUpload(req, res) {
                   subcategoryData.rows.forEach((row) => {
                     subcatobj[row.subcategory_name] = row.id;
                   });
-                  console.log("${catobj[data.Category]}", `${catobj[data.Category]}`);
+                  console.log('${catobj[data.Category]}', `${catobj[data.Category]}`);
 
                   let condition = `select * from products where "productName" iLike '${data.Product_Name}'
                    and "categoryId" = '${catobj[data.Category]}' 
@@ -1126,16 +811,16 @@ function bulkUpload(req, res) {
                   if (checkDuplicate.rowCount > 0) {
                     isDuplictate = true;
                     duplicateRecord++;
-                    console.log("duplicate in if 1st", duplicateRecord);
+                    console.log('duplicate in if 1st', duplicateRecord);
                   } else {
                     var dateObj = new Date();
                     var month = dateObj.getUTCMonth() + 1; //months from 1-12
                     var day = dateObj.getUTCDate();
                     var year = dateObj.getUTCFullYear();
 
-                    var reqReleaseDate = `${moment(data.ReleaseDate).utc().format("YYYY-MM-DD")}`;
+                    var reqReleaseDate = `${moment(data.ReleaseDate).utc().format('YYYY-MM-DD')}`;
 
-                    newdate = year + "-" + month + "-" + day;
+                    newdate = year + '-' + month + '-' + day;
 
                     let data2 = {
                       productName: data.Product_Name ? data.Product_Name : null,
@@ -1149,59 +834,59 @@ function bulkUpload(req, res) {
                     };
                     // console.log(data);return;
                     let savePrtoductData = await common_query.saveRecord(ProductModel, data2);
-                    console.log("save record status", savePrtoductData.code);
+                    console.log('save record status', savePrtoductData.code);
 
                     if (savePrtoductData.code == 200) {
                       req.body.category_id = catobj[data.Category];
                       req.body.subcategory_id = subcatobj[data.SubCategory];
                       saveCategoryMapping(req, res);
                       totalRecord++;
-                      console.log("total recorddata on save product data", totalRecord);
+                      console.log('total recorddata on save product data', totalRecord);
 
-                      console.log("total record 2nd", totalRecord);
+                      console.log('total record 2nd', totalRecord);
                     } else if (savePrtoductData.code == 409) {
                       duplicateRecord++;
                       fail++;
-                      console.log("duplicate record 3rd", duplicateRecord, fail);
+                      console.log('duplicate record 3rd', duplicateRecord, fail);
                     }
                   }
-                  console.log("countDatacountDatacountData", countData);
-                  console.log("totalRecordtotalRecord", totalRecord);
-                  console.log("duplicateRecordduplicateRecord", duplicateRecord);
+                  console.log('countDatacountDatacountData', countData);
+                  console.log('totalRecordtotalRecord', totalRecord);
+                  console.log('duplicateRecordduplicateRecord', duplicateRecord);
                 } else {
                   norecordFound++;
                 }
               }
               if (countData == totalRecord + duplicateRecord + norecordFound) {
-                console.log("ops end here now", countData, totalRecord, duplicateRecord, norecordFound);
-                result_s3["totalRecord"] = totalRecord;
-                result_s3["duplicateRecord"] = duplicateRecord;
+                console.log('ops end here now', countData, totalRecord, duplicateRecord, norecordFound);
+                result_s3['totalRecord'] = totalRecord;
+                result_s3['duplicateRecord'] = duplicateRecord;
                 return res.json(Response(constant.statusCode.ok, constant.messages.bulkUploadSuccessfully, result_s3));
               }
             })
-            .on("end", () => {
-              console.log(result_s3.url, "end on call");
+            .on('end', () => {
+              console.log(result_s3.url, 'end on call');
 
               // return res.json(Response(constant.statusCode.ok, constant.messages.bulkUploadSuccessfully, result));
             })
-            .on("finish", () => {
-              console.log("streamdatatatatataat", arrStreamData);
+            .on('finish', () => {
+              console.log('streamdatatatatataat', arrStreamData);
 
-              console.log("rstream finish");
+              console.log('rstream finish');
             })
-            .on("close", () => {
-              console.log("rstream close");
+            .on('close', () => {
+              console.log('rstream close');
             });
 
           // console.log("totalRecord------------>", arrStreamData);
           //  console.log("duplicateRecord------------>",duplicateRecord);
           //  console.log("result in bulkupload is",result)
         } else {
-          console.log("updateCSV error");
+          console.log('updateCSV error');
           return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
         }
       } else {
-        return res.json(Response(constant.statusCode.alreadyExist, "Invalid format"));
+        return res.json(Response(constant.statusCode.alreadyExist, 'Invalid format'));
       }
     }
 
@@ -1438,9 +1123,7 @@ function getProductDetails(req, res) {
     let getProductDetails = await common_query.findAllData(ProductModel, condition);
     //   console.log(saveUserData);
     if (getProductDetails.code == 200) {
-      return res.json(
-        Response(constant.statusCode.ok, constant.messages.productDetailsFetchedSuccessfully, getProductDetails)
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.productDetailsFetchedSuccessfully, getProductDetails));
     } else if (getProductDetails.code == 409) {
       return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
     }
@@ -1484,11 +1167,11 @@ function getAllProducts(req, res) {
         LIKE '%${req.body.searchChar}%') and `;
       }
 
-      let columnName = req.body.columnName || "productName";
-      let sortingOrder = req.body.sortingOrder || "ASC";
-      if (req.body.columnName == "categoryName") {
+      let columnName = req.body.columnName || 'productName';
+      let sortingOrder = req.body.sortingOrder || 'ASC';
+      if (req.body.columnName == 'categoryName') {
         orderQuery = `C."categoryName"`;
-      } else if (req.body.columnName == "subcategoryName") {
+      } else if (req.body.columnName == 'subcategoryName') {
         orderQuery = `S."subcategory_name"`;
       } else {
         orderQuery = `P."${columnName}"`;
@@ -1500,8 +1183,8 @@ function getAllProducts(req, res) {
       LEFT OUTER JOIN images I on P.id = I."productId"
       LEFT OUTER JOIN category C on C.id = P."categoryId"
       LEFT OUTER JOIN subcategory S on S.id = P."subcategoryId"
-      WHERE ${searchChar ? searchChar : ""} 
-      P.isdeleted=? ORDER BY ${orderQuery ? orderQuery : ""} ${sortingOrder} OFFSET ? LIMIT ?`;
+      WHERE ${searchChar ? searchChar : ''} 
+      P.isdeleted=? ORDER BY ${orderQuery ? orderQuery : ''} ${sortingOrder} OFFSET ? LIMIT ?`;
       bookshelf.knex
         .raw(sql, [isdeleted, offset, limit])
         .then((data) => {
@@ -1547,7 +1230,7 @@ function getAllCategorysYears(req, res) {
           let output1 = JSON.parse(output);
           years.push(output1.years.match(/\(([^)]+)\)/)[1]);
         });
-        console.log("res", years);
+        console.log('res', years);
         return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, years));
       })
       .catch(function (err) {
@@ -1646,9 +1329,7 @@ function deleteProduct(req, res) {
     if (updateUserData.code == 200) {
       return res.json(Response(constant.statusCode.ok, constant.messages.DeleteSuccess, updateUserData));
     } else {
-      return res.json(
-        Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body));
     }
   }
   deleteProductMethod().then((data) => {});
@@ -1658,28 +1339,24 @@ function updateProductImage(req, res) {
   async function updateProductImageMethod() {
     let timeStamp = JSON.stringify(Date.now());
     let { producr_id } = req.body;
-    let db_path = "";
-    let path = "";
+    let db_path = '';
+    let path = '';
     let extension;
     mkdirp(config.ARTICLEIMAGE).then(async function (data, err) {
       if (err) {
         return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err));
       } else {
         if (req.body) {
-          extension = req.files.file.name.split(".");
+          extension = req.files.file.name.split('.');
           let imgOriginalName = req.files.file.name;
-          path = config.PRODUCTIMAGE + timeStamp + "_" + imgOriginalName;
-          db_path = timeStamp + "_" + imgOriginalName;
-          if (path != "") {
-            let extensionArray = ["jpg", "jpeg", "png", "jfif"];
+          path = config.PRODUCTIMAGE + timeStamp + '_' + imgOriginalName;
+          db_path = timeStamp + '_' + imgOriginalName;
+          if (path != '') {
+            let extensionArray = ['jpg', 'jpeg', 'png', 'jfif'];
             let format = extension[extension.length - 1];
             if (extensionArray.includes(format)) {
               const result = await common_query.fileUpload(path, req.files.file.data);
-              const updateImage = await common_query.updateRecord(
-                imageModel,
-                { imageUrl: db_path },
-                { productId: producr_id }
-              );
+              const updateImage = await common_query.updateRecord(imageModel, { imageUrl: db_path }, { productId: producr_id });
             } else {
               return res.json(Response(constant.statusCode.unauth, constant.validateMsg.notSupportedType));
             }
@@ -1693,7 +1370,7 @@ function updateProductImage(req, res) {
 }
 
 function getAllCategorysYearstest(req, res, next) {
-  console.log("in method");
+  console.log('in method');
   async function userdetailsMethod() {
     // var pageSize, limit, offset
     // let options = santize.escape(req.body.params);
@@ -1706,7 +1383,7 @@ function getAllCategorysYearstest(req, res, next) {
       .where(conditions)
       .query(_filter)
       .query(function (qb) {
-        qb.columns(["products.*", "images.imageUrl", "bid_and_ask.amount"]);
+        qb.columns(['products.*', 'images.imageUrl', 'bid_and_ask.amount']);
       })
       .fetchAll()
       .then(function (getDraftListResult) {
@@ -1720,7 +1397,7 @@ function getAllCategorysYearstest(req, res, next) {
         return res.json({
           status: config.statusCode.error,
           data: [],
-          message: i18n.__("INTERNAL_ERROR"),
+          message: i18n.__('INTERNAL_ERROR'),
         });
       });
     function _filter(qb) {
@@ -1960,7 +1637,7 @@ function getNewListingProduct(req, res) {
     var raw2 = bookshelf.knex.raw(sql, []);
     raw2
       .then(function (result) {
-        console.log("varun------------->", result);
+        console.log('varun------------->', result);
         return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
@@ -1979,7 +1656,7 @@ function saveCategoryMapping(req, res) {
     let condition = `select * from cat_subcat_mapping where "category_id"='${category_id}' and "subcategory_id"='${subcategory_id}';`;
     //console.log('query:--------->',condition);return;
     let checkDuplicate = await bookshelf.knex.raw(condition);
-    console.log("scat map duplicate check");
+    console.log('scat map duplicate check');
     if (checkDuplicate.rowCount > 0) {
       isDuplictate = true;
     }
@@ -1989,7 +1666,7 @@ function saveCategoryMapping(req, res) {
       var day = dateObj.getUTCDate();
       var year = dateObj.getUTCFullYear();
 
-      newdate = year + "-" + month + "-" + day;
+      newdate = year + '-' + month + '-' + day;
 
       let data = {
         category_id: category_id ? category_id : null,
@@ -2000,7 +1677,7 @@ function saveCategoryMapping(req, res) {
       };
       try {
         let saveCategoryData = await common_query.saveRecord(CatSubcatMappingModel, data);
-        console.log("scategory map", saveCategoryData);
+        console.log('scategory map', saveCategoryData);
       } catch (error) {
         return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       }

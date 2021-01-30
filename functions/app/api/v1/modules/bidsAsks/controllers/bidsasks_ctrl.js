@@ -1,34 +1,34 @@
-var bookshelf = __rootRequire("app/config/bookshelf");
-var config = __rootRequire("app/config/constant");
-var Joi = require("joi");
-var moment = require("moment");
-var crypto = __rootRequire("app/utils/crypto");
-var loader = __rootRequire("app/api/v1/loader");
-var santize = __rootRequire("app/utils/santize");
-var i18n = require("i18n");
-var _ = require("lodash");
-var __ = require("underscore");
-var text = __rootRequire("app/utils/text");
-var async = require("async");
-var bidsasksModel = loader.loadModel("/bidsAsks/models/bidsasks_models");
-var UserModel = loader.loadModel("/user/models/user_models");
-var imageModel = loader.loadModel("/images/models/image_models");
-var roomModel = require("../models/room_models");
-var contactModel = require("../models/contact_models");
-var chatModel = require("../../chat/models/chat_models");
-var ChatofferModel = require("../../chat/models/chat_offer_models");
-var common_query = require("../../../../../utils/commonQuery");
-var Response = require("../../../../../utils/response");
-var constant = require("../../../../../utils/constants");
-var s3file_upload = require("../../../../../utils/fileUpload");
-const uuidv4 = require("uuid/v4");
-const randomize = require("randomatic");
+var bookshelf = require('app/config/bookshelf');
+var config = require('app/config/constant');
+var Joi = require('joi');
+var moment = require('moment');
+var crypto = require('app/utils/crypto');
+var loader = require('app/api/v1/loader');
+var santize = require('app/utils/santize');
+var i18n = require('i18n');
+var _ = require('lodash');
+var __ = require('underscore');
+var text = require('app/utils/text');
+var async = require('async');
+var bidsasksModel = loader.loadModel('/bidsAsks/models/bidsasks_models');
+var UserModel = loader.loadModel('/user/models/user_models');
+var imageModel = loader.loadModel('/images/models/image_models');
+var roomModel = require('../models/room_models');
+var contactModel = require('../models/contact_models');
+var chatModel = require('../../chat/models/chat_models');
+var ChatofferModel = require('../../chat/models/chat_offer_models');
+var common_query = require('../../../../../utils/commonQuery');
+var Response = require('../../../../../utils/response');
+var constant = require('../../../../../utils/constants');
+var s3file_upload = require('../../../../../utils/fileUpload');
+const uuidv4 = require('uuid/v4');
+const randomize = require('randomatic');
 
-const csv = require("csv-parser");
-const formidable = require("formidable");
-var Config = __rootRequire("app/config/config").get("default");
+const csv = require('csv-parser');
+const formidable = require('formidable');
+var Config = require('app/config/config').get('default');
 
-var AWS = require("aws-sdk");
+var AWS = require('aws-sdk');
 AWS.config.update({
   accessKeyId: Config.AWS_KEY.ACCESS_KEY_ID, // fetched from Config file based on the environment
   secretAccessKey: Config.AWS_KEY.SECRET_ACCESS_KEY,
@@ -82,7 +82,7 @@ async function saveCounterHistory(req, res) {
       is_responder: req.body.is_responder,
       counter_id: req.body.counter_id,
     };
-    await bookshelf.knex("counter_history").insert(history);
+    await bookshelf.knex('counter_history').insert(history);
     return res.json({
       history,
     });
@@ -97,7 +97,7 @@ async function getCounterHistory(req, res) {
   try {
     const counter_id = req.body.counter_id;
     const history = await bookshelf
-      .knex("counter_history")
+      .knex('counter_history')
       .where({ counter_id })
       .orderBy('id', 'desc')
       .then((history) => history);
@@ -131,29 +131,11 @@ function updateBidAndAsk(req, res) {
         .raw(sql)
         .then((data) => {
           console.log(data);
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.recordFetchedSuccessfully,
-              data.rows
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, data.rows));
         })
-        .catch((err) =>
-          res.json(
-            Response(
-              constant.statusCode.notFound,
-              constant.validateMsg.noRecordFound
-            )
-          )
-        );
+        .catch((err) => res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound)));
     } catch (err) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.commonError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError));
     }
   }
   updateBidAndAsk().then((data) => {});
@@ -167,28 +149,25 @@ function listOfferForChat(req, res) {
         /**
          * find the contact id
          */
-        console.log("c_conditionc_condition", req.body.my_own_id);
+        console.log('c_conditionc_condition', req.body.my_own_id);
 
         const c_condition = {
           my_id: req.body.my_own_id,
           my_contact_id: req.body.userid_of_my_contact,
         };
-        console.log("c_conditionc_condition", c_condition);
+        console.log('c_conditionc_condition', c_condition);
 
-        let getContactId = await common_query.findAllData(
-          contactModel,
-          c_condition
-        );
+        let getContactId = await common_query.findAllData(contactModel, c_condition);
 
-        console.log("getContactId", getContactId.data.toJSON());
+        console.log('getContactId', getContactId.data.toJSON());
 
         getContactId = getContactId.data.toJSON();
         const condition = {
-          "chat_offer.contact_id": getContactId[0].id,
+          'chat_offer.contact_id': getContactId[0].id,
           // "cart.isDeleted": false
           // "cart.isCheckout": false
         };
-        console.log("condition", getContactId[0].id);
+        console.log('condition', getContactId[0].id);
         new ChatofferModel()
           .where(condition)
           .query(_filter)
@@ -196,46 +175,40 @@ function listOfferForChat(req, res) {
           .query(_filter2)
           .query(function (qb) {
             qb.columns([
-              "chat_offer.id as co_id",
-              "chat_offer.offer_id as co_offer_id",
-              "chat_offer.contact_id as co_contact_id",
-              "my.first_name as my_firstname",
-              "my.last_name as my_lastname",
-              "my.profile_image_url as my_profile_image",
-              "other.first_name as other_firstname",
-              "other.last_name as other_lastname",
-              "other.term_shipping",
-              "other.additional_term",
-              "other.shipping_address",
-              "other.profile_image_url as other_profile_image",
-              "products.productName",
-              "images.imageUrl",
-              "bid_and_ask.*",
-              "counter.expiry_date as c_expiry_date",
-              "counter.type_of as c_type",
-              "counter.type_of_offer as c_type_of_offer",
-              "counter.payment_time as c_payment_time ",
-              "counter.expiry_day as c_expiry_day",
-              "counter.product_id as c_product_id",
-              "counter.payment_method as c_payment_method",
-              "counter.qty as c_qty",
-              "counter.amount as c_amount",
-              "counter.total_amount as c_total_amount",
-              "counter.note as c_note",
-              "counter.track_no as c_track_no",
+              'chat_offer.id as co_id',
+              'chat_offer.offer_id as co_offer_id',
+              'chat_offer.contact_id as co_contact_id',
+              'my.first_name as my_firstname',
+              'my.last_name as my_lastname',
+              'my.profile_image_url as my_profile_image',
+              'other.first_name as other_firstname',
+              'other.last_name as other_lastname',
+              'other.term_shipping',
+              'other.additional_term',
+              'other.shipping_address',
+              'other.profile_image_url as other_profile_image',
+              'products.productName',
+              'images.imageUrl',
+              'bid_and_ask.*',
+              'counter.expiry_date as c_expiry_date',
+              'counter.type_of as c_type',
+              'counter.type_of_offer as c_type_of_offer',
+              'counter.payment_time as c_payment_time ',
+              'counter.expiry_day as c_expiry_day',
+              'counter.product_id as c_product_id',
+              'counter.payment_method as c_payment_method',
+              'counter.qty as c_qty',
+              'counter.amount as c_amount',
+              'counter.total_amount as c_total_amount',
+              'counter.note as c_note',
+              'counter.track_no as c_track_no',
             ]);
-            qb.orderBy("bid_and_ask.amount", "ASC");
+            qb.orderBy('bid_and_ask.amount', 'ASC');
           })
           .fetchAll()
           .then(function (chatofferlist) {
-            console.log("chatofferlistchatofferlist", chatofferlist.toJSON());
-            return res.json(
-              Response(
-                constant.statusCode.ok,
-                constant.messages.dataFetchedSuccess,
-                chatofferlist
-              )
-            );
+            console.log('chatofferlistchatofferlist', chatofferlist.toJSON());
+            return res.json(Response(constant.statusCode.ok, constant.messages.dataFetchedSuccess, chatofferlist));
           })
           .catch(function (err) {
             console.log(err);
@@ -243,7 +216,7 @@ function listOfferForChat(req, res) {
             res.json({
               status: config.statusCode.error,
               data: [],
-              message: i18n.__("INTERNAL_ERROR"),
+              message: i18n.__('INTERNAL_ERROR'),
             });
           });
       }
@@ -251,29 +224,17 @@ function listOfferForChat(req, res) {
 
     function _filter(qb) {
       // qb.joinRaw(`LEFT JOIN users ON (cart."user_id" = users.id)`);
-      qb.joinRaw(
-        `LEFT JOIN contacts ON (chat_offer."contact_id" = contacts.id)`
-      );
-      qb.joinRaw(
-        `LEFT JOIN counters as counter ON (chat_offer."offer_id" = counter.id)`
-      );
+      qb.joinRaw(`LEFT JOIN contacts ON (chat_offer."contact_id" = contacts.id)`);
+      qb.joinRaw(`LEFT JOIN counters as counter ON (chat_offer."offer_id" = counter.id)`);
     }
     function _filter1(qb) {
-      qb.joinRaw(
-        `LEFT JOIN bid_and_ask ON (counter."bid_and_ask_id" = bid_and_ask.id)`
-      );
-      qb.joinRaw(
-        `LEFT JOIN users as other ON (contacts."my_contact_id" = other.id)`
-      );
+      qb.joinRaw(`LEFT JOIN bid_and_ask ON (counter."bid_and_ask_id" = bid_and_ask.id)`);
+      qb.joinRaw(`LEFT JOIN users as other ON (contacts."my_contact_id" = other.id)`);
       qb.joinRaw(`LEFT JOIN users as my ON (contacts."my_id" = my.id)`);
     }
     function _filter2(qb) {
-      qb.joinRaw(
-        `LEFT JOIN products ON (bid_and_ask."productId" = products.id)`
-      );
-      qb.joinRaw(
-        `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-      );
+      qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products.id)`);
+      qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
     }
   }
   async_fun();
@@ -286,12 +247,7 @@ function getofferfromchat(req, res) {
     try {
       if (req.body.sellerid && req.body.bidderid) {
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.validation,
-            constant.messages.invalid_data
-          )
-        );
+        return res.json(Response(constant.statusCode.validation, constant.messages.invalid_data));
       }
     } catch (error) {}
   }
@@ -320,36 +276,20 @@ function searchUserList(req, res) {
         U1.id=${req.body.my_id}
         LEFT JOIN users as U2 ON 
         U2.id!=${req.body.my_id}
-WHERE ${searchChar ? searchChar : ""} order by U2.first_name, U2.last_name`;
+WHERE ${searchChar ? searchChar : ''} order by U2.first_name, U2.last_name`;
 
         bookshelf.knex
           .raw(sql)
           .then((data) => {
-            console.log("User list search Data: ", data.rows);
-            return res.json(
-              Response(
-                constant.statusCode.ok,
-                constant.messages.categoryFetchedSuccessfully,
-                data.rows
-              )
-            );
+            console.log('User list search Data: ', data.rows);
+            return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data.rows));
           })
-          .catch((err) => console.log("errerrerrerrerrerrerrerrerr", err));
+          .catch((err) => console.log('errerrerrerrerrerrerrerrerr', err));
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.validation,
-            constant.messages.invalid_data
-          )
-        );
+        return res.json(Response(constant.statusCode.validation, constant.messages.invalid_data));
       }
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   async_fun();
@@ -359,8 +299,8 @@ function searchContact(req, res) {
   async function async_fun() {
     try {
       const searchTexr = String(req.body.searchName);
-      const searchArray = searchTexr.split(" ");
-      console.log("searchArray", searchArray);
+      const searchArray = searchTexr.split(' ');
+      console.log('searchArray', searchArray);
       if (req.body.searchName) {
         let searchChar, orderQuery;
 
@@ -392,7 +332,7 @@ function searchContact(req, res) {
         Left join users as U1 on U1.id=${req.body.my_id} AND U1.is_active=true  
         Left join (select DISTINCT ON (my_id) * from contacts) as C on U2.id=C.my_id
         left join images im on im."userId"=U2.id 
-        where ${searchChar ? searchChar : ""} order by U2."first_name"`;
+        where ${searchChar ? searchChar : ''} order by U2."first_name"`;
         //   let sql = `SELECT
         //    C.my_id as my_own_id, C.my_contact_id as user_contact_id,
         //   C.room_id,
@@ -432,35 +372,19 @@ function searchContact(req, res) {
           .raw(sql)
           .then((data) => {
             // console.log('datadatadatadata searchChat', data.rows);
-            return res.json(
-              Response(
-                constant.statusCode.ok,
-                constant.messages.categoryFetchedSuccessfully,
-                data.rows
-              )
-            );
+            return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data.rows));
           })
           .catch(
-            (err) => console.log("errerrerrerrerrerrerrerrerr", err)
+            (err) => console.log('errerrerrerrerrerrerrerrerr', err)
             // res.json(Response(
             //   constant.statusCode.notFound,
             //   constant.validateMsg.noRecordFound))
           );
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.validation,
-            constant.messages.invalid_data
-          )
-        );
+        return res.json(Response(constant.statusCode.validation, constant.messages.invalid_data));
       }
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   async_fun();
@@ -474,8 +398,8 @@ function fetchContactList(req, res) {
       var temp2;
       if (req.body.my_id) {
         const condition = {
-          "contacts.my_id": req.body.my_id,
-          "contacts.isblocked": false,
+          'contacts.my_id': req.body.my_id,
+          'contacts.isblocked': false,
         };
         // var sql = `SELECT * FROM bid_and_ask where "id"=${req.body.my_id}; `
         var sql = `SELECT contacts.my_id, contacts.my_id as myid, contacts.my_contact_id as user_contact_id,
@@ -536,7 +460,7 @@ function fetchContactList(req, res) {
             res.json({
               status: config.statusCode.error,
               data: [],
-              message: i18n.__("INTERNAL_ERROR"),
+              message: i18n.__('INTERNAL_ERROR'),
             });
           });
 
@@ -565,19 +489,13 @@ function fetchContactList(req, res) {
             res.json({
               status: config.statusCode.error,
               data: [],
-              message: i18n.__("INTERNAL_ERROR"),
+              message: i18n.__('INTERNAL_ERROR'),
             });
           });
 
         result = result.concat(temp1).concat(temp2).reverse();
 
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.offerFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.offerFetchedSuccessfully, result));
         // new contactModel()
         //   .where(condition)
         //   .query(_filter)
@@ -623,30 +541,16 @@ function fetchContactList(req, res) {
         //     });
         //   });
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.validation,
-            constant.messages.invalid_data
-          )
-        );
+        return res.json(Response(constant.statusCode.validation, constant.messages.invalid_data));
       }
     } catch (error) {
-      console.log("errorerrorerror", error);
+      console.log('errorerrorerror', error);
 
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
     function _filter(qb) {
-      qb.joinRaw(
-        `LEFT JOIN users as my_info ON (contacts.my_id = my_info.id and my_info.is_active=true)`
-      );
-      qb.joinRaw(
-        `LEFT JOIN users as my_contact_info ON (contacts.my_contact_id = my_contact_info.id and my_contact_info.is_active=true)`
-      );
+      qb.joinRaw(`LEFT JOIN users as my_info ON (contacts.my_id = my_info.id and my_info.is_active=true)`);
+      qb.joinRaw(`LEFT JOIN users as my_contact_info ON (contacts.my_contact_id = my_contact_info.id and my_contact_info.is_active=true)`);
 
       qb.joinRaw(`LEFT JOIN chats ON (contacts."room_id" = chats.room_id)`);
     }
@@ -657,11 +561,7 @@ function fetchContactList(req, res) {
 function fetchChat(req, res) {
   async function async_fun() {
     try {
-      console.log(
-        "req.body.room_id req.body.my_id",
-        req.body.my_id,
-        req.body.room_id
-      );
+      console.log('req.body.room_id req.body.my_id', req.body.my_id, req.body.room_id);
 
       if (req.body.room_id && req.body.my_id) {
         const condition = {
@@ -674,20 +574,20 @@ function fetchChat(req, res) {
           .query(_filter)
           .query(function (qb) {
             qb.columns([
-              "my_info.first_name as my_first_name",
-              "my_info.last_name as my_last_name",
-              "my_info.user_name as my_user_name",
-              "my_info.profile_image_url as profile_image_url1",
-              "my_info.company_logo as company_logo1",
-              "my_contact_info.first_name",
-              "my_contact_info.last_name",
-              "my_contact_info.profile_image_url",
-              "my_contact_info.user_name",
-              "my_contact_info.company_logo",
+              'my_info.first_name as my_first_name',
+              'my_info.last_name as my_last_name',
+              'my_info.user_name as my_user_name',
+              'my_info.profile_image_url as profile_image_url1',
+              'my_info.company_logo as company_logo1',
+              'my_contact_info.first_name',
+              'my_contact_info.last_name',
+              'my_contact_info.profile_image_url',
+              'my_contact_info.user_name',
+              'my_contact_info.company_logo',
 
-              "chats.*",
+              'chats.*',
             ]);
-            qb.orderBy("chats.created_at", "ASC");
+            qb.orderBy('chats.created_at', 'ASC');
           })
           .fetchAll()
           .then(function (contactandChatlist1) {
@@ -700,13 +600,7 @@ function fetchChat(req, res) {
             //   // `key` is group's name (uid), `value` is the array of objects
             //   .map((value, key) => ({ date_to_group: key, data: value }))
             //   .value()
-            return res.json(
-              Response(
-                constant.statusCode.ok,
-                constant.messages.loginSuccess,
-                contactandChatlist1
-              )
-            );
+            return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, contactandChatlist1));
           })
           .catch(function (err) {
             console.log(err);
@@ -714,31 +608,19 @@ function fetchChat(req, res) {
             res.json({
               status: config.statusCode.error,
               data: [],
-              message: i18n.__("INTERNAL_ERROR"),
+              message: i18n.__('INTERNAL_ERROR'),
             });
           });
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.validation,
-            constant.messages.invalid_data
-          )
-        );
+        return res.json(Response(constant.statusCode.validation, constant.messages.invalid_data));
       }
     } catch (error) {
-      console.log("errorerrorerrorerrorerrorerrorerrorerror", error);
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      console.log('errorerrorerrorerrorerrorerrorerrorerror', error);
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
     function _filter(qb) {
       qb.joinRaw(`LEFT JOIN users as my_info ON (chats.my_id = my_info.id)`);
-      qb.joinRaw(
-        `LEFT JOIN users as my_contact_info ON (chats.contact_id = my_contact_info.id)`
-      );
+      qb.joinRaw(`LEFT JOIN users as my_contact_info ON (chats.contact_id = my_contact_info.id)`);
       // qb.joinRaw(`LEFT JOIN chats ON (contacts."room_id" = chats.room_id)`);
       // qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
     }
@@ -808,27 +690,15 @@ function getBidAndAskId(req, res) {
       LEFT JOIN users u ON (b."createdbyId" = u.id and u.is_active=true)
       where b."id"=${req.body.bid_and_ask}; `;
       bookshelf.knex.raw(sql).then((response) => {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.offerFetchedSuccessfully,
-            response
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.offerFetchedSuccessfully, response));
       });
     } catch (err) {
-      console.log("err in getBidAndAskId");
+      console.log('err in getBidAndAskId');
     }
     function _filter(qb) {
-      qb.joinRaw(
-        `LEFT JOIN users ON (bid_and_ask."createdbyId" = users.id and users.is_active=true)`
-      );
-      qb.joinRaw(
-        `LEFT JOIN products ON (bid_and_ask."productId" = products.id)`
-      );
-      qb.joinRaw(
-        `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-      );
+      qb.joinRaw(`LEFT JOIN users ON (bid_and_ask."createdbyId" = users.id and users.is_active=true)`);
+      qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products.id)`);
+      qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
     }
   }
   getBidAndAskId().then((response) => {});
@@ -846,21 +716,17 @@ function deleteListingBidOrAsk(req, res) {
             let condition = {
               id: req.body[i].id,
             };
-            let updateUserData = await common_query.updateRecord(
-              bidsasksModel,
-              updatedata,
-              condition
-            );
+            let updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
           }
         }
         return res.json(
           Response(constant.statusCode.ok, constant.messages.UpdateSuccess, {
-            value: "success",
+            value: 'success',
           })
         );
       }
     } catch (err) {
-      console.log("err in deleteListing", err);
+      console.log('err in deleteListing', err);
     }
   }
   deleteListingBidOrAsk().then((response) => {});
@@ -878,21 +744,17 @@ function inactiveListingBidOrAsk(req, res) {
             let condition = {
               id: req.body[i].id,
             };
-            let updateUserData = await common_query.updateRecord(
-              bidsasksModel,
-              updatedata,
-              condition
-            );
+            let updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
           }
         }
         return res.json(
           Response(constant.statusCode.ok, constant.messages.UpdateSuccess, {
-            value: "success",
+            value: 'success',
           })
         );
       }
     } catch (err) {
-      console.log("err in inactiveListing", err);
+      console.log('err in inactiveListing', err);
     }
   }
   inactiveListingBidOrAsk().then((response) => {});
@@ -910,23 +772,13 @@ function inactiveAllBidOrAsk(req, res) {
             let condition = {
               id: req.body[i],
             };
-            var updateUserData = await common_query.updateRecord(
-              bidsasksModel,
-              updatedata,
-              condition
-            );
+            var updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
           }
         }
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.UpdateSuccess,
-            updateUserData
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData));
       }
     } catch (err) {
-      console.log("err in inactive", err);
+      console.log('err in inactive', err);
     }
   }
   inactiveAllBidOrAsk().then((response) => {});
@@ -935,34 +787,24 @@ function inactiveAllBidOrAsk(req, res) {
 function deleteAllBidOrAsk(req, res) {
   async function deleteAllBidOrAsk() {
     try {
-      console.log("delete reqqqqqqq::::::", req.body);
+      console.log('delete reqqqqqqq::::::', req.body);
       if (req.body.length > 0) {
         for (var i = 0; i < req.body.length; i++) {
           if (req.body[i]) {
-            console.log("req:::::::::", req.body[i]);
+            console.log('req:::::::::', req.body[i]);
             var updatedata = {
               isdeleted: true,
             };
             let condition = {
               id: req.body[i],
             };
-            var updateUserData = await common_query.updateRecord(
-              bidsasksModel,
-              updatedata,
-              condition
-            );
+            var updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
           }
         }
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.UpdateSuccess,
-            updateUserData
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData));
       }
     } catch (err) {
-      console.log("err in delete", err);
+      console.log('err in delete', err);
     }
   }
   deleteAllBidOrAsk().then((response) => {});
@@ -972,38 +814,23 @@ Function added by VarunY
 */
 function getHighestBidOrMinAsk(req, res) {
   async function asy_init() {
-    if (req.body.request == "bids") {
+    if (req.body.request == 'bids') {
       var sql = `SELECT bid_and_ask.* FROM bid_and_ask where "request"=? AND "productId"=? AND "type"=? AND "isdeleted"=false AND amount IS NOT NULL ORDER BY amount DESC LIMIT 1;`;
     } else {
       var sql = `SELECT bid_and_ask.* FROM bid_and_ask where "request"=? AND "productId"=? AND "type"=? AND "isdeleted"=false AND amount IS NOT NULL ORDER BY amount ASC LIMIT 1;`;
     }
-    var raw = bookshelf.knex.raw(sql, [
-      req.body.request,
-      req.body.productId,
-      req.body.type,
-    ]);
+    var raw = bookshelf.knex.raw(sql, [req.body.request, req.body.productId, req.body.type]);
     raw
       .then(function (result) {
         let bid_and_ask = result.rows;
-        console.log("result", result.rows);
+        console.log('result', result.rows);
 
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            bid_and_ask
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, bid_and_ask));
       })
       .catch(function (err) {
-        console.log("resulttttttttt errrorrrrr", err);
+        console.log('resulttttttttt errrorrrrr', err);
 
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
 
@@ -1019,28 +846,12 @@ function deleteBidOrAsk(req, res) {
       id: req.body.id,
     };
 
-    let updateUserData = await common_query.updateRecord(
-      bidsasksModel,
-      updatedata,
-      condition
-    );
+    let updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
 
     if (updateUserData.code == 200) {
-      return res.json(
-        Response(
-          constant.statusCode.ok,
-          constant.messages.DeleteSuccess,
-          updateUserData
-        )
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.DeleteSuccess, updateUserData));
     } else {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError,
-          result.req.body
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body));
     }
   }
   asy_init();
@@ -1054,28 +865,12 @@ function updateNotes(req, res) {
     let condition = {
       id: req.body.id,
     };
-    let updateUserData = await common_query.updateRecord(
-      bidsasksModel,
-      updatedata,
-      condition
-    );
+    let updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
 
     if (updateUserData.code == 200) {
-      return res.json(
-        Response(
-          constant.statusCode.ok,
-          constant.messages.UpdateSuccess,
-          updateUserData
-        )
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData));
     } else {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError,
-          result.req.body
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body));
     }
   }
   asy_init();
@@ -1084,11 +879,11 @@ function updateNotes(req, res) {
 function updateBidOrAsk(req, res) {
   async function asy_init() {
     var qty = [];
-    var minQuantity = "";
-    var maxQuantity = "";
+    var minQuantity = '';
+    var maxQuantity = '';
 
     if (req.body && req.body.minQuantity) {
-      qty = req.body.minQuantity.split("-");
+      qty = req.body.minQuantity.split('-');
       minQuantity = qty[0];
       maxQuantity = qty[1];
 
@@ -1106,28 +901,12 @@ function updateBidOrAsk(req, res) {
         id: req.body.id,
       };
 
-      let updateUserData = await common_query.updateRecord(
-        bidsasksModel,
-        updatedata,
-        condition
-      );
+      let updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
 
       if (updateUserData.code == 200) {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.DeleteSuccess,
-            updateUserData
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.DeleteSuccess, updateUserData));
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.internalservererror,
-            constant.validateMsg.internalError,
-            result.req.body
-          )
-        );
+        return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body));
       }
     }
   }
@@ -1142,28 +921,12 @@ function inactiveBidOrAsk(req, res) {
     let condition = {
       id: req.body.id,
     };
-    let updateUserData = await common_query.updateRecord(
-      bidsasksModel,
-      updatedata,
-      condition
-    );
+    let updateUserData = await common_query.updateRecord(bidsasksModel, updatedata, condition);
 
     if (updateUserData.code == 200) {
-      return res.json(
-        Response(
-          constant.statusCode.ok,
-          constant.messages.InactivateSuccess,
-          updateUserData
-        )
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.InactivateSuccess, updateUserData));
     } else {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError,
-          result.req.body
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body));
     }
   }
   asy_init();
@@ -1171,8 +934,8 @@ function inactiveBidOrAsk(req, res) {
 
 function getlistingfilterData(req, res) {
   async function asy_init() {
-    var sql = "";
-    if (req.body.data == "Today") {
+    var sql = '';
+    if (req.body.data == 'Today') {
       sql = `Select P.*, U."first_name", U."last_name", U."profile_image_url",  PR."productName", I."imageUrl"
              From bid_and_ask P
              LEFT OUTER JOIN users U on U.id = P."createdbyId"
@@ -1180,7 +943,7 @@ function getlistingfilterData(req, res) {
              LEFT OUTER JOIN images I ON P."productId" = I."productId"
               WHERE DATE(P."createdAt") >= DATE(NOW()) - INTERVAL '1 days'
               ORDER BY P.amount DESC`;
-    } else if (req.body.data == "Twoday") {
+    } else if (req.body.data == 'Twoday') {
       sql = `Select P.*, U."first_name", U."last_name", U."profile_image_url", PR."productName", I."imageUrl"
       From bid_and_ask P
       LEFT OUTER JOIN users U on U.id = P."createdbyId and U.is_active=true"
@@ -1188,7 +951,7 @@ function getlistingfilterData(req, res) {
       LEFT OUTER JOIN images I ON P."productId" = I."productId"
        WHERE DATE(P."createdAt") >= DATE(NOW()) - INTERVAL '2 days'
        ORDER BY P.amount DESC`;
-    } else if (req.body.data == "Threeday") {
+    } else if (req.body.data == 'Threeday') {
       sql = `Select P.*, U."first_name", U."last_name", U."profile_image_url", PR."productName", I."imageUrl"
       From bid_and_ask P
       LEFT OUTER JOIN users U on U.id = P."createdbyId"
@@ -1200,22 +963,11 @@ function getlistingfilterData(req, res) {
     var raw2 = bookshelf.knex.raw(sql, []);
     raw2
       .then(function (result) {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
 
@@ -1224,8 +976,8 @@ function getlistingfilterData(req, res) {
 
 function getUserProfilelistingfilter(req, res) {
   async function asy_init() {
-    var sql = "";
-    if (req.body.data == "Date") {
+    var sql = '';
+    if (req.body.data == 'Date') {
       sql = `Select B.*, U."first_name", U."last_name",  P."productName", I."imageUrl"
       From bid_and_ask B
       LEFT OUTER JOIN users U on B."createdbyId" = U.id
@@ -1234,7 +986,7 @@ function getUserProfilelistingfilter(req, res) {
       where B.isdeleted = false
       GROUP BY B.id, U."first_name", U."last_name",  P."productName", I."imageUrl"
       ORDER BY B."createdAt" DESC`;
-    } else if (req.body.data == "Name") {
+    } else if (req.body.data == 'Name') {
       sql = `Select B.*, U."first_name", U."last_name",  P."productName", I."imageUrl"
       From bid_and_ask B
       LEFT OUTER JOIN users U on B."createdbyId" = U.id
@@ -1247,22 +999,11 @@ function getUserProfilelistingfilter(req, res) {
     var raw2 = bookshelf.knex.raw(sql, []);
     raw2
       .then(function (result) {
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            result
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, result));
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
 
@@ -1272,118 +1013,90 @@ function getUserProfilelistingfilter(req, res) {
 function getfilterData(req, res) {
   async function getfilterdataMethod() {
     if (
-      (req.body.type != undefined ||
-        req.body.type != "" ||
-        req.body.type != null) &&
-      (req.body.producttype != undefined ||
-        req.body.producttype != "" ||
-        req.body.producttype != null)
+      (req.body.type != undefined || req.body.type != '' || req.body.type != null) &&
+      (req.body.producttype != undefined || req.body.producttype != '' || req.body.producttype != null)
     ) {
       var condition = {
         request: req.body.request,
-        "bid_and_ask.productId": req.body.productid,
+        'bid_and_ask.productId': req.body.productid,
         type: req.body.type,
         producttype: req.body.producttype,
       };
     }
     if (
-      (req.body.type === undefined ||
-        req.body.type === "" ||
-        req.body.type === null) &&
-      (req.body.producttype != undefined ||
-        req.body.producttype != "" ||
-        req.body.producttype != null)
+      (req.body.type === undefined || req.body.type === '' || req.body.type === null) &&
+      (req.body.producttype != undefined || req.body.producttype != '' || req.body.producttype != null)
     ) {
       var condition = {
         request: req.body.request,
-        "bid_and_ask.productId": req.body.productid,
+        'bid_and_ask.productId': req.body.productid,
         producttype: req.body.producttype,
       };
     }
     if (
-      (req.body.type != undefined ||
-        req.body.type != "" ||
-        req.body.type != null) &&
-      (req.body.producttype === undefined ||
-        req.body.producttype === "" ||
-        req.body.producttype === null)
+      (req.body.type != undefined || req.body.type != '' || req.body.type != null) &&
+      (req.body.producttype === undefined || req.body.producttype === '' || req.body.producttype === null)
     ) {
       var condition = {
         request: req.body.request,
-        "bid_and_ask.productId": req.body.productid,
+        'bid_and_ask.productId': req.body.productid,
         type: req.body.type,
       };
     }
     if (
-      (req.body.type === undefined ||
-        req.body.type === "" ||
-        req.body.type === null) &&
-      (req.body.producttype === undefined ||
-        req.body.producttype === "" ||
-        req.body.producttype === null)
+      (req.body.type === undefined || req.body.type === '' || req.body.type === null) &&
+      (req.body.producttype === undefined || req.body.producttype === '' || req.body.producttype === null)
     ) {
       var condition = {
         request: req.body.request,
-        "bid_and_ask.productId": req.body.productid,
+        'bid_and_ask.productId': req.body.productid,
       };
     }
     if (
-      (req.body.type === undefined ||
-        req.body.type === "" ||
-        req.body.type === null) &&
-      (req.body.producttype === undefined ||
-        req.body.producttype === "" ||
-        req.body.producttype === null) &&
-      (req.body.productId === undefined ||
-        req.body.productId === "" ||
-        req.body.productId === null)
+      (req.body.type === undefined || req.body.type === '' || req.body.type === null) &&
+      (req.body.producttype === undefined || req.body.producttype === '' || req.body.producttype === null) &&
+      (req.body.productId === undefined || req.body.productId === '' || req.body.productId === null)
     ) {
       var condition = {
         request: req.body.request,
       };
     }
-    condition["bid_and_ask.isdeleted"] = false;
+    condition['bid_and_ask.isdeleted'] = false;
     // condition["bid_and_ask.isaddtocart"] = false;
     // console.log('conditioncondition',condition)
-    condition["users.is_active"] = true;
-    condition["bid_and_ask.isactive"] = false;
-    condition["isPrivate"] = false;
-    
-    if (req.body && req.body.request == "asks") {
+    condition['users.is_active'] = true;
+    condition['bid_and_ask.isactive'] = false;
+    condition['isPrivate'] = false;
+
+    if (req.body && req.body.request == 'asks') {
       new bidsasksModel()
         .where(condition)
         .query(_filter)
         .query(function (qb) {
           qb.columns([
-            "bid_and_ask.*",
-            "users.first_name",
-            "users.last_name",
-            "users.user_name",
-            "users.id as uid",
-            "users.term_shipping",
-            "users.payment_mode",
-            "users.payment_timing",
-            "users.company_logo",
-            "users.additional_term",
-            "users.profile_image_url",
-            "products.productName",
-            "products.categoryId",
-            "products.subcategoryId",
-            "products.releaseDate",
-            "images.imageUrl",
+            'bid_and_ask.*',
+            'users.first_name',
+            'users.last_name',
+            'users.user_name',
+            'users.id as uid',
+            'users.term_shipping',
+            'users.payment_mode',
+            'users.payment_timing',
+            'users.company_logo',
+            'users.additional_term',
+            'users.profile_image_url',
+            'products.productName',
+            'products.categoryId',
+            'products.subcategoryId',
+            'products.releaseDate',
+            'images.imageUrl',
           ]);
-          qb.orderBy("bid_and_ask.amount", "ASC");
+          qb.orderBy('bid_and_ask.amount', 'ASC');
         })
         .fetchAll()
         .then(function (getDraftListResult) {
           getDraftListResult = getDraftListResult.toJSON();
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.loginSuccess,
-              getDraftListResult
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
         })
         .catch(function (err) {
           console.log(err);
@@ -1391,18 +1104,14 @@ function getfilterData(req, res) {
           res.json({
             status: config.statusCode.error,
             data: [],
-            message: i18n.__("INTERNAL_ERROR"),
+            message: i18n.__('INTERNAL_ERROR'),
           });
         });
 
       function _filter(qb) {
         qb.joinRaw(`LEFT JOIN users ON (bid_and_ask."createdbyId" = users.id)`);
-        qb.joinRaw(
-          `LEFT JOIN products ON (bid_and_ask."productId" = products.id)`
-        );
-        qb.joinRaw(
-          `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-        );
+        qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products.id)`);
+        qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
       }
     } else {
       new bidsasksModel()
@@ -1410,35 +1119,29 @@ function getfilterData(req, res) {
         .query(_filter)
         .query(function (qb) {
           qb.columns([
-            "bid_and_ask.*",
-            "users.first_name",
-            "users.last_name",
-            "users.user_name",
-            "users.id as uid",
-            "users.company_logo",
-            "users.term_shipping",
-            "users.payment_mode",
-            "users.payment_timing",
-            "users.additional_term",
-            "products.productName",
-            "users.profile_image_url",
-            "products.categoryId",
-            "products.subcategoryId",
-            "products.releaseDate",
-            "images.imageUrl",
+            'bid_and_ask.*',
+            'users.first_name',
+            'users.last_name',
+            'users.user_name',
+            'users.id as uid',
+            'users.company_logo',
+            'users.term_shipping',
+            'users.payment_mode',
+            'users.payment_timing',
+            'users.additional_term',
+            'products.productName',
+            'users.profile_image_url',
+            'products.categoryId',
+            'products.subcategoryId',
+            'products.releaseDate',
+            'images.imageUrl',
           ]);
-          qb.orderBy("bid_and_ask.amount", "desc");
+          qb.orderBy('bid_and_ask.amount', 'desc');
         })
         .fetchAll()
         .then(function (getDraftListResult) {
           getDraftListResult = getDraftListResult.toJSON();
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.loginSuccess,
-              getDraftListResult
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
         })
         .catch(function (err) {
           console.log(err);
@@ -1446,18 +1149,14 @@ function getfilterData(req, res) {
           res.json({
             status: config.statusCode.error,
             data: [],
-            message: i18n.__("INTERNAL_ERROR"),
+            message: i18n.__('INTERNAL_ERROR'),
           });
         });
 
       function _filter(qb) {
         qb.joinRaw(`LEFT JOIN users ON (bid_and_ask."createdbyId" = users.id)`);
-        qb.joinRaw(
-          `LEFT JOIN products ON (bid_and_ask."productId" = products.id)`
-        );
-        qb.joinRaw(
-          `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-        );
+        qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products.id)`);
+        qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
       }
     }
   }
@@ -1467,21 +1166,18 @@ function getfilterData(req, res) {
 function uploadListing(req, res) {
   async function uploadListingMethod() {
     try {
-      console.log("Varun--->");
+      console.log('Varun--->');
       if (req.files) {
         let timeStamp = JSON.stringify(Date.now());
-        extension = req.files.csvfile.name.split(".");
+        extension = req.files.csvfile.name.split('.');
         let csvOriginalName = req.files.csvfile.name;
-        db_path = timeStamp + "_" + csvOriginalName;
+        db_path = timeStamp + '_' + csvOriginalName;
 
-        let result_s3 = await s3file_upload.uploadBulkUploadImage(
-          req.files.csvfile.data,
-          db_path
-        );
+        let result_s3 = await s3file_upload.uploadBulkUploadImage(req.files.csvfile.data, db_path);
 
         let streamData;
         let arrStreamData = [];
-        let extensionArray = ["csv"];
+        let extensionArray = ['csv'];
         let format = extension[extension.length - 1];
         if (extensionArray.includes(format)) {
           if (result_s3.url) {
@@ -1494,7 +1190,7 @@ function uploadListing(req, res) {
             s3.getObject(params)
               .createReadStream(result_s3.url)
               .pipe(csv())
-              .on("data", async (data) => {
+              .on('data', async (data) => {
                 // let d1= JSON.parse(data);
 
                 // console.log('data1178',data)
@@ -1503,16 +1199,16 @@ function uploadListing(req, res) {
                 streamData = data;
 
                 arrStreamData.push(streamData);
-                if (data && (data.subtype == "null" || !data.subtype)) {
+                if (data && (data.subtype == 'null' || !data.subtype)) {
                   data.subtype = 0;
                 }
 
-                var createdAt = `${moment().utc().format("YYYY-MM-DD")}`;
+                var createdAt = `${moment().utc().format('YYYY-MM-DD')}`;
                 let boln = data.rowAddedorUpdated.toLowerCase();
-                console.log("boolan", boln);
+                console.log('boolan', boln);
 
-                if (boln == "true") {
-                  console.log("inside if");
+                if (boln == 'true') {
+                  console.log('inside if');
                   let savedata = {
                     request: data.request ? data.request : null,
                     productId: data.product_id ? data.product_id : null,
@@ -1534,26 +1230,17 @@ function uploadListing(req, res) {
                       id: data.id,
                       createdbyId: req.body.id,
                     };
-                    console.log("cnditionnnn 1213", condit);
-                    let findProduct = await common_query
-                      .findAllData(bidsasksModel, condit, savedata)
-                      .catch((err) => {
-                        throw err;
-                      });
-                    console.log("findProduct", findProduct.data.toJSON());
+                    console.log('cnditionnnn 1213', condit);
+                    let findProduct = await common_query.findAllData(bidsasksModel, condit, savedata).catch((err) => {
+                      throw err;
+                    });
+                    console.log('findProduct', findProduct.data.toJSON());
                     if (findProduct.data.toJSON().length) {
-                      console.log("inside findproduct");
-                      let updateData = await common_query.updateRecord(
-                        bidsasksModel,
-                        savedata,
-                        condit
-                      );
+                      console.log('inside findproduct');
+                      let updateData = await common_query.updateRecord(bidsasksModel, savedata, condit);
                     } else {
-                      console.log("save Data", savedata);
-                      let savesuccess = await common_query.saveRecord(
-                        bidsasksModel,
-                        savedata
-                      );
+                      console.log('save Data', savedata);
+                      let savesuccess = await common_query.saveRecord(bidsasksModel, savedata);
                       if (savesuccess.code == 200) {
                         // return res.json(Response(constant.statusCode.ok, "uploaded successfully", {}));
                       }
@@ -1563,10 +1250,10 @@ function uploadListing(req, res) {
                   }
                 }
               })
-              .on("end", () => {
-                console.log(result_s3.url, "end on call");
+              .on('end', () => {
+                console.log(result_s3.url, 'end on call');
               })
-              .on("finish", async () => {
+              .on('finish', async () => {
                 // if (arrStreamData.length > 0) {
                 //   arrStreamData.forEach(async (element) => {
                 //     if (element && (element.subtype == 'null' || !element.subtype)) {
@@ -1594,38 +1281,20 @@ function uploadListing(req, res) {
 
                 //   return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, { value: 'success' }))
                 // }
-                return res.json(
-                  Response(
-                    constant.statusCode.ok,
-                    constant.messages.UpdateSuccess,
-                    { value: "success" }
-                  )
-                );
+                return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, { value: 'success' }));
               })
-              .on("close", () => {
-                console.log("rstream close");
+              .on('close', () => {
+                console.log('rstream close');
               });
           } else {
-            return res.json(
-              Response(
-                constant.statusCode.alreadyExist,
-                constant.validateMsg.updateError
-              )
-            );
+            return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.updateError));
           }
         } else {
-          return res.json(
-            Response(constant.statusCode.alreadyExist, "Invalid format")
-          );
+          return res.json(Response(constant.statusCode.alreadyExist, 'Invalid format'));
         }
       }
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   uploadListingMethod().then((data1) => {});
@@ -1649,18 +1318,11 @@ function getUserBid(req, res) {
       var raw2 = bookshelf.knex.raw(sql, [req.body.id]);
       raw2.then(function (result) {
         if (result) {
-          return res.json(
-            Response(constant.statusCode.ok, constant.messages.userData, result)
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.userData, result));
         }
       });
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   getUserBidMethod().then((data) => {});
@@ -1692,7 +1354,7 @@ function getUserFeedback(req, res) {
           result.lifetime.push(data.rows);
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
       var sql1 = `
@@ -1712,7 +1374,7 @@ function getUserFeedback(req, res) {
           result.threemonths.push(data.rows);
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
 
       var sql2 = `
@@ -1732,18 +1394,11 @@ function getUserFeedback(req, res) {
           result.sixmonths.push(data.rows);
         })
         .catch((err) => {
-          console.log("err");
+          console.log('err');
         });
-      return res.json(
-        Response(constant.statusCode.ok, constant.messages.userFeedback, result)
-      );
+      return res.json(Response(constant.statusCode.ok, constant.messages.userFeedback, result));
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   getUserFeedbackMethod().then((data) => {});
@@ -1752,18 +1407,18 @@ function getUserFeedback(req, res) {
 function getUserData(req, res) {
   async function getUserdataMethod() {
     let condition = {};
-    if (req.body.type == "Box" || req.body.type == "Case") {
+    if (req.body.type == 'Box' || req.body.type == 'Case') {
       condition = {
         createdbyId: req.body.createdbyId,
         request: req.body.request,
-        "bid_and_ask.productId": req.body.productId,
+        'bid_and_ask.productId': req.body.productId,
         type: req.body.type,
       };
     } else if (req.body && req.body.productId) {
       condition = {
         createdbyId: req.body.createdbyId,
         request: req.body.request,
-        "bid_and_ask.productId": req.body.productId,
+        'bid_and_ask.productId': req.body.productId,
       };
     } else {
       condition = {
@@ -1774,36 +1429,30 @@ function getUserData(req, res) {
     if (req.body && req.body.producttype) {
       condition.producttype = req.body.producttype;
     }
-    condition["bid_and_ask.isdeleted"] = false;
-    if (req.body.request == "asks") {
+    condition['bid_and_ask.isdeleted'] = false;
+    if (req.body.request == 'asks') {
       new bidsasksModel()
         .where(condition)
         .query(_filter)
         .query(function (qb) {
           qb.columns([
-            "bid_and_ask.*",
-            "users.first_name",
-            "users.last_name",
-            "users.user_name",
-            "users.id as uid",
-            "users.company_logo",
-            "users.profile_image_url",
-            "products.productName",
-            "products.releaseDate",
-            "images.imageUrl",
+            'bid_and_ask.*',
+            'users.first_name',
+            'users.last_name',
+            'users.user_name',
+            'users.id as uid',
+            'users.company_logo',
+            'users.profile_image_url',
+            'products.productName',
+            'products.releaseDate',
+            'images.imageUrl',
           ]);
-          qb.orderBy("bid_and_ask.amount", "ASC");
+          qb.orderBy('bid_and_ask.amount', 'ASC');
         })
         .fetchAll()
         .then(function (getDraftListResult) {
           getDraftListResult = getDraftListResult.toJSON();
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.loginSuccess,
-              getDraftListResult
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
         })
         .catch(function (err) {
           console.log(err);
@@ -1811,18 +1460,14 @@ function getUserData(req, res) {
           res.json({
             status: config.statusCode.error,
             data: [],
-            message: i18n.__("INTERNAL_ERROR"),
+            message: i18n.__('INTERNAL_ERROR'),
           });
         });
 
       function _filter(qb) {
         qb.joinRaw(`LEFT JOIN users ON (bid_and_ask."createdbyId" = users.id)`);
-        qb.joinRaw(
-          `LEFT JOIN products ON (bid_and_ask."productId" = products.id)`
-        );
-        qb.joinRaw(
-          `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-        );
+        qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products.id)`);
+        qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
       }
     } else {
       new bidsasksModel()
@@ -1830,29 +1475,23 @@ function getUserData(req, res) {
         .query(_filter)
         .query(function (qb) {
           qb.columns([
-            "bid_and_ask.*",
-            "users.first_name",
-            "users.last_name",
-            "users.user_name",
-            "users.id as uid",
-            "users.company_logo",
-            "users.profile_image_url",
-            "products.productName",
-            "products.releaseDate",
-            "images.imageUrl",
+            'bid_and_ask.*',
+            'users.first_name',
+            'users.last_name',
+            'users.user_name',
+            'users.id as uid',
+            'users.company_logo',
+            'users.profile_image_url',
+            'products.productName',
+            'products.releaseDate',
+            'images.imageUrl',
           ]);
-          qb.orderBy("bid_and_ask.amount", "DESC");
+          qb.orderBy('bid_and_ask.amount', 'DESC');
         })
         .fetchAll()
         .then(function (getDraftListResult) {
           getDraftListResult = getDraftListResult.toJSON();
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.loginSuccess,
-              getDraftListResult
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
         })
         .catch(function (err) {
           console.log(err);
@@ -1860,18 +1499,14 @@ function getUserData(req, res) {
           res.json({
             status: config.statusCode.error,
             data: [],
-            message: i18n.__("INTERNAL_ERROR"),
+            message: i18n.__('INTERNAL_ERROR'),
           });
         });
 
       function _filter(qb) {
         qb.joinRaw(`LEFT JOIN users ON (bid_and_ask."createdbyId" = users.id)`);
-        qb.joinRaw(
-          `LEFT JOIN products ON (bid_and_ask."productId" = products.id)`
-        );
-        qb.joinRaw(
-          `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-        );
+        qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products.id)`);
+        qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
       }
     }
   }
@@ -1879,33 +1514,20 @@ function getUserData(req, res) {
 }
 
 function createbidsorask(req, res) {
-
-
   async function createbidsoraskMethod() {
     try {
-      let {
-        request,
-        productId,
-        minQuantity,
-        producttype,
-        amount,
-        type,
-        subtype,
-        note,
-        isPrivate
-      } = req.body;
+      let { request, productId, minQuantity, producttype, amount, type, subtype, note, isPrivate } = req.body;
       var qty = [];
       let maxQuantity;
-      console.log("req.bodyreq.bodyreq.body", req.body);
       if (req.body && req.body.minQuantity) {
-        qty = req.body.minQuantity.split("-");
+        qty = req.body.minQuantity.split('-');
         minQuantity = qty[0];
         maxQuantity = qty[1];
       }
-      console.log("bodyreq", minQuantity, "maxQuantity", maxQuantity);
-      const transaction_number = randomize("Aa0", 6);
+      console.log('bodyreq', minQuantity, 'maxQuantity', maxQuantity);
+      const transaction_number = randomize('Aa0', 6);
       // req.body.minQuantity.split('-')
-      var createdAt = `${moment().utc().format("YYYY-MM-DD")}`;
+      var createdAt = `${moment().utc().format('YYYY-MM-DD')}`;
       let data = {
         request: request ? request : null,
         productId: productId ? productId : null,
@@ -1921,11 +1543,11 @@ function createbidsorask(req, res) {
         isdeleted: false,
         isactive: false,
         isaddtocart: false,
-        isPrivate: isPrivate ? isPrivate : false
+        isPrivate: isPrivate ? isPrivate : false,
       };
 
       var msg;
-      if (req.body.request == "bids") {
+      if (req.body.request == 'bids') {
         msg = constant.messages.BidCreated;
       } else {
         msg = constant.messages.AskCreated;
@@ -1935,22 +1557,12 @@ function createbidsorask(req, res) {
       if (createBidData.code == 200) {
         return res.json(Response(constant.statusCode.ok, msg, createBidData));
       } else if (createBidData.code == 409) {
-        console.log("saveUserData===>in else");
+        console.log('saveUserData===>in else');
 
-        return res.json(
-          Response(
-            constant.statusCode.internalservererror,
-            constant.validateMsg.internalError
-          )
-        );
+        return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
       }
     } catch (error) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   createbidsoraskMethod().then((data) => {});
@@ -1969,9 +1581,7 @@ function updateMyAsk(req, res) {
           } else {
             if (req.body.length > 1 && i != 0) {
               if (req.body[i].amount && req.body[i].minQuantity) {
-                toUpdate = toUpdate.concat(
-                  `,(${req.body[i].id},${req.body[i].amount},${req.body[i].minQuantity}, ${req.body[i].maxQuantity})`
-                );
+                toUpdate = toUpdate.concat(`,(${req.body[i].id},${req.body[i].amount},${req.body[i].minQuantity}, ${req.body[i].maxQuantity})`);
               }
             }
           }
@@ -1979,23 +1589,12 @@ function updateMyAsk(req, res) {
         let sql = `update bid_and_ask as t1 set "amount" = t2.amount, "minQuantity" = t2.minQuantity, "maxQuantity" = t2.maxQuantity from (values ${toUpdate}) as t2(id, amount, minQuantity, maxQuantity) where t2.id = t1.id;`;
         let responseData = await bookshelf.knex.raw(sql);
         if (responseData.rowCount > 0) {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.UpdateSuccess,
-              responseData
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, responseData));
         }
       }
     } catch (err) {
-      console.log("@error in updatemytasks", err);
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      console.log('@error in updatemytasks', err);
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   updateMyAskMethod();
@@ -2114,30 +1713,17 @@ function updateMyAsk(req, res) {
             toUpdate = `(${req.body[i].id},${req.body[i].amount},${req.body[i].minQuantity},${req.body[i].maxQuantity})`;
           }
           if (req.body.length > 1 && i != 0) {
-            toUpdate = toUpdate.concat(
-              `,(${req.body[i].id},${req.body[i].amount},${req.body[i].minQuantity}, ${req.body[i].maxQuantity})`
-            );
+            toUpdate = toUpdate.concat(`,(${req.body[i].id},${req.body[i].amount},${req.body[i].minQuantity}, ${req.body[i].maxQuantity})`);
           }
         }
         let sql = `update bid_and_ask as t1 set "amount" = t2.amount, "minQuantity" = t2.minQuantity, "maxQuantity" = t2.maxQuantity from (values ${toUpdate}) as t2(id, amount, minQuantity, maxQuantity) where t2.id = t1.id;`;
         let responseData = await bookshelf.knex.raw(sql);
         if (responseData.rowCount > 0) {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.UpdateSuccess,
-              responseData
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, responseData));
         }
       }
     } catch (err) {
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
 
@@ -2145,14 +1731,11 @@ function updateMyAsk(req, res) {
 }
 function getHighestBidLowestAsk(req, res) {
   async function getHighestBidLowestAskMethod() {
-    console.log("sdfsdfsdfsdfsdfsdfsdfsdfsdfs", req.body);
+    console.log('sdfsdfsdfsdfsdfsdfsdfsdfsdfs', req.body);
     var sql = `SELECT products.*, images."imageUrl" FROM 
     products LEFT JOIN images ON 
     products.id=images."productId" WHERE ("category_id"=? AND (SELECT EXTRACT(YEAR FROM "releaseDate")=?));`;
-    var raw = bookshelf.knex.raw(sql, [
-      req.body.category_id,
-      req.body.releaseDate,
-    ]);
+    var raw = bookshelf.knex.raw(sql, [req.body.category_id, req.body.releaseDate]);
     raw.then(function (result) {});
   }
   getHighestBidLowestAskMethod().then(function (params) {});
@@ -2180,10 +1763,7 @@ function getHighestBidAndLowestAsk(req, res) {
     console.log(req.body);
 
     var sql = `SELECT products.*, images."imageUrl" FROM products LEFT JOIN images ON products.id=images."productId" WHERE ("category_id"=? AND (SELECT EXTRACT(YEAR FROM "releaseDate")=?));`;
-    var raw = bookshelf.knex.raw(sql, [
-      req.body.category_id,
-      req.body.releaseDate,
-    ]);
+    var raw = bookshelf.knex.raw(sql, [req.body.category_id, req.body.releaseDate]);
     raw
       .then(function (result) {
         let array1 = result.rows;
@@ -2194,22 +1774,11 @@ function getHighestBidAndLowestAsk(req, res) {
           let output1 = JSON.parse(output);
           products.push(output1);
         });
-        console.log("res", products);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.categoryFetchedSuccessfully,
-            products
-          )
-        );
+        console.log('res', products);
+        return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, products));
       })
       .catch(function (err) {
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getAllproductByYearsMethod().then(function (params) {});
@@ -2218,19 +1787,15 @@ function getHighestBidAndLowestAsk(req, res) {
 function getAllMybidOrAsk(req, res) {
   async function getAllMybidOrAskMethod() {
     var conditions = {
-      "bid_and_ask.createdbyid": 34,
-      "bid_and_ask.request": "bids",
+      'bid_and_ask.createdbyid': 34,
+      'bid_and_ask.request': 'bids',
     };
 
     new bidsasksModel()
       .where(conditions)
       .query(_filter)
       .query(function (qb) {
-        qb.columns([
-          "bid_and_ask.*",
-          "products.productName",
-          "images.imageUrl",
-        ]);
+        qb.columns(['bid_and_ask.*', 'products.productName', 'images.imageUrl']);
         //  qb.select(bookshelf
 
         // .knex.raw(`(SELECT EXTRACT(MONTH FROM 'createdAt')=?)`),[3])
@@ -2239,13 +1804,7 @@ function getAllMybidOrAsk(req, res) {
       .then(function (getDraftListResult) {
         getDraftListResult = getDraftListResult.toJSON();
         console.log(getDraftListResult);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.loginSuccess,
-            getDraftListResult
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
       })
       .catch(function (err) {
         console.log(err);
@@ -2253,17 +1812,13 @@ function getAllMybidOrAsk(req, res) {
         res.json({
           status: config.statusCode.error,
           data: [],
-          message: i18n.__("INTERNAL_ERROR"),
+          message: i18n.__('INTERNAL_ERROR'),
         });
       });
 
     function _filter(qb) {
-      qb.joinRaw(
-        `LEFT JOIN products ON (bid_and_ask."productId" = products."id")`
-      );
-      qb.joinRaw(
-        `LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`
-      );
+      qb.joinRaw(`LEFT JOIN products ON (bid_and_ask."productId" = products."id")`);
+      qb.joinRaw(`LEFT JOIN images ON (bid_and_ask."productId" = images."productId")`);
     }
   }
   getAllMybidOrAskMethod().then((data) => {});
@@ -2285,23 +1840,12 @@ function getListingSearch(req, res) {
     raw2
       .then(function (result) {
         if (result) {
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.searchresultsuccess,
-              result
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.searchresultsuccess, result));
         }
       })
       .catch(function (err) {
         console.log(err);
-        return res.json(
-          Response(
-            constant.statusCode.alreadyExist,
-            constant.validateMsg.emailAlreadyExist
-          )
-        );
+        return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
       });
   }
   getListingSearchMethod().then(function (params) {});
@@ -2309,7 +1853,7 @@ function getListingSearch(req, res) {
 
 function getAllBidAndAsks(req, res) {
   async function getAllBidAndAsksMethod() {
-    console.log("values:", req.body.request);
+    console.log('values:', req.body.request);
     let condition = {
       request: req.body.request,
       productId: req.body.productid,
@@ -2320,9 +1864,9 @@ function getAllBidAndAsks(req, res) {
       .query(_filter)
       .query(function (qb) {
         qb.columns([
-          "bid_and_ask.*",
-          "users.first_name",
-          "users.last_name",
+          'bid_and_ask.*',
+          'users.first_name',
+          'users.last_name',
           //  "images.imageUrl"
         ]);
         //  qb.select(bookshelf
@@ -2333,13 +1877,7 @@ function getAllBidAndAsks(req, res) {
       .then(function (getDraftListResult) {
         getDraftListResult = getDraftListResult.toJSON();
         console.log(getDraftListResult);
-        return res.json(
-          Response(
-            constant.statusCode.ok,
-            constant.messages.loginSuccess,
-            getDraftListResult
-          )
-        );
+        return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
       })
       .catch(function (err) {
         console.log(err);
@@ -2347,7 +1885,7 @@ function getAllBidAndAsks(req, res) {
         res.json({
           status: config.statusCode.error,
           data: [],
-          message: i18n.__("INTERNAL_ERROR"),
+          message: i18n.__('INTERNAL_ERROR'),
         });
       });
 
@@ -2360,7 +1898,7 @@ function getAllBidAndAsks(req, res) {
 }
 
 function createRoom(req, res) {
-  console.log("reqqqq", req.body);
+  console.log('reqqqq', req.body);
   async function createRoom() {
     try {
       if (req.body.user_id && req.body.contact_id) {
@@ -2368,8 +1906,8 @@ function createRoom(req, res) {
           user_id1: req.body.user_id,
           user_id2: req.body.contact_id,
           status: true,
-          created_at: `${moment().utc().format("YYYY-MM-DD")}`,
-          updated_at: `${moment().utc().format("YYYY-MM-DD")}`,
+          created_at: `${moment().utc().format('YYYY-MM-DD')}`,
+          updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
         };
 
         // const room_user = await common_query.findAllData(roomModel, rm_condition).catch(err => {
@@ -2378,24 +1916,22 @@ function createRoom(req, res) {
         let inRoom = await bookshelf.knex.raw(`select 
          "id" from rooms where ("user_id1"= '${req.body.user_id}' and "user_id2"= '${req.body.contact_id}') or
          ("user_id2"= '${req.body.user_id}' and "user_id1"= '${req.body.contact_id}');`);
-        console.log("offer_idoffer_id", req.body.offer_id);
+        console.log('offer_idoffer_id', req.body.offer_id);
         if (inRoom.rowCount) {
-          console.log("2");
+          console.log('2');
           let rmCondition = {
             id: inRoom.rows[0].id,
           };
 
-          console.log("5");
+          console.log('5');
 
           const update_rm = {
             status: true,
-            updated_at: `${moment().utc().format("YYYY-MM-DD")}`,
+            updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
           };
-          await common_query
-            .updateRecord(roomModel, update_rm, rmCondition)
-            .catch((err) => {
-              throw err;
-            });
+          await common_query.updateRecord(roomModel, update_rm, rmCondition).catch((err) => {
+            throw err;
+          });
 
           const update_offer_userid = {
             room_id: inRoom.rows[0].id,
@@ -2405,49 +1941,37 @@ function createRoom(req, res) {
           const toUpdateoffer = {
             offer_id: req.body.offer_id,
           };
-          const dataOrder = await common_query
-            .updateRecord(contactModel, toUpdateoffer, update_offer_userid)
-            .catch((err) => {
-              throw err;
-            });
-          console.log("dataOrderdataOrderdataOrderdataOrder", dataOrder);
+          const dataOrder = await common_query.updateRecord(contactModel, toUpdateoffer, update_offer_userid).catch((err) => {
+            throw err;
+          });
+          console.log('dataOrderdataOrderdataOrderdataOrder', dataOrder);
           const update_offer_contact_id = {
             room_id: inRoom.rows[0].id,
             my_contact_id: req.body.user_id,
             my_id: req.body.contact_id,
           };
-          await common_query
-            .updateRecord(contactModel, toUpdateoffer, update_offer_contact_id)
-            .catch((err) => {
-              throw err;
-            });
+          await common_query.updateRecord(contactModel, toUpdateoffer, update_offer_contact_id).catch((err) => {
+            throw err;
+          });
           const responseD = {
             roomid: inRoom.rows[0].id,
           };
 
-          return res.json(
-            Response(
-              constant.statusCode.ok,
-              constant.messages.Registration,
-              responseD
-            )
-          );
+          return res.json(Response(constant.statusCode.ok, constant.messages.Registration, responseD));
         } else {
-          console.log("datadatadatadata", data);
-          let saveRoom = await common_query
-            .saveRecord(roomModel, data)
-            .catch((err) => {
-              throw err;
-            });
-          console.log("saveRoomsaveRoom", saveRoom.success.toJSON());
+          console.log('datadatadatadata', data);
+          let saveRoom = await common_query.saveRecord(roomModel, data).catch((err) => {
+            throw err;
+          });
+          console.log('saveRoomsaveRoom', saveRoom.success.toJSON());
           let resp = saveRoom.success.toJSON();
           if (saveRoom) {
             let data = {
               my_id: req.body.user_id,
               my_contact_id: req.body.contact_id,
               isblocked: false,
-              created_at: `${moment().utc().format("YYYY-MM-DD")}`,
-              updated_at: `${moment().utc().format("YYYY-MM-DD")}`,
+              created_at: `${moment().utc().format('YYYY-MM-DD')}`,
+              updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
               room_id: resp.id,
               offer_id: req.body.offer_id,
             };
@@ -2458,8 +1982,8 @@ function createRoom(req, res) {
               my_contact_id: req.body.user_id,
               my_id: req.body.contact_id,
               isblocked: false,
-              created_at: `${moment().utc().format("YYYY-MM-DD")}`,
-              updated_at: `${moment().utc().format("YYYY-MM-DD")}`,
+              created_at: `${moment().utc().format('YYYY-MM-DD')}`,
+              updated_at: `${moment().utc().format('YYYY-MM-DD')}`,
               room_id: resp.id,
               offer_id: req.body.offer_id,
             };
@@ -2470,39 +1994,17 @@ function createRoom(req, res) {
             const responseData = {
               roomid: resp.id,
             };
-            return res.json(
-              Response(
-                constant.statusCode.ok,
-                constant.messages.Registration,
-                responseData
-              )
-            );
+            return res.json(Response(constant.statusCode.ok, constant.messages.Registration, responseData));
           } else {
-            return res.json(
-              Response(
-                constant.statusCode.internalError,
-                constant.messages.commonError,
-                null
-              )
-            );
+            return res.json(Response(constant.statusCode.internalError, constant.messages.commonError, null));
           }
         }
       } else {
-        return res.json(
-          Response(
-            constant.statusCode.validation,
-            constant.messages.invalid_data
-          )
-        );
+        return res.json(Response(constant.statusCode.validation, constant.messages.invalid_data));
       }
     } catch (err) {
-      console.log("err in creating Room");
-      return res.json(
-        Response(
-          constant.statusCode.internalservererror,
-          constant.validateMsg.internalError
-        )
-      );
+      console.log('err in creating Room');
+      return res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError));
     }
   }
   createRoom().then(function () {});

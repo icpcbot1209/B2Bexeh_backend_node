@@ -15,9 +15,8 @@ var fileupload = require('express-fileupload');
 // const formidable = require('formidable');
 
 require('dotenv').config();
-global.__rootRequire = function (relpath) {
-  return require(path.join(__dirname, relpath));
-};
+
+require('app-module-path').addPath(__dirname);
 
 global.__debug = function () {
   if (!process.env.NODE_ENV || process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'aws') {

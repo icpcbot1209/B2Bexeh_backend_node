@@ -5,7 +5,7 @@ module.exports = function (express) {
     return res.send(`${Date.now()}`);
   });
 
-  var auth = __rootRequire('app/utils/crypto');
+  var auth = require('app/utils/crypto');
   var middlewares = [auth.ensureAuthorized];
 
   const user = require('./controllers/user');

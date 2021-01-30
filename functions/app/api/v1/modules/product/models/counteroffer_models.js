@@ -1,20 +1,18 @@
-var bookshelf = __rootRequire("app/config/bookshelf");
-var santize = __rootRequire("app/utils/santize");
-var config = __rootRequire("app/config/constant");
-var moment = require("moment");
-var Joi = require("joi");
+var bookshelf = require('app/config/bookshelf');
+var santize = require('app/utils/santize');
+var config = require('app/config/constant');
+var moment = require('moment');
+var Joi = require('joi');
 
 var CounterOffer = bookshelf.Model.extend({
-  tableName: "counters",
+  tableName: 'counters',
   initialize: function () {
-    this.on("creating", this.onCreating);
+    this.on('creating', this.onCreating);
   },
   onCreating: function () {
     let self = this;
     self.attributes = santize.striptags(self.attributes);
-    self.attributes.created = moment
-      .utc()
-      .format(config.MOMENT_DATE_TIME_FORMAT);
+    self.attributes.created = moment.utc().format(config.MOMENT_DATE_TIME_FORMAT);
     var validate = Joi.object().keys({
       bid_and_ask_id: Joi.any(),
       seller_id: Joi.any(),
@@ -42,4 +40,4 @@ var CounterOffer = bookshelf.Model.extend({
   },
 });
 
-module.exports = bookshelf.model("counters", CounterOffer);
+module.exports = bookshelf.model('counters', CounterOffer);

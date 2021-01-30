@@ -1,79 +1,79 @@
-"use strict";
+'use strict';
 
 function _typeof(obj) {
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+  if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
     _typeof = function _typeof(obj) {
       return typeof obj;
     };
   } else {
     _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      return obj && typeof Symbol === 'function' && obj.constructor === Symbol && obj !== Symbol.prototype ? 'symbol' : typeof obj;
     };
   }
   return _typeof(obj);
 }
 
-var bookshelf = __rootRequire("app/config/bookshelf");
+var bookshelf = require('app/config/bookshelf');
 
-var config = __rootRequire("app/config/constant");
+var config = require('app/config/constant');
 
-var Joi = require("joi");
+var Joi = require('joi');
 
-var moment = require("moment");
+var moment = require('moment');
 
-var crypto = __rootRequire("app/utils/crypto");
+var crypto = require('app/utils/crypto');
 
-var loader = __rootRequire("app/api/v1/loader");
+var loader = require('app/api/v1/loader');
 
-var santize = __rootRequire("app/utils/santize");
+var santize = require('app/utils/santize');
 
-var i18n = require("i18n");
+var i18n = require('i18n');
 
-var _ = require("lodash");
+var _ = require('lodash');
 
-var __ = require("underscore");
+var __ = require('underscore');
 
-var text = __rootRequire("app/utils/text");
+var text = require('app/utils/text');
 
-var async = require("async");
+var async = require('async');
 
-var UserModel = loader.loadModel("/user/models/user_models");
-var TxnHistoryModel = loader.loadModel("/user/models/transaction_history_model");
-var NotificationModel = loader.loadModel("/user/models/notification_models");
-var OrderModel = loader.loadModel("/user/models/order_models");
-var EmailBlastModel = loader.loadModel("/user/models/emailblast_models");
-var CounterModel = loader.loadModel("/product/models/counteroffer_models");
-var WatchListModel = loader.loadModel("/user/models/watchlist_models");
-var imageModel = loader.loadModel("/images/models/image_models");
+var UserModel = loader.loadModel('/user/models/user_models');
+var TxnHistoryModel = loader.loadModel('/user/models/transaction_history_model');
+var NotificationModel = loader.loadModel('/user/models/notification_models');
+var OrderModel = loader.loadModel('/user/models/order_models');
+var EmailBlastModel = loader.loadModel('/user/models/emailblast_models');
+var CounterModel = loader.loadModel('/product/models/counteroffer_models');
+var WatchListModel = loader.loadModel('/user/models/watchlist_models');
+var imageModel = loader.loadModel('/images/models/image_models');
 
-var settingModel = require("../../admin_settings/models/admin_setting_models");
+var settingModel = require('../../admin_settings/models/admin_setting_models');
 
-var ChatModel = require("../../chat/models/chat_models");
+var ChatModel = require('../../chat/models/chat_models');
 
-var roomModel = require("../../bidsAsks/models/room_models");
+var roomModel = require('../../bidsAsks/models/room_models');
 
-var contactModel = require("../../bidsAsks/models/contact_models");
+var contactModel = require('../../bidsAsks/models/contact_models');
 
-var mkdirp = require("mkdirp");
+var mkdirp = require('mkdirp');
 
-var config1 = __rootRequire("app/config/config").get("local");
+var config1 = require('app/config/config').get('local');
 
-var s3file_upload = require("../../../../../utils/fileUpload"); // var AddressModel = loader.loadModel('/address/models/address_models');
+var s3file_upload = require('../../../../../utils/fileUpload'); // var AddressModel = loader.loadModel('/address/models/address_models');
 
-var jwt = require("jsonwebtoken"); // var MetricesSettingProviderModel = loader.loadModel('/metrices_setting_provider/models/metrices_setting_provider_model');
+var jwt = require('jsonwebtoken'); // var MetricesSettingProviderModel = loader.loadModel('/metrices_setting_provider/models/metrices_setting_provider_model');
 // var MetricesSettingModel = loader.loadModel('/metrices_setting/models/metrices_setting_model');
 
-var constant = require("../../../../../utils/constants");
+var constant = require('../../../../../utils/constants');
 
-var common_query = require("../../../../../utils/commonQuery");
+var common_query = require('../../../../../utils/commonQuery');
 
-var Response = require("../../../../../utils/response");
+var Response = require('../../../../../utils/response');
 
-var uuidv4 = require("uuid/v4");
+var uuidv4 = require('uuid/v4');
 
-var utility = require("../../../../../utils/utility");
+var utility = require('../../../../../utils/utility');
 
-var nodemailer = require("nodemailer");
+var nodemailer = require('nodemailer');
 
 module.exports = {
   updateUserData: updateUserData,
@@ -152,10 +152,10 @@ function statusChange(req, res) {
                 break;
               }
 
-              return _context.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, _updateUserData)));
+              return _context.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, _updateUserData)));
 
             case 10:
-              return _context.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              return _context.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 11:
               _context.next = 16;
@@ -163,11 +163,11 @@ function statusChange(req, res) {
 
             case 13:
               _context.prev = 13;
-              _context.t0 = _context["catch"](2);
-              return _context.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              _context.t0 = _context['catch'](2);
+              return _context.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 16:
-            case "end":
+            case 'end':
               return _context.stop();
           }
         }
@@ -192,9 +192,17 @@ function getLastThreeTransaction(req, res) {
               _context2.prev = 0;
 
               if (req.body && req.body.limit) {
-                sql = 'Select O.id, O."created_at",C."type_of",C."type", C."amount", C."qty", P."productName"\n        from orders O\n        LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n        LEFT OUTER JOIN products P ON O."product_id" = P.id\n        where O.is_deleted = false and O.product_id ='.concat(req.body.product_id, ' and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n        Group By O.id, C."type_of", C."total_amount", C."amount",C."qty", P."productName", C."type"\n        order by id desc limit ').concat(req.body.limit);
+                sql = 'Select O.id, O."created_at",C."type_of",C."type", C."amount", C."qty", P."productName"\n        from orders O\n        LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n        LEFT OUTER JOIN products P ON O."product_id" = P.id\n        where O.is_deleted = false and O.product_id ='
+                  .concat(
+                    req.body.product_id,
+                    ' and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n        Group By O.id, C."type_of", C."total_amount", C."amount",C."qty", P."productName", C."type"\n        order by id desc limit '
+                  )
+                  .concat(req.body.limit);
               } else {
-                sql = 'Select O.id, O."created_at",C."type_of",C."type", C."amount", C."qty", P."productName"\n        from orders O\n        LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n        LEFT OUTER JOIN products P ON O."product_id" = P.id\n        where O.is_deleted = false and O.product_id ='.concat(req.body.product_id, ' and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n        Group By O.id, C."type_of", C."total_amount", C."amount",C."qty", P."productName", C."type"\n        order by O."created_at" desc');
+                sql = 'Select O.id, O."created_at",C."type_of",C."type", C."amount", C."qty", P."productName"\n        from orders O\n        LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n        LEFT OUTER JOIN products P ON O."product_id" = P.id\n        where O.is_deleted = false and O.product_id ='.concat(
+                  req.body.product_id,
+                  ' and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n        Group By O.id, C."type_of", C."total_amount", C."amount",C."qty", P."productName", C."type"\n        order by O."created_at" desc'
+                );
               }
 
               bookshelf.knex
@@ -202,7 +210,7 @@ function getLastThreeTransaction(req, res) {
                 .then(function (data) {
                   return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, data.rows));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context2.next = 8;
@@ -210,11 +218,11 @@ function getLastThreeTransaction(req, res) {
 
             case 5:
               _context2.prev = 5;
-              _context2.t0 = _context2["catch"](0);
-              return _context2.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context2.t0 = _context2['catch'](0);
+              return _context2.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 8:
-            case "end":
+            case 'end':
               return _context2.stop();
           }
         }
@@ -286,17 +294,17 @@ function getTxnHistory(req, res) {
             case 0:
               _context3.prev = 0;
               _result = {
-                total_txn_lifetime: "",
-                total_txn_ninty_days: "",
-                total_txn_ninty_days1: "",
-                total_txn_ninty_days2: "",
-                total_txn_six_month: "",
-                total_txn_six_month1: "",
-                total_txn_six_month2: "",
-                total_txn_lifetime_count: "",
-                total_txn_lifetime_count1: "",
-                total_txn_lifetime_count2: "",
-                txnHistoryTotal: "",
+                total_txn_lifetime: '',
+                total_txn_ninty_days: '',
+                total_txn_ninty_days1: '',
+                total_txn_ninty_days2: '',
+                total_txn_six_month: '',
+                total_txn_six_month1: '',
+                total_txn_six_month2: '',
+                total_txn_lifetime_count: '',
+                total_txn_lifetime_count1: '',
+                total_txn_lifetime_count2: '',
+                txnHistoryTotal: '',
               };
               sql = 'select * from transaction_history where "userId"= '.concat(req.body.userId, ' and "is_deleted"=false;');
               _context3.next = 5;
@@ -306,28 +314,34 @@ function getTxnHistory(req, res) {
                   .then(function (data) {
                     _result.total_txn_lifetime = data.rows.length ? data.rows[0].total_txn_lifetime : 0;
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error1===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error1===', err);
                   })
               );
 
             case 5:
-              sql1 = "select * from orders o left outer join counters C on c.id =o.counter_id where C.bidder_id =".concat(req.body.userId, '\n  and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'90 days\' and o."paymentdetail" is not NULL;');
+              sql1 = 'select * from orders o left outer join counters C on c.id =o.counter_id where C.bidder_id ='.concat(
+                req.body.userId,
+                '\n  and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'90 days\' and o."paymentdetail" is not NULL;'
+              );
               _context3.next = 8;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
                   .raw(sql1)
                   .then(function (data) {
                     _result.total_txn_ninty_days1 = data.rows.length;
-                    console.log("3 months data 1", data.rows.length);
+                    console.log('3 months data 1', data.rows.length);
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error2===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error2===', err);
                   })
               );
 
             case 8:
-              sql11 = "select * from orders o left outer join counters C on c.id =o.counter_id where C.seller_id =".concat(req.body.userId, '\n  and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'90 days\' and o."track_no" is not NULL;');
+              sql11 = 'select * from orders o left outer join counters C on c.id =o.counter_id where C.seller_id ='.concat(
+                req.body.userId,
+                '\n  and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'90 days\' and o."track_no" is not NULL;'
+              );
               _context3.next = 11;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -335,15 +349,18 @@ function getTxnHistory(req, res) {
                   .then(function (data) {
                     _result.total_txn_ninty_days2 = data.rows.length;
                     _result.total_txn_ninty_days = _result.total_txn_ninty_days1 + _result.total_txn_ninty_days2;
-                    console.log("3 months data 2", _result.total_txn_ninty_days);
+                    console.log('3 months data 2', _result.total_txn_ninty_days);
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error2===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error2===', err);
                   })
               );
 
             case 11:
-              sql2 = "select * from orders o left outer join counters C on c.id =o.counter_id where C.bidder_id =".concat(req.body.userId, '\n  and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'180 days\' and o."paymentdetail" is not NULL;');
+              sql2 = 'select * from orders o left outer join counters C on c.id =o.counter_id where C.bidder_id ='.concat(
+                req.body.userId,
+                '\n  and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'180 days\' and o."paymentdetail" is not NULL;'
+              );
               _context3.next = 14;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -351,13 +368,16 @@ function getTxnHistory(req, res) {
                   .then(function (data) {
                     _result.total_txn_six_month1 = data.rows.length;
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error3===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error3===', err);
                   })
               );
 
             case 14:
-              sql21 = "select * from orders o left outer join counters C on c.id =o.counter_id where C.seller_id =".concat(req.body.userId, '\n          and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'180 days\' and o."track_no" is not NULL;');
+              sql21 = 'select * from orders o left outer join counters C on c.id =o.counter_id where C.seller_id ='.concat(
+                req.body.userId,
+                '\n          and C."is_deleted"=false and DATE(C."created_at") >= DATE(NOW()) - INTERVAL \'180 days\' and o."track_no" is not NULL;'
+              );
               _context3.next = 17;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -366,13 +386,16 @@ function getTxnHistory(req, res) {
                     _result.total_txn_six_month2 = data.rows.length;
                     _result.total_txn_six_month = _result.total_txn_six_month1 + _result.total_txn_six_month2;
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error3===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error3===', err);
                   })
               );
 
             case 17:
-              sql3 = "select * from orders o left outer join counters C on c.id =o.counter_id where C.bidder_id =".concat(req.body.userId, '\n          and C."is_deleted"=false  and o."paymentdetail" is not NULL;');
+              sql3 = 'select * from orders o left outer join counters C on c.id =o.counter_id where C.bidder_id ='.concat(
+                req.body.userId,
+                '\n          and C."is_deleted"=false  and o."paymentdetail" is not NULL;'
+              );
               _context3.next = 20;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -380,13 +403,16 @@ function getTxnHistory(req, res) {
                   .then(function (data) {
                     _result.total_txn_lifetime_count1 = data.rows.length;
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error4===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error4===', err);
                   })
               );
 
             case 20:
-              sql31 = "select * from orders o left outer join counters C on c.id =o.counter_id where C.seller_id =".concat(req.body.userId, '\n          and C."is_deleted"=false and o."track_no" is not NULL; ');
+              sql31 = 'select * from orders o left outer join counters C on c.id =o.counter_id where C.seller_id ='.concat(
+                req.body.userId,
+                '\n          and C."is_deleted"=false and o."track_no" is not NULL; '
+              );
               _context3.next = 23;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -395,22 +421,22 @@ function getTxnHistory(req, res) {
                     _result.total_txn_lifetime_count2 = data.rows.length;
                     _result.total_txn_lifetime_count = _result.total_txn_lifetime_count1 + _result.total_txn_lifetime_count2;
                   })
-                  ["catch"](function (err) {
-                    return console.log("Error4===", err);
+                  ['catch'](function (err) {
+                    return console.log('Error4===', err);
                   })
               );
 
             case 23:
-              console.log("resultttttttttttttttttttt", _result);
-              return _context3.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, _result)));
+              console.log('resultttttttttttttttttttt', _result);
+              return _context3.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, _result)));
 
             case 27:
               _context3.prev = 27;
-              _context3.t0 = _context3["catch"](0);
-              return _context3.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context3.t0 = _context3['catch'](0);
+              return _context3.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 30:
-            case "end":
+            case 'end':
               return _context3.stop();
           }
         }
@@ -452,7 +478,7 @@ function saveTxnHistory(req, res) {
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
 
               if (!(TxnHistoryData.rowCount > 0)) {
                 _context4.next = 26;
@@ -483,10 +509,16 @@ function saveTxnHistory(req, res) {
                 break;
               }
 
-              return _context4.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateTxnHistoryData.success)));
+              return _context4.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateTxnHistoryData.success))
+              );
 
             case 23:
-              return _context4.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+              return _context4.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+              );
 
             case 24:
               _context4.next = 35;
@@ -511,10 +543,13 @@ function saveTxnHistory(req, res) {
                 break;
               }
 
-              return _context4.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.TxnsubmittedSuccessfully, _updateUserData2)));
+              return _context4.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.ok, constant.messages.TxnsubmittedSuccessfully, _updateUserData2))
+              );
 
             case 34:
-              return _context4.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              return _context4.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 35:
               _context4.next = 40;
@@ -522,11 +557,11 @@ function saveTxnHistory(req, res) {
 
             case 37:
               _context4.prev = 37;
-              _context4.t0 = _context4["catch"](0);
-              return _context4.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              _context4.t0 = _context4['catch'](0);
+              return _context4.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 40:
-            case "end":
+            case 'end':
               return _context4.stop();
           }
         }
@@ -555,7 +590,7 @@ function saveEmailBlast(req, res) {
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               data = {
                 is_deleted: false,
                 subject: req.body.subject ? req.body.subject : null,
@@ -576,7 +611,22 @@ function saveEmailBlast(req, res) {
               }
 
               req.body.user.forEach(function _callee3(element) {
-                var notObj, _data, inRoom, rmCondition, update_rm, contact_chat_condition, contactInfo, _data2, saveRoom, resp, _data3, c2, data1, c1, message, chatData;
+                var notObj,
+                  _data,
+                  inRoom,
+                  rmCondition,
+                  update_rm,
+                  contact_chat_condition,
+                  contactInfo,
+                  _data2,
+                  saveRoom,
+                  resp,
+                  _data3,
+                  c2,
+                  data1,
+                  c1,
+                  message,
+                  chatData;
 
                 return regeneratorRuntime.async(function _callee3$(_context7) {
                   while (1) {
@@ -589,25 +639,33 @@ function saveEmailBlast(req, res) {
 
                         notObj = {
                           created_by: req.body.userId,
-                          content: "Email blast:" + " " + req.body.subject,
+                          content: 'Email blast:' + ' ' + req.body.subject,
                           destnation_user_id: element.id,
                         };
                         utility.addNotification(notObj, function (err, resp) {
                           if (err) {
-                            console.log("Error adding notification in Email blast", err);
+                            console.log('Error adding notification in Email blast', err);
                           } else {
-                            console.log("response after calling common add notification in Email blast", resp);
+                            console.log('response after calling common add notification in Email blast', resp);
                           }
                         });
                         _data = {
                           user_id1: req.body.userId,
                           user_id2: element.id,
                           status: true,
-                          created_at: "".concat(moment().utc().format("YYYY-MM-DD")),
-                          updated_at: "".concat(moment().utc().format("YYYY-MM-DD")),
+                          created_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
+                          updated_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
                         };
                         _context7.next = 6;
-                        return regeneratorRuntime.awrap(bookshelf.knex.raw('select\n"id" from rooms where ("user_id1"= \''.concat(req.body.userId, "' and \"user_id2\"= '").concat(element.id, "') or\n(\"user_id2\"= '").concat(req.body.userId, "' and \"user_id1\"= '").concat(element.id, "');")));
+                        return regeneratorRuntime.awrap(
+                          bookshelf.knex.raw(
+                            'select\n"id" from rooms where ("user_id1"= \''
+                              .concat(req.body.userId, '\' and "user_id2"= \'')
+                              .concat(element.id, '\') or\n("user_id2"= \'')
+                              .concat(req.body.userId, '\' and "user_id1"= \'')
+                              .concat(element.id, "');")
+                          )
+                        );
 
                       case 6:
                         inRoom = _context7.sent;
@@ -617,18 +675,18 @@ function saveEmailBlast(req, res) {
                           break;
                         }
 
-                        console.log("2");
+                        console.log('2');
                         rmCondition = {
                           id: inRoom.rows[0].id,
                         };
                         roomId = inRoom.rows[0].id;
                         update_rm = {
                           status: true,
-                          updated_at: "".concat(moment().utc().format("YYYY-MM-DD")),
+                          updated_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
                         };
                         _context7.next = 14;
                         return regeneratorRuntime.awrap(
-                          common_query.updateRecord(roomModel, update_rm, rmCondition)["catch"](function (err) {
+                          common_query.updateRecord(roomModel, update_rm, rmCondition)['catch'](function (err) {
                             throw err;
                           })
                         );
@@ -639,17 +697,17 @@ function saveEmailBlast(req, res) {
                           my_id: req.body.userId,
                           my_contact_id: element.id,
                         };
-                        console.log("data contact_chat_condition id in line number 312", contact_chat_condition);
+                        console.log('data contact_chat_condition id in line number 312', contact_chat_condition);
                         _context7.next = 18;
                         return regeneratorRuntime.awrap(
-                          common_query.findAllData(contactModel, contact_chat_condition)["catch"](function (err) {
+                          common_query.findAllData(contactModel, contact_chat_condition)['catch'](function (err) {
                             throw err;
                           })
                         );
 
                       case 18:
                         contactInfo = _context7.sent;
-                        console.log("data contact id in line number 317", contactInfo.data.toJSON());
+                        console.log('data contact id in line number 317', contactInfo.data.toJSON());
 
                         if (!contactInfo.data.toJSON().length) {
                           _context7.next = 26;
@@ -658,7 +716,7 @@ function saveEmailBlast(req, res) {
 
                         contactInfo = contactInfo.data.toJSON();
                         contact_id_for_chat = contactInfo[0].id;
-                        console.log("data contact id in line number 318", contact_id_for_chat);
+                        console.log('data contact id in line number 318', contact_id_for_chat);
                         _context7.next = 29;
                         break;
 
@@ -667,15 +725,15 @@ function saveEmailBlast(req, res) {
                           my_id: req.body.userId,
                           my_contact_id: element.id,
                           isblocked: false,
-                          created_at: "".concat(moment().utc().format("YYYY-MM-DD")),
-                          updated_at: "".concat(moment().utc().format("YYYY-MM-DD")),
+                          created_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
+                          updated_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
                           room_id: inRoom.rows[0].id,
                         };
                         _context7.next = 29;
                         return regeneratorRuntime.awrap(
                           common_query
                             .saveRecord(contactModel, _data2)
-                            ["catch"](function (err) {
+                            ['catch'](function (err) {
                               throw err;
                             })
                             .then(function _callee(data) {
@@ -684,29 +742,29 @@ function saveEmailBlast(req, res) {
                                 while (1) {
                                   switch ((_context5.prev = _context5.next)) {
                                     case 0:
-                                      console.log("datata in line number 335");
+                                      console.log('datata in line number 335');
                                       contact_chat_condition = {
                                         room_id: inRoom.rows[0].id,
                                         my_id: req.body.userId,
                                         my_contact_id: element.id,
                                       };
-                                      console.log("datata in line number 343", contact_chat_condition);
+                                      console.log('datata in line number 343', contact_chat_condition);
                                       _context5.next = 5;
                                       return regeneratorRuntime.awrap(
-                                        common_query.findAllData(contactModel, contact_chat_condition)["catch"](function (err) {
+                                        common_query.findAllData(contactModel, contact_chat_condition)['catch'](function (err) {
                                           throw err;
                                         })
                                       );
 
                                     case 5:
                                       contactInfo = _context5.sent;
-                                      console.log("datata in line number 349", contactInfo.data);
+                                      console.log('datata in line number 349', contactInfo.data);
                                       contactInfo = contactInfo.data.toJSON();
                                       contact_id_for_chat = contactInfo[0].id;
-                                      console.log("data contact id in line number 348", contact_id_for_chat);
+                                      console.log('data contact id in line number 348', contact_id_for_chat);
 
                                     case 10:
-                                    case "end":
+                                    case 'end':
                                       return _context5.stop();
                                   }
                                 }
@@ -719,17 +777,17 @@ function saveEmailBlast(req, res) {
                         break;
 
                       case 31:
-                        console.log("datadatadatadata", _data);
+                        console.log('datadatadatadata', _data);
                         _context7.next = 34;
                         return regeneratorRuntime.awrap(
-                          common_query.saveRecord(roomModel, _data)["catch"](function (err) {
+                          common_query.saveRecord(roomModel, _data)['catch'](function (err) {
                             throw err;
                           })
                         );
 
                       case 34:
                         saveRoom = _context7.sent;
-                        console.log("saveRoomsaveRoom", saveRoom.success.toJSON());
+                        console.log('saveRoomsaveRoom', saveRoom.success.toJSON());
                         resp = saveRoom.success.toJSON();
 
                         if (!saveRoom) {
@@ -741,8 +799,8 @@ function saveEmailBlast(req, res) {
                           my_id: req.body.userId,
                           my_contact_id: element.id,
                           isblocked: false,
-                          created_at: "".concat(moment().utc().format("YYYY-MM-DD")),
-                          updated_at: "".concat(moment().utc().format("YYYY-MM-DD")),
+                          created_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
+                          updated_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
                           room_id: resp.id,
                         };
                         roomId = resp.id;
@@ -750,7 +808,7 @@ function saveEmailBlast(req, res) {
                         return regeneratorRuntime.awrap(
                           common_query
                             .saveRecord(contactModel, _data3)
-                            ["catch"](function (err) {
+                            ['catch'](function (err) {
                               throw err;
                             })
                             .then(function _callee2(data) {
@@ -759,7 +817,7 @@ function saveEmailBlast(req, res) {
                                 while (1) {
                                   switch ((_context6.prev = _context6.next)) {
                                     case 0:
-                                      console.log("datata in line number 335");
+                                      console.log('datata in line number 335');
                                       contact_chat_condition = {
                                         room_id: resp.id,
                                         my_id: req.body.userId,
@@ -767,7 +825,7 @@ function saveEmailBlast(req, res) {
                                       };
                                       _context6.next = 4;
                                       return regeneratorRuntime.awrap(
-                                        common_query.findAllData(contactModel, contact_chat_condition)["catch"](function (err) {
+                                        common_query.findAllData(contactModel, contact_chat_condition)['catch'](function (err) {
                                           throw err;
                                         })
                                       );
@@ -776,10 +834,10 @@ function saveEmailBlast(req, res) {
                                       contactInfo = _context6.sent;
                                       contactInfo = contactInfo.data.toJSON();
                                       contact_id_for_chat = contactInfo[0].id;
-                                      console.log("data contact id in line number 348", contact_id_for_chat);
+                                      console.log('data contact id in line number 348', contact_id_for_chat);
 
                                     case 8:
-                                    case "end":
+                                    case 'end':
                                       return _context6.stop();
                                   }
                                 }
@@ -793,13 +851,13 @@ function saveEmailBlast(req, res) {
                           my_contact_id: req.body.userId,
                           my_id: element.id,
                           isblocked: false,
-                          created_at: "".concat(moment().utc().format("YYYY-MM-DD")),
-                          updated_at: "".concat(moment().utc().format("YYYY-MM-DD")),
+                          created_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
+                          updated_at: ''.concat(moment().utc().format('YYYY-MM-DD')),
                           room_id: resp.id,
                         };
                         _context7.next = 46;
                         return regeneratorRuntime.awrap(
-                          common_query.saveRecord(contactModel, data1)["catch"](function (err) {
+                          common_query.saveRecord(contactModel, data1)['catch'](function (err) {
                             throw err;
                           })
                         );
@@ -810,7 +868,7 @@ function saveEmailBlast(req, res) {
                         break;
 
                       case 49:
-                        return _context7.abrupt("return", res.json(Response(constant.statusCode.internalError, constant.messages.commonError, null)));
+                        return _context7.abrupt('return', res.json(Response(constant.statusCode.internalError, constant.messages.commonError, null)));
 
                       case 50:
                         message = {
@@ -824,10 +882,10 @@ function saveEmailBlast(req, res) {
                           room_id: parseInt(roomId),
                           contact_id: parseInt(element.id),
                           message: message,
-                          type: "email",
-                          date_to_group: "".concat(moment().utc().format("YYYY-MM-DD")),
-                          created_at: "".concat(moment().utc().format("YYYY-MM-DD HH:mm:ss")),
-                          updated_at: "".concat(moment().utc().format("YYYY-MM-DD HH:mm:ss")),
+                          type: 'email',
+                          date_to_group: ''.concat(moment().utc().format('YYYY-MM-DD')),
+                          created_at: ''.concat(moment().utc().format('YYYY-MM-DD HH:mm:ss')),
+                          updated_at: ''.concat(moment().utc().format('YYYY-MM-DD HH:mm:ss')),
                           isdelete: false,
                           isActionPerformedbySender: false,
                           isActionPerformedbyRecieved: false,
@@ -839,16 +897,16 @@ function saveEmailBlast(req, res) {
                         return regeneratorRuntime.awrap(common_query.saveRecord(ChatModel, chatData));
 
                       case 54:
-                      case "end":
+                      case 'end':
                         return _context7.stop();
                     }
                   }
                 });
               });
-              return _context8.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.EmailBlastedSuccess, _updateUserData3)));
+              return _context8.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.EmailBlastedSuccess, _updateUserData3)));
 
             case 15:
-              return _context8.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              return _context8.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 16:
               _context8.next = 21;
@@ -856,11 +914,11 @@ function saveEmailBlast(req, res) {
 
             case 18:
               _context8.prev = 18;
-              _context8.t0 = _context8["catch"](0);
-              return _context8.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              _context8.t0 = _context8['catch'](0);
+              return _context8.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 21:
-            case "end":
+            case 'end':
               return _context8.stop();
           }
         }
@@ -885,7 +943,7 @@ function sendContactUs(req, res) {
               _context9.prev = 0;
               cond = {
                 isdeleted: false,
-                settingname: "emailsetting",
+                settingname: 'emailsetting',
               };
               _context9.next = 4;
               return regeneratorRuntime.awrap(common_query.findAllData(settingModel, cond));
@@ -900,24 +958,24 @@ function sendContactUs(req, res) {
               }
 
               admindata = finalData[0].settingvalue;
-              title = req.body.name + "- Contact Us Notification ";
+              title = req.body.name + '- Contact Us Notification ';
               sendData = {
                 email: admindata.email,
                 sendername: req.body.name,
                 sendermessage: req.body.message,
-                template: "contact_us",
+                template: 'contact_us',
               };
-              utility.readTemplateSendMailV2(admindata.email, title, sendData, "contact_us", function (err, resp) {
+              utility.readTemplateSendMailV2(admindata.email, title, sendData, 'contact_us', function (err, resp) {
                 if (err) {
-                  console.log("Mail send error", err);
+                  console.log('Mail send error', err);
                 } else if (resp) {
-                  console.log("Contact us success");
+                  console.log('Contact us success');
                 }
               });
-              return _context9.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.Submit, {})));
+              return _context9.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.Submit, {})));
 
             case 14:
-              return _context9.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, {})));
+              return _context9.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, {})));
 
             case 15:
               _context9.next = 20;
@@ -925,11 +983,11 @@ function sendContactUs(req, res) {
 
             case 17:
               _context9.prev = 17;
-              _context9.t0 = _context9["catch"](0);
-              return _context9.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              _context9.t0 = _context9['catch'](0);
+              return _context9.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 20:
-            case "end":
+            case 'end':
               return _context9.stop();
           }
         }
@@ -956,7 +1014,25 @@ function getAcceptOfferByUserId(req, res) {
               _context11.next = 3;
               return regeneratorRuntime.awrap(
                 (function _callee4() {
-                  var result, groupbyAsk, groupbyBid, groupbyAsksql, groupbyBidsql, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, eachobj, create, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _eachobj, _create;
+                  var result,
+                    groupbyAsk,
+                    groupbyBid,
+                    groupbyAsksql,
+                    groupbyBidsql,
+                    _iteratorNormalCompletion,
+                    _didIteratorError,
+                    _iteratorError,
+                    _iterator,
+                    _step,
+                    eachobj,
+                    create,
+                    _iteratorNormalCompletion2,
+                    _didIteratorError2,
+                    _iteratorError2,
+                    _iterator2,
+                    _step2,
+                    _eachobj,
+                    _create;
 
                   return regeneratorRuntime.async(
                     function _callee4$(_context10) {
@@ -969,7 +1045,10 @@ function getAcceptOfferByUserId(req, res) {
                             };
                             groupbyAsk = [];
                             groupbyBid = [];
-                            groupbyAsksql = "select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id\n      from counters where seller_id=".concat(req.body.loggedUser, " and type_of_offer='Accept' and is_deleted='false'\n      and type_of='ask' and expiry_date > now() AT TIME ZONE 'UTC'\n      group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id ;");
+                            groupbyAsksql = 'select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id\n      from counters where seller_id='.concat(
+                              req.body.loggedUser,
+                              " and type_of_offer='Accept' and is_deleted='false'\n      and type_of='ask' and expiry_date > now() AT TIME ZONE 'UTC'\n      group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id ;"
+                            );
                             _context10.next = 6;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbyAsksql).then(function (data) {
@@ -978,7 +1057,10 @@ function getAcceptOfferByUserId(req, res) {
                             );
 
                           case 6:
-                            groupbyBidsql = "select created_at,product_id,expiry_day,seller_id,bid_and_ask_id\n      from counters where bidder_id=".concat(req.body.loggedUser, " and type_of_offer='Accept' and is_deleted='false'\n      and type_of='bid' and expiry_date > now() AT TIME ZONE 'UTC'\n      group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id ;");
+                            groupbyBidsql = 'select created_at,product_id,expiry_day,seller_id,bid_and_ask_id\n      from counters where bidder_id='.concat(
+                              req.body.loggedUser,
+                              " and type_of_offer='Accept' and is_deleted='false'\n      and type_of='bid' and expiry_date > now() AT TIME ZONE 'UTC'\n      group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id ;"
+                            );
                             _context10.next = 9;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbyBidsql).then(function (data) {
@@ -1005,14 +1087,17 @@ function getAcceptOfferByUserId(req, res) {
                             }
 
                             eachobj = _step.value;
-                            create = "".concat(moment(eachobj.created_at).format("YYYY-MM-DD"));
+                            create = ''.concat(moment(eachobj.created_at).format('YYYY-MM-DD'));
                             sqlbid = 'select c.*,i."imageUrl",sum(c."total_amount") OVER() AS full_amount,a.type,a."producttype",\n          s.user_name as sellerusername,b.user_name as bidderusername,\n          s.first_name as sellerFirst,p."productName" as product_name,s.company_logo as companylogo,b.company_logo as b_companylogo,\n                s.last_name as sellerLast,b.first_name as bidderFirst,b.last_name as bidderLast,O.id as order_id,O."status",O."delivered",O."createdbyId",O."track_no",O."courier",O."paymentdetail" from counters c\n                LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n                LEFT OUTER JOIN images i on i."productId" = c."product_id"\n                LEFT OUTER JOIN users s on s.id = c."seller_id"\n                LEFT OUTER JOIN users b on b.id = c."bidder_id"\n                LEFT OUTER JOIN products p on p.id = c."product_id"\n                LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                where c."created_at"=\''
                               .concat(create, '\' and c."seller_id"=')
                               .concat(eachobj.seller_id, ' and c."expiry_day"=')
                               .concat(eachobj.expiry_day, '\n                 and c."product_id"=')
                               .concat(eachobj.product_id, " and type_of='bid' and c.bidder_id=")
-                              .concat(req.body.loggedUser, "\n                 and c.type_of_offer='Accept' and c.is_deleted='false'\n                 and c.type_of='bid' and c.expiry_date > now() AT TIME ZONE 'UTC'\n                 and c.\"bid_and_ask_id\"=")
-                              .concat(eachobj.bid_and_ask_id, "; ");
+                              .concat(
+                                req.body.loggedUser,
+                                "\n                 and c.type_of_offer='Accept' and c.is_deleted='false'\n                 and c.type_of='bid' and c.expiry_date > now() AT TIME ZONE 'UTC'\n                 and c.\"bid_and_ask_id\"="
+                              )
+                              .concat(eachobj.bid_and_ask_id, '; ');
                             _context10.next = 21;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1020,8 +1105,8 @@ function getAcceptOfferByUserId(req, res) {
                                 .then(function (data) {
                                   result.acceptBid.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err");
+                                ['catch'](function (err) {
+                                  console.log('err');
                                 })
                             );
 
@@ -1036,7 +1121,7 @@ function getAcceptOfferByUserId(req, res) {
 
                           case 26:
                             _context10.prev = 26;
-                            _context10.t0 = _context10["catch"](13);
+                            _context10.t0 = _context10['catch'](13);
                             _didIteratorError = true;
                             _iteratorError = _context10.t0;
 
@@ -1044,8 +1129,8 @@ function getAcceptOfferByUserId(req, res) {
                             _context10.prev = 30;
                             _context10.prev = 31;
 
-                            if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-                              _iterator["return"]();
+                            if (!_iteratorNormalCompletion && _iterator['return'] != null) {
+                              _iterator['return']();
                             }
 
                           case 33:
@@ -1083,14 +1168,17 @@ function getAcceptOfferByUserId(req, res) {
                             }
 
                             _eachobj = _step2.value;
-                            _create = "".concat(moment(_eachobj.created_at).format("YYYY-MM-DD"));
+                            _create = ''.concat(moment(_eachobj.created_at).format('YYYY-MM-DD'));
                             sqlask = 'select c.*,i."imageUrl",sum(c."total_amount") OVER() AS full_amount,a.type,a."producttype",\n          s.company_logo as companylogo,b.company_logo as b_companylogo,\n          s.user_name as sellerusername,b.user_name as bidderusername,\n          s.first_name as sellerFirst,p."productName" as product_name,\n                s.last_name as sellerLast,b.first_name as bidderFirst,b.last_name as bidderLast,O.id as order_id,O."status",O."delivered",O."createdbyId",O."track_no",O."courier",O."paymentdetail" from counters c\n                LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n                LEFT OUTER JOIN images i on i."productId" = c."product_id"\n                LEFT OUTER JOIN users s on s.id = c."seller_id"\n                LEFT OUTER JOIN users b on b.id = c."bidder_id"\n                LEFT OUTER JOIN products p on p.id = c."product_id"\n                LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                where c."created_at"=\''
                               .concat(_create, '\' and c."bidder_id"=')
                               .concat(_eachobj.bidder_id, ' and c."expiry_day"=')
                               .concat(_eachobj.expiry_day, '\n                 and c."product_id"=')
-                              .concat(_eachobj.product_id, " and c.seller_id=")
-                              .concat(req.body.loggedUser, " and c.type_of_offer='Accept' and c.is_deleted='false'\n                and c.type_of='ask' and c.expiry_date > now() AT TIME ZONE 'UTC'\n                and c.\"bid_and_ask_id\"=")
-                              .concat(_eachobj.bid_and_ask_id, "; ");
+                              .concat(_eachobj.product_id, ' and c.seller_id=')
+                              .concat(
+                                req.body.loggedUser,
+                                " and c.type_of_offer='Accept' and c.is_deleted='false'\n                and c.type_of='ask' and c.expiry_date > now() AT TIME ZONE 'UTC'\n                and c.\"bid_and_ask_id\"="
+                              )
+                              .concat(_eachobj.bid_and_ask_id, '; ');
                             _context10.next = 50;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1098,8 +1186,8 @@ function getAcceptOfferByUserId(req, res) {
                                 .then(function (data) {
                                   result.acceptAsk.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err");
+                                ['catch'](function (err) {
+                                  console.log('err');
                                 })
                             );
 
@@ -1114,7 +1202,7 @@ function getAcceptOfferByUserId(req, res) {
 
                           case 55:
                             _context10.prev = 55;
-                            _context10.t1 = _context10["catch"](42);
+                            _context10.t1 = _context10['catch'](42);
                             _didIteratorError2 = true;
                             _iteratorError2 = _context10.t1;
 
@@ -1122,8 +1210,8 @@ function getAcceptOfferByUserId(req, res) {
                             _context10.prev = 59;
                             _context10.prev = 60;
 
-                            if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-                              _iterator2["return"]();
+                            if (!_iteratorNormalCompletion2 && _iterator2['return'] != null) {
+                              _iterator2['return']();
                             }
 
                           case 62:
@@ -1162,12 +1250,12 @@ function getAcceptOfferByUserId(req, res) {
 
                             result.acceptAsk = temp;
                             result.acceptBid = temp1;
-                            return _context10.abrupt("return", {
-                              v: res.json(Response(constant.statusCode.ok, "Active Offer fetched", result)),
+                            return _context10.abrupt('return', {
+                              v: res.json(Response(constant.statusCode.ok, 'Active Offer fetched', result)),
                             });
 
                           case 76:
-                          case "end":
+                          case 'end':
                             return _context10.stop();
                         }
                       }
@@ -1187,12 +1275,12 @@ function getAcceptOfferByUserId(req, res) {
             case 3:
               _ret = _context11.sent;
 
-              if (!(_typeof(_ret) === "object")) {
+              if (!(_typeof(_ret) === 'object')) {
                 _context11.next = 6;
                 break;
               }
 
-              return _context11.abrupt("return", _ret.v);
+              return _context11.abrupt('return', _ret.v);
 
             case 6:
               _context11.next = 11;
@@ -1200,11 +1288,11 @@ function getAcceptOfferByUserId(req, res) {
 
             case 8:
               _context11.prev = 8;
-              _context11.t0 = _context11["catch"](0);
-              console.log("err in getAcceptOfferByUserId");
+              _context11.t0 = _context11['catch'](0);
+              console.log('err in getAcceptOfferByUserId');
 
             case 11:
-            case "end":
+            case 'end':
               return _context11.stop();
           }
         }
@@ -1231,7 +1319,25 @@ function getSentAcceptOfferByUserId(req, res) {
               _context13.next = 3;
               return regeneratorRuntime.awrap(
                 (function _callee5() {
-                  var result, groupbyAsk, groupbyBid, groupbyAsksql, groupbyBidsql, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, eachobj, create, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _eachobj2, _create2;
+                  var result,
+                    groupbyAsk,
+                    groupbyBid,
+                    groupbyAsksql,
+                    groupbyBidsql,
+                    _iteratorNormalCompletion3,
+                    _didIteratorError3,
+                    _iteratorError3,
+                    _iterator3,
+                    _step3,
+                    eachobj,
+                    create,
+                    _iteratorNormalCompletion4,
+                    _didIteratorError4,
+                    _iteratorError4,
+                    _iterator4,
+                    _step4,
+                    _eachobj2,
+                    _create2;
 
                   return regeneratorRuntime.async(
                     function _callee5$(_context12) {
@@ -1244,7 +1350,10 @@ function getSentAcceptOfferByUserId(req, res) {
                             };
                             groupbyAsk = [];
                             groupbyBid = [];
-                            groupbyAsksql = "select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id\n  from counters where bidder_id=".concat(req.body.loggedUser, " and type_of_offer='Accept' and is_deleted='false'\n  and type_of='ask' and expiry_date > now() AT TIME ZONE 'UTC'\n  group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id ;");
+                            groupbyAsksql = 'select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id\n  from counters where bidder_id='.concat(
+                              req.body.loggedUser,
+                              " and type_of_offer='Accept' and is_deleted='false'\n  and type_of='ask' and expiry_date > now() AT TIME ZONE 'UTC'\n  group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id ;"
+                            );
                             _context12.next = 6;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbyAsksql).then(function (data) {
@@ -1253,7 +1362,10 @@ function getSentAcceptOfferByUserId(req, res) {
                             );
 
                           case 6:
-                            groupbyBidsql = "select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id\n  from counters where seller_id=".concat(req.body.loggedUser, " and type_of_offer='Accept' and is_deleted='false'\n  and type_of='bid' and expiry_date > now() AT TIME ZONE 'UTC'\n  group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id ;");
+                            groupbyBidsql = 'select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id\n  from counters where seller_id='.concat(
+                              req.body.loggedUser,
+                              " and type_of_offer='Accept' and is_deleted='false'\n  and type_of='bid' and expiry_date > now() AT TIME ZONE 'UTC'\n  group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id ;"
+                            );
                             _context12.next = 9;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbyBidsql).then(function (data) {
@@ -1280,14 +1392,17 @@ function getSentAcceptOfferByUserId(req, res) {
                             }
 
                             eachobj = _step3.value;
-                            create = "".concat(moment(eachobj.created_at).format("YYYY-MM-DD"));
+                            create = ''.concat(moment(eachobj.created_at).format('YYYY-MM-DD'));
                             sqlbid = 'select c.*,i."imageUrl",sum(c."total_amount") OVER() AS full_amount,a.type,\n          a."producttype",s.user_name as sellerusername,s.first_name as sellerFirst,p."productName" as product_name,\n  s.last_name as sellerLast,s.company_logo as companylogo,\n  b.user_name as bidderusername,b.first_name as bidderFirst,b.last_name as bidderLast,\n  b.company_logo as b_companylogo, O.id as order_id,O."status", O."delivered", O."createdbyId",O."track_no",O."courier",O."paymentdetail" from counters c\n  LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n  LEFT OUTER JOIN images i on i."productId" = c."product_id"\n  LEFT OUTER JOIN users s on s.id = c."seller_id"\n  LEFT OUTER JOIN users b on b.id = c."bidder_id"\n  LEFT OUTER JOIN products p on p.id = c."product_id"\n  LEFT OUTER JOIN orders O on c.id = O."counter_id"\n  where c."created_at"=\''
                               .concat(create, '\' and c."seller_id"=')
                               .concat(req.body.loggedUser, ' and c."expiry_day"=')
                               .concat(eachobj.expiry_day, '\n  and c."product_id"=')
                               .concat(eachobj.product_id, " and type_of='bid' and c.bidder_id=")
-                              .concat(eachobj.bidder_id, "\n  and c.type_of_offer='Accept' and c.is_deleted='false' and (c.status!='decline' or c.status is null)\n  and c.type_of='bid' and c.expiry_date > now() AT TIME ZONE 'UTC'\n  and c.\"bid_and_ask_id\"=")
-                              .concat(eachobj.bid_and_ask_id, "; ");
+                              .concat(
+                                eachobj.bidder_id,
+                                "\n  and c.type_of_offer='Accept' and c.is_deleted='false' and (c.status!='decline' or c.status is null)\n  and c.type_of='bid' and c.expiry_date > now() AT TIME ZONE 'UTC'\n  and c.\"bid_and_ask_id\"="
+                              )
+                              .concat(eachobj.bid_and_ask_id, '; ');
                             _context12.next = 21;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1295,8 +1410,8 @@ function getSentAcceptOfferByUserId(req, res) {
                                 .then(function (data) {
                                   result.acceptBid.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err");
+                                ['catch'](function (err) {
+                                  console.log('err');
                                 })
                             );
 
@@ -1311,7 +1426,7 @@ function getSentAcceptOfferByUserId(req, res) {
 
                           case 26:
                             _context12.prev = 26;
-                            _context12.t0 = _context12["catch"](13);
+                            _context12.t0 = _context12['catch'](13);
                             _didIteratorError3 = true;
                             _iteratorError3 = _context12.t0;
 
@@ -1319,8 +1434,8 @@ function getSentAcceptOfferByUserId(req, res) {
                             _context12.prev = 30;
                             _context12.prev = 31;
 
-                            if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-                              _iterator3["return"]();
+                            if (!_iteratorNormalCompletion3 && _iterator3['return'] != null) {
+                              _iterator3['return']();
                             }
 
                           case 33:
@@ -1358,14 +1473,17 @@ function getSentAcceptOfferByUserId(req, res) {
                             }
 
                             _eachobj2 = _step4.value;
-                            _create2 = "".concat(moment(_eachobj2.created_at).format("YYYY-MM-DD"));
+                            _create2 = ''.concat(moment(_eachobj2.created_at).format('YYYY-MM-DD'));
                             sqlask = 'select c.*,i."imageUrl",sum(c."total_amount") OVER() AS full_amount,a.type,a."producttype",s.user_name as sellerusername,\n          s.first_name as sellerFirst,p."productName" as product_name,\n  s.last_name as sellerLast,b.user_name as bidderusername,s.company_logo as companylogo,\n  b.first_name as bidderFirst,b.last_name as bidderLast, b.company_logo as b_companylogo,\n  O.id as order_id,O."status",O."delivered",O."createdbyId",O."track_no",O."courier",O."paymentdetail" from counters c\n  LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n  LEFT OUTER JOIN images i on i."productId" = c."product_id"\n  LEFT OUTER JOIN users s on s.id = c."seller_id"\n  LEFT OUTER JOIN users b on b.id = c."bidder_id"\n  LEFT OUTER JOIN products p on p.id = c."product_id"\n  LEFT OUTER JOIN orders O on c.id = O."counter_id"\n  where c."created_at"=\''
                               .concat(_create2, '\' and c."bidder_id"=')
                               .concat(req.body.loggedUser, ' and c."expiry_day"=')
                               .concat(_eachobj2.expiry_day, '\n  and c."product_id"=')
-                              .concat(_eachobj2.product_id, " and c.seller_id=")
-                              .concat(_eachobj2.seller_id, " and c.type_of_offer='Accept' and c.is_deleted='false'\n  and c.type_of='ask' and c.expiry_date > now() AT TIME ZONE 'UTC'\n  and c.\"bid_and_ask_id\"=")
-                              .concat(_eachobj2.bid_and_ask_id, "; ");
+                              .concat(_eachobj2.product_id, ' and c.seller_id=')
+                              .concat(
+                                _eachobj2.seller_id,
+                                " and c.type_of_offer='Accept' and c.is_deleted='false'\n  and c.type_of='ask' and c.expiry_date > now() AT TIME ZONE 'UTC'\n  and c.\"bid_and_ask_id\"="
+                              )
+                              .concat(_eachobj2.bid_and_ask_id, '; ');
                             _context12.next = 50;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1373,8 +1491,8 @@ function getSentAcceptOfferByUserId(req, res) {
                                 .then(function (data) {
                                   result.acceptAsk.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err");
+                                ['catch'](function (err) {
+                                  console.log('err');
                                 })
                             );
 
@@ -1389,7 +1507,7 @@ function getSentAcceptOfferByUserId(req, res) {
 
                           case 55:
                             _context12.prev = 55;
-                            _context12.t1 = _context12["catch"](42);
+                            _context12.t1 = _context12['catch'](42);
                             _didIteratorError4 = true;
                             _iteratorError4 = _context12.t1;
 
@@ -1397,8 +1515,8 @@ function getSentAcceptOfferByUserId(req, res) {
                             _context12.prev = 59;
                             _context12.prev = 60;
 
-                            if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-                              _iterator4["return"]();
+                            if (!_iteratorNormalCompletion4 && _iterator4['return'] != null) {
+                              _iterator4['return']();
                             }
 
                           case 62:
@@ -1437,12 +1555,12 @@ function getSentAcceptOfferByUserId(req, res) {
 
                             result.acceptAsk = temp;
                             result.acceptBid = temp1;
-                            return _context12.abrupt("return", {
-                              v: res.json(Response(constant.statusCode.ok, "Active Offer fetched", result)),
+                            return _context12.abrupt('return', {
+                              v: res.json(Response(constant.statusCode.ok, 'Active Offer fetched', result)),
                             });
 
                           case 76:
-                          case "end":
+                          case 'end':
                             return _context12.stop();
                         }
                       }
@@ -1462,12 +1580,12 @@ function getSentAcceptOfferByUserId(req, res) {
             case 3:
               _ret2 = _context13.sent;
 
-              if (!(_typeof(_ret2) === "object")) {
+              if (!(_typeof(_ret2) === 'object')) {
                 _context13.next = 6;
                 break;
               }
 
-              return _context13.abrupt("return", _ret2.v);
+              return _context13.abrupt('return', _ret2.v);
 
             case 6:
               _context13.next = 11;
@@ -1475,11 +1593,11 @@ function getSentAcceptOfferByUserId(req, res) {
 
             case 8:
               _context13.prev = 8;
-              _context13.t0 = _context13["catch"](0);
-              console.log("err in getAcceptOfferByUserId");
+              _context13.t0 = _context13['catch'](0);
+              console.log('err in getAcceptOfferByUserId');
 
             case 11:
-            case "end":
+            case 'end':
               return _context13.stop();
           }
         }
@@ -1624,8 +1742,8 @@ function getPendingOfferByUserId(req, res) {
             case 0:
               _context16.prev = 0;
               searchTexr = String(req.body.searchName);
-              searchArray = searchTexr.split(" ");
-              console.log("searchArray", searchArray);
+              searchArray = searchTexr.split(' ');
+              console.log('searchArray', searchArray);
 
               if (!req.body.searchName) {
                 _context16.next = 12;
@@ -1635,14 +1753,36 @@ function getPendingOfferByUserId(req, res) {
               _context16.next = 7;
               return regeneratorRuntime.awrap(
                 (function _callee6() {
-                  var result, groupbySelling, groupbyBuying, groupbySellingsql, groupbyBuyingsql, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, eachobj, searchChar, orderQuery, create, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _eachobj3, _searchChar, _orderQuery, _create3;
+                  var result,
+                    groupbySelling,
+                    groupbyBuying,
+                    groupbySellingsql,
+                    groupbyBuyingsql,
+                    _iteratorNormalCompletion5,
+                    _didIteratorError5,
+                    _iteratorError5,
+                    _iterator5,
+                    _step5,
+                    eachobj,
+                    searchChar,
+                    orderQuery,
+                    create,
+                    _iteratorNormalCompletion6,
+                    _didIteratorError6,
+                    _iteratorError6,
+                    _iterator6,
+                    _step6,
+                    _eachobj3,
+                    _searchChar,
+                    _orderQuery,
+                    _create3;
 
                   return regeneratorRuntime.async(
                     function _callee6$(_context14) {
                       while (1) {
                         switch ((_context14.prev = _context14.next)) {
                           case 0:
-                            console.log("searchArray***************************");
+                            console.log('searchArray***************************');
                             result = {
                               selling: [],
                               buying: [],
@@ -1653,10 +1793,13 @@ function getPendingOfferByUserId(req, res) {
                             //and type_of_offer='Accept'
                             //and type_of='bid'
 
-                            console.log("userid is", req.body.loggedUser); // const sData = await common_query.findAllData(CounterModel, { "id": 6318 })
+                            console.log('userid is', req.body.loggedUser); // const sData = await common_query.findAllData(CounterModel, { "id": 6318 })
                             // console.log('sDatatatatataat', sData.data.toJSON())
 
-                            groupbySellingsql = "select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status\n    from counters where seller_id=".concat(req.body.loggedUser, " \n    and is_deleted='false'  group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status ;");
+                            groupbySellingsql = 'select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status\n    from counters where seller_id='.concat(
+                              req.body.loggedUser,
+                              " \n    and is_deleted='false'  group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status ;"
+                            );
                             _context14.next = 8;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbySellingsql).then(function (data) {
@@ -1666,7 +1809,10 @@ function getPendingOfferByUserId(req, res) {
                             );
 
                           case 8:
-                            groupbyBuyingsql = "select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status\n    from counters where bidder_id=".concat(req.body.loggedUser, "  and is_deleted='false'\n    group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status ;");
+                            groupbyBuyingsql = 'select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status\n    from counters where bidder_id='.concat(
+                              req.body.loggedUser,
+                              "  and is_deleted='false'\n    group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status ;"
+                            );
                             _context14.next = 11;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbyBuyingsql).then(function (data) {
@@ -1702,15 +1848,15 @@ function getPendingOfferByUserId(req, res) {
                               searchChar = '(s."user_name"\n        ilike \'%'.concat(searchArray[0], "%')  AND s.is_active=true ");
                             }
 
-                            create = "".concat(moment(eachobj.created_at).format("YYYY-MM-DD"));
+                            create = ''.concat(moment(eachobj.created_at).format('YYYY-MM-DD'));
                             sqlbid = 'select c.*,i."imageUrl",sum(c."total_amount")\n    OVER() AS full_amount,a.type,a."producttype",s.user_name as sellerUserName,\n    s.company_logo as companylogo,s.first_name as sellerFirst,p."productName" as product_name,\n    s.last_name as sellerLast,b.user_name as bidderUserName,b.first_name as bidderFirst,\n    b.company_logo as b_companylogo,b.last_name as bidderLast,\n    O.id as order_id,O."status", O."delivered", O."createdbyId",\n    O."track_no",O."courier",O."paymentdetail",f."feedback_by_seller" as seller_feedback,\n    f."feedback_by_bidder" as bidder_feedback from counters c\n    LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n    LEFT OUTER JOIN images i on i."productId" = c."product_id"\n    LEFT OUTER JOIN users s on s.id = c."seller_id"\n    LEFT OUTER JOIN users b on b.id = c."bidder_id"\n    LEFT OUTER JOIN products p on p.id = c."product_id"\n    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n    LEFT OUTER JOIN feedbacks f on c.id = f."counters_id"\n    where c."created_at"=\''
                               .concat(create, '\' and c."seller_id"=')
                               .concat(eachobj.seller_id, '\n    and c."expiry_day"=')
-                              .concat(eachobj.expiry_day, "\n    and  ")
-                              .concat(searchChar ? searchChar : "", '\n    and c."product_id"=')
-                              .concat(eachobj.product_id, " and c.bidder_id=")
-                              .concat(eachobj.bidder_id, "\n    and c.is_deleted='false'\n\n    and c.\"bid_and_ask_id\"=")
-                              .concat(eachobj.bid_and_ask_id, "; ");
+                              .concat(eachobj.expiry_day, '\n    and  ')
+                              .concat(searchChar ? searchChar : '', '\n    and c."product_id"=')
+                              .concat(eachobj.product_id, ' and c.bidder_id=')
+                              .concat(eachobj.bidder_id, '\n    and c.is_deleted=\'false\'\n\n    and c."bid_and_ask_id"=')
+                              .concat(eachobj.bid_and_ask_id, '; ');
                             _context14.next = 25;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1719,8 +1865,8 @@ function getPendingOfferByUserId(req, res) {
                                   // console.log('data in buy query----->', data.rows)
                                   result.buying.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err in buy query", err);
+                                ['catch'](function (err) {
+                                  console.log('err in buy query', err);
                                 })
                             );
 
@@ -1735,7 +1881,7 @@ function getPendingOfferByUserId(req, res) {
 
                           case 30:
                             _context14.prev = 30;
-                            _context14.t0 = _context14["catch"](15);
+                            _context14.t0 = _context14['catch'](15);
                             _didIteratorError5 = true;
                             _iteratorError5 = _context14.t0;
 
@@ -1743,8 +1889,8 @@ function getPendingOfferByUserId(req, res) {
                             _context14.prev = 34;
                             _context14.prev = 35;
 
-                            if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-                              _iterator5["return"]();
+                            if (!_iteratorNormalCompletion5 && _iterator5['return'] != null) {
+                              _iterator5['return']();
                             }
 
                           case 37:
@@ -1790,15 +1936,15 @@ function getPendingOfferByUserId(req, res) {
                               _searchChar = '(b."user_name"\n            ilike \'%'.concat(searchArray[0], "%') AND b.is_active=true ");
                             }
 
-                            _create3 = "".concat(moment(_eachobj3.created_at).format("YYYY-MM-DD"));
+                            _create3 = ''.concat(moment(_eachobj3.created_at).format('YYYY-MM-DD'));
                             sqlask = 'select c.*,i."imageUrl",sum(c."total_amount") OVER() AS full_amount,a.type,a."producttype",\n    s.user_name as sellerUserName,s.first_name as sellerFirst,p."productName" as product_name,\n    s.last_name as sellerLast,b.user_name as bidderUserName,\n    s.company_logo as companylogo,b.company_logo as b_companylogo,\n    b.first_name as bidderFirst,b.last_name as bidderLast, O.id as order_id,O."status",\n    O."delivered",O."createdbyId",O."track_no",O."courier",O."paymentdetail",\n    f."feedback_by_seller" as seller_feedback,f."feedback_by_bidder" as bidder_feedback from counters c\n    LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n    LEFT OUTER JOIN images i on i."productId" = c."product_id"\n    LEFT OUTER JOIN users s on s.id = c."seller_id"\n    LEFT OUTER JOIN users b on b.id = c."bidder_id"\n    LEFT OUTER JOIN products p on p.id = c."product_id"\n    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n    LEFT OUTER JOIN feedbacks f on c.id = f."counters_id"\n    where c."created_at"=\''
                               .concat(_create3, '\' and\n    c."bidder_id"=')
                               .concat(_eachobj3.bidder_id, ' and c."expiry_day"=')
                               .concat(_eachobj3.expiry_day, '\n    and c."product_id"=')
-                              .concat(_eachobj3.product_id, "\n    and c.seller_id=")
+                              .concat(_eachobj3.product_id, '\n    and c.seller_id=')
                               .concat(_eachobj3.seller_id, " and c.is_deleted='false'\n    and  ")
-                              .concat(_searchChar ? _searchChar : "", '\n    and c."bid_and_ask_id"=')
-                              .concat(_eachobj3.bid_and_ask_id, "; ");
+                              .concat(_searchChar ? _searchChar : '', '\n    and c."bid_and_ask_id"=')
+                              .concat(_eachobj3.bid_and_ask_id, '; ');
                             _context14.next = 56;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1807,8 +1953,8 @@ function getPendingOfferByUserId(req, res) {
                                   // console.log('data in sell query----->', data.rows)
                                   result.selling.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err in sell query", err);
+                                ['catch'](function (err) {
+                                  console.log('err in sell query', err);
                                 })
                             );
 
@@ -1823,7 +1969,7 @@ function getPendingOfferByUserId(req, res) {
 
                           case 61:
                             _context14.prev = 61;
-                            _context14.t1 = _context14["catch"](46);
+                            _context14.t1 = _context14['catch'](46);
                             _didIteratorError6 = true;
                             _iteratorError6 = _context14.t1;
 
@@ -1831,8 +1977,8 @@ function getPendingOfferByUserId(req, res) {
                             _context14.prev = 65;
                             _context14.prev = 66;
 
-                            if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
-                              _iterator6["return"]();
+                            if (!_iteratorNormalCompletion6 && _iterator6['return'] != null) {
+                              _iterator6['return']();
                             }
 
                           case 68:
@@ -1871,12 +2017,12 @@ function getPendingOfferByUserId(req, res) {
 
                             result.selling = temp;
                             result.buying = temp1;
-                            return _context14.abrupt("return", {
-                              v: res.json(Response(constant.statusCode.ok, "Pending offers fetched", result)),
+                            return _context14.abrupt('return', {
+                              v: res.json(Response(constant.statusCode.ok, 'Pending offers fetched', result)),
                             });
 
                           case 82:
-                          case "end":
+                          case 'end':
                             return _context14.stop();
                         }
                       }
@@ -1896,12 +2042,12 @@ function getPendingOfferByUserId(req, res) {
             case 7:
               _ret3 = _context16.sent;
 
-              if (!(_typeof(_ret3) === "object")) {
+              if (!(_typeof(_ret3) === 'object')) {
                 _context16.next = 10;
                 break;
               }
 
-              return _context16.abrupt("return", _ret3.v);
+              return _context16.abrupt('return', _ret3.v);
 
             case 10:
               _context16.next = 17;
@@ -1911,14 +2057,32 @@ function getPendingOfferByUserId(req, res) {
               _context16.next = 14;
               return regeneratorRuntime.awrap(
                 (function _callee7() {
-                  var result, groupbySelling, groupbyBuying, groupbySellingsql, groupbyBuyingsql, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, eachobj, create, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _eachobj4, _create4;
+                  var result,
+                    groupbySelling,
+                    groupbyBuying,
+                    groupbySellingsql,
+                    groupbyBuyingsql,
+                    _iteratorNormalCompletion7,
+                    _didIteratorError7,
+                    _iteratorError7,
+                    _iterator7,
+                    _step7,
+                    eachobj,
+                    create,
+                    _iteratorNormalCompletion8,
+                    _didIteratorError8,
+                    _iteratorError8,
+                    _iterator8,
+                    _step8,
+                    _eachobj4,
+                    _create4;
 
                   return regeneratorRuntime.async(
                     function _callee7$(_context15) {
                       while (1) {
                         switch ((_context15.prev = _context15.next)) {
                           case 0:
-                            console.log("searchArray no search ***************************");
+                            console.log('searchArray no search ***************************');
                             result = {
                               selling: [],
                               buying: [],
@@ -1929,10 +2093,13 @@ function getPendingOfferByUserId(req, res) {
                             //and type_of_offer='Accept'
                             //and type_of='bid'
 
-                            console.log("userid is", req.body.loggedUser); // const sData = await common_query.findAllData(CounterModel, { "id": 6318 })
+                            console.log('userid is', req.body.loggedUser); // const sData = await common_query.findAllData(CounterModel, { "id": 6318 })
                             // console.log('sDatatatatataat', sData.data.toJSON())
 
-                            groupbySellingsql = "select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status\n    from counters where seller_id=".concat(req.body.loggedUser, " and (status='accept' or status='decline')\n    and is_deleted='false'  group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status ;");
+                            groupbySellingsql = 'select created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status\n    from counters where seller_id='.concat(
+                              req.body.loggedUser,
+                              " and (status='accept' or status='decline')\n    and is_deleted='false'  group by created_at,product_id,expiry_day,bidder_id,bid_and_ask_id,seller_id,status ;"
+                            );
                             _context15.next = 8;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbySellingsql).then(function (data) {
@@ -1942,7 +2109,10 @@ function getPendingOfferByUserId(req, res) {
                             );
 
                           case 8:
-                            groupbyBuyingsql = "select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status\n    from counters where bidder_id=".concat(req.body.loggedUser, " and (status='accept' or status='decline') and is_deleted='false'\n    group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status ;");
+                            groupbyBuyingsql = 'select created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status\n    from counters where bidder_id='.concat(
+                              req.body.loggedUser,
+                              " and (status='accept' or status='decline') and is_deleted='false'\n    group by created_at,product_id,expiry_day,seller_id,bid_and_ask_id,bidder_id,status ;"
+                            );
                             _context15.next = 11;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex.raw(groupbyBuyingsql).then(function (data) {
@@ -1970,14 +2140,14 @@ function getPendingOfferByUserId(req, res) {
                             }
 
                             eachobj = _step7.value;
-                            create = "".concat(moment(eachobj.created_at).format("YYYY-MM-DD"));
+                            create = ''.concat(moment(eachobj.created_at).format('YYYY-MM-DD'));
                             sqlbid = 'select c.*,i."imageUrl",sum(c."total_amount")\n    OVER() AS full_amount,a.type,a."producttype",s.user_name as sellerUserName,\n    s.company_logo as companylogo,s.first_name as sellerFirst,p."productName" as product_name,\n    s.last_name as sellerLast,b.user_name as bidderUserName,b.first_name as bidderFirst,\n    b.company_logo as b_companylogo,b.last_name as bidderLast,\n    O.id as order_id,O."status", O."delivered", O."createdbyId",\n    O."track_no",O."courier",O."paymentdetail",f."feedback_by_seller" as seller_feedback,\n    f."feedback_by_bidder" as bidder_feedback from counters c\n    LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n    LEFT OUTER JOIN images i on i."productId" = c."product_id"\n    LEFT OUTER JOIN users s on s.id = c."seller_id"\n    LEFT OUTER JOIN users b on b.id = c."bidder_id"\n    LEFT OUTER JOIN products p on p.id = c."product_id"\n    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n    LEFT OUTER JOIN feedbacks f on c.id = f."counters_id"\n    where c."created_at"=\''
                               .concat(create, '\' and c."seller_id"=')
                               .concat(eachobj.seller_id, '\n    and c."expiry_day"=')
                               .concat(eachobj.expiry_day, '\n\n    and c."product_id"=')
-                              .concat(eachobj.product_id, " and c.bidder_id=")
-                              .concat(eachobj.bidder_id, "\n    and c.is_deleted='false'\n\n    and c.\"bid_and_ask_id\"=")
-                              .concat(eachobj.bid_and_ask_id, "; ");
+                              .concat(eachobj.product_id, ' and c.bidder_id=')
+                              .concat(eachobj.bidder_id, '\n    and c.is_deleted=\'false\'\n\n    and c."bid_and_ask_id"=')
+                              .concat(eachobj.bid_and_ask_id, '; ');
                             _context15.next = 23;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -1986,8 +2156,8 @@ function getPendingOfferByUserId(req, res) {
                                   // console.log('data in buy query----->', data.rows)
                                   result.buying.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err in buy query", err);
+                                ['catch'](function (err) {
+                                  console.log('err in buy query', err);
                                 })
                             );
 
@@ -2002,7 +2172,7 @@ function getPendingOfferByUserId(req, res) {
 
                           case 28:
                             _context15.prev = 28;
-                            _context15.t0 = _context15["catch"](15);
+                            _context15.t0 = _context15['catch'](15);
                             _didIteratorError7 = true;
                             _iteratorError7 = _context15.t0;
 
@@ -2010,8 +2180,8 @@ function getPendingOfferByUserId(req, res) {
                             _context15.prev = 32;
                             _context15.prev = 33;
 
-                            if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
-                              _iterator7["return"]();
+                            if (!_iteratorNormalCompletion7 && _iterator7['return'] != null) {
+                              _iterator7['return']();
                             }
 
                           case 35:
@@ -2049,14 +2219,14 @@ function getPendingOfferByUserId(req, res) {
                             }
 
                             _eachobj4 = _step8.value;
-                            _create4 = "".concat(moment(_eachobj4.created_at).format("YYYY-MM-DD"));
+                            _create4 = ''.concat(moment(_eachobj4.created_at).format('YYYY-MM-DD'));
                             sqlask = 'select c.*,i."imageUrl",sum(c."total_amount") OVER() AS full_amount,a.type,a."producttype",\n    s.user_name as sellerUserName,s.first_name as sellerFirst,p."productName" as product_name,\n    s.last_name as sellerLast,b.user_name as bidderUserName,\n    s.company_logo as companylogo,b.company_logo as b_companylogo,\n    b.first_name as bidderFirst,b.last_name as bidderLast, O.id as order_id,O."status",\n    O."delivered",O."createdbyId",O."track_no",O."courier",O."paymentdetail",\n    f."feedback_by_seller" as seller_feedback,f."feedback_by_bidder" as bidder_feedback from counters c\n    LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n    LEFT OUTER JOIN images i on i."productId" = c."product_id"\n    LEFT OUTER JOIN users s on s.id = c."seller_id"\n    LEFT OUTER JOIN users b on b.id = c."bidder_id"\n    LEFT OUTER JOIN products p on p.id = c."product_id"\n    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n    LEFT OUTER JOIN feedbacks f on c.id = f."counters_id"\n    where c."created_at"=\''
                               .concat(_create4, '\' and\n    c."bidder_id"=')
                               .concat(_eachobj4.bidder_id, ' and c."expiry_day"=')
                               .concat(_eachobj4.expiry_day, '\n    and c."product_id"=')
-                              .concat(_eachobj4.product_id, "\n    and c.seller_id=")
-                              .concat(_eachobj4.seller_id, " and c.is_deleted='false'\n    and c.\"bid_and_ask_id\"=")
-                              .concat(_eachobj4.bid_and_ask_id, "; ");
+                              .concat(_eachobj4.product_id, '\n    and c.seller_id=')
+                              .concat(_eachobj4.seller_id, ' and c.is_deleted=\'false\'\n    and c."bid_and_ask_id"=')
+                              .concat(_eachobj4.bid_and_ask_id, '; ');
                             _context15.next = 52;
                             return regeneratorRuntime.awrap(
                               bookshelf.knex
@@ -2065,8 +2235,8 @@ function getPendingOfferByUserId(req, res) {
                                   // console.log('data in sell query----->', data.rows)
                                   result.selling.push(data);
                                 })
-                                ["catch"](function (err) {
-                                  console.log("err in sell query", err);
+                                ['catch'](function (err) {
+                                  console.log('err in sell query', err);
                                 })
                             );
 
@@ -2081,7 +2251,7 @@ function getPendingOfferByUserId(req, res) {
 
                           case 57:
                             _context15.prev = 57;
-                            _context15.t1 = _context15["catch"](44);
+                            _context15.t1 = _context15['catch'](44);
                             _didIteratorError8 = true;
                             _iteratorError8 = _context15.t1;
 
@@ -2089,8 +2259,8 @@ function getPendingOfferByUserId(req, res) {
                             _context15.prev = 61;
                             _context15.prev = 62;
 
-                            if (!_iteratorNormalCompletion8 && _iterator8["return"] != null) {
-                              _iterator8["return"]();
+                            if (!_iteratorNormalCompletion8 && _iterator8['return'] != null) {
+                              _iterator8['return']();
                             }
 
                           case 64:
@@ -2129,12 +2299,12 @@ function getPendingOfferByUserId(req, res) {
 
                             result.selling = temp;
                             result.buying = temp1;
-                            return _context15.abrupt("return", {
-                              v: res.json(Response(constant.statusCode.ok, "Pending offers fetched", result)),
+                            return _context15.abrupt('return', {
+                              v: res.json(Response(constant.statusCode.ok, 'Pending offers fetched', result)),
                             });
 
                           case 78:
-                          case "end":
+                          case 'end':
                             return _context15.stop();
                         }
                       }
@@ -2154,12 +2324,12 @@ function getPendingOfferByUserId(req, res) {
             case 14:
               _ret4 = _context16.sent;
 
-              if (!(_typeof(_ret4) === "object")) {
+              if (!(_typeof(_ret4) === 'object')) {
                 _context16.next = 17;
                 break;
               }
 
-              return _context16.abrupt("return", _ret4.v);
+              return _context16.abrupt('return', _ret4.v);
 
             case 17:
               _context16.next = 22;
@@ -2167,11 +2337,11 @@ function getPendingOfferByUserId(req, res) {
 
             case 19:
               _context16.prev = 19;
-              _context16.t0 = _context16["catch"](0);
-              console.log("err in Pending Offers", _context16.t0);
+              _context16.t0 = _context16['catch'](0);
+              console.log('err in Pending Offers', _context16.t0);
 
             case 22:
-            case "end":
+            case 'end':
               return _context16.stop();
           }
         }
@@ -2200,7 +2370,10 @@ function getActiveOfferByUserId(req, res) {
               // for(let i of type_of_offer){
               // for(let j of type_of){
 
-              sqlbid = 'select c.*,i."imageUrl",a.type,a."producttype",s.user_name as sellerUserName,s.first_name as sellerFirst,p."productName" as product_name,\n  s.last_name as sellerLast,s.company_logo as companylogo,b.company_logo as b_companylogo,b.user_name as bidderUserName,b.first_name as bidderFirst,b.last_name as bidderLast from counters c\n  LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n  LEFT OUTER JOIN images i on i."productId" = c."product_id"\n  LEFT OUTER JOIN users s on s.id = c."seller_id"\n  LEFT OUTER JOIN users b on b.id = c."bidder_id"\n  LEFT OUTER JOIN products p on p.id = c."product_id"\n  where (c."bidder_id"='.concat(req.body.loggedUser, ")\n  and (c.expiry_date > now() AT TIME ZONE 'UTC' and c.is_deleted=false and c.type_of_offer='Counter' and c.type_of='bid' );");
+              sqlbid = 'select c.*,i."imageUrl",a.type,a."producttype",s.user_name as sellerUserName,s.first_name as sellerFirst,p."productName" as product_name,\n  s.last_name as sellerLast,s.company_logo as companylogo,b.company_logo as b_companylogo,b.user_name as bidderUserName,b.first_name as bidderFirst,b.last_name as bidderLast from counters c\n  LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n  LEFT OUTER JOIN images i on i."productId" = c."product_id"\n  LEFT OUTER JOIN users s on s.id = c."seller_id"\n  LEFT OUTER JOIN users b on b.id = c."bidder_id"\n  LEFT OUTER JOIN products p on p.id = c."product_id"\n  where (c."bidder_id"='.concat(
+                req.body.loggedUser,
+                ")\n  and (c.expiry_date > now() AT TIME ZONE 'UTC' and c.is_deleted=false and c.type_of_offer='Counter' and c.type_of='bid' );"
+              );
               _context17.next = 5;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -2208,13 +2381,16 @@ function getActiveOfferByUserId(req, res) {
                   .then(function (data) {
                     _result2.counterBid = data;
                   })
-                  ["catch"](function (err) {
-                    console.log("err");
+                  ['catch'](function (err) {
+                    console.log('err');
                   })
               );
 
             case 5:
-              sqlask = 'select c.*,i."imageUrl",a.type,a."producttype",s.user_name as sellerUserName\n  ,s.company_logo as companylogo,s.first_name as sellerFirst,p."productName" as product_name,b.company_logo as b_companylogo\n  ,s.last_name as sellerLast,b.user_name as bidderUserName,b.first_name as bidderFirst,b.last_name as bidderLast from counters c\n  LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n  LEFT OUTER JOIN images i on i."productId" = c."product_id"\n  LEFT OUTER JOIN users s on s.id = c."seller_id"\n  LEFT OUTER JOIN users b on b.id = c."bidder_id"\n  LEFT OUTER JOIN products p on p.id = c."product_id"\n  where (c."seller_id"='.concat(req.body.loggedUser, ")\n  and (c.expiry_date > now() AT TIME ZONE 'UTC' and c.is_deleted=false and c.type_of_offer='Counter' and c.type_of='ask' );");
+              sqlask = 'select c.*,i."imageUrl",a.type,a."producttype",s.user_name as sellerUserName\n  ,s.company_logo as companylogo,s.first_name as sellerFirst,p."productName" as product_name,b.company_logo as b_companylogo\n  ,s.last_name as sellerLast,b.user_name as bidderUserName,b.first_name as bidderFirst,b.last_name as bidderLast from counters c\n  LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n  LEFT OUTER JOIN images i on i."productId" = c."product_id"\n  LEFT OUTER JOIN users s on s.id = c."seller_id"\n  LEFT OUTER JOIN users b on b.id = c."bidder_id"\n  LEFT OUTER JOIN products p on p.id = c."product_id"\n  where (c."seller_id"='.concat(
+                req.body.loggedUser,
+                ")\n  and (c.expiry_date > now() AT TIME ZONE 'UTC' and c.is_deleted=false and c.type_of_offer='Counter' and c.type_of='ask' );"
+              );
               _context17.next = 8;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -2222,21 +2398,21 @@ function getActiveOfferByUserId(req, res) {
                   .then(function (data) {
                     _result2.counterAsk = data;
                   })
-                  ["catch"](function (err) {
-                    console.log("err");
+                  ['catch'](function (err) {
+                    console.log('err');
                   })
               );
 
             case 8:
-              return _context17.abrupt("return", res.json(Response(constant.statusCode.ok, "Active Offer fetched", _result2)));
+              return _context17.abrupt('return', res.json(Response(constant.statusCode.ok, 'Active Offer fetched', _result2)));
 
             case 11:
               _context17.prev = 11;
-              _context17.t0 = _context17["catch"](0);
-              console.log("err in getActiveOfferByUserId");
+              _context17.t0 = _context17['catch'](0);
+              console.log('err in getActiveOfferByUserId');
 
             case 14:
-            case "end":
+            case 'end':
               return _context17.stop();
           }
         }
@@ -2263,7 +2439,10 @@ function getActiveRecievedByUserId(req, res) {
               _result3 = {};
               sqlask = '\n      select c.*,\n\t\t i."imageUrl",\n\t\t a.type,a."producttype",\n\t\t s.user_name as sellerUserName,\n\t\t p."productName" as product_name,\n\t\t b.user_name as bidderUserName,\n\t\t O.id as order_id,O."status" as "order_status", O."delivered", O."createdbyId", O."track_no",O."courier",O."paymentdetail",\n\t\t f."feedback_by_seller" as seller_feedback, f."feedback_by_bidder" as bidder_feedback\n\tfrom counters c\n    LEFT OUTER JOIN bid_and_ask a on a.id = c."bid_and_ask_id"\n    LEFT OUTER JOIN images i on i."productId" = c."product_id"\n    LEFT OUTER JOIN users s on s.id = c."seller_id"\n    LEFT OUTER JOIN users b on b.id = c."bidder_id"\n    LEFT OUTER JOIN products p on p.id = c."product_id"\n    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n    LEFT OUTER JOIN feedbacks f on c.id = f."counters_id"\n    where (c."bidder_id"='
                 .concat(req.body.loggedUser, '  or c."seller_id"=')
-                .concat(req.body.loggedUser, " )\n    and c.is_deleted='false'\n    and ( type_of='bid' or type_of='ask')\n    and (c.\"status\" is not NULL or  c.expiry_date > now() AT TIME ZONE 'UTC') ");
+                .concat(
+                  req.body.loggedUser,
+                  " )\n    and c.is_deleted='false'\n    and ( type_of='bid' or type_of='ask')\n    and (c.\"status\" is not NULL or  c.expiry_date > now() AT TIME ZONE 'UTC') "
+                );
               _context18.next = 5;
               return regeneratorRuntime.awrap(
                 bookshelf.knex
@@ -2271,21 +2450,21 @@ function getActiveRecievedByUserId(req, res) {
                   .then(function (data) {
                     _result3 = data.rows;
                   })
-                  ["catch"](function (err) {
-                    console.log("err");
+                  ['catch'](function (err) {
+                    console.log('err');
                   })
               );
 
             case 5:
-              return _context18.abrupt("return", res.json(Response(constant.statusCode.ok, "Active Recieved Offer fetched", _result3)));
+              return _context18.abrupt('return', res.json(Response(constant.statusCode.ok, 'Active Recieved Offer fetched', _result3)));
 
             case 8:
               _context18.prev = 8;
-              _context18.t0 = _context18["catch"](0);
-              console.log("err in getActiveOfferByUserId");
+              _context18.t0 = _context18['catch'](0);
+              console.log('err in getActiveOfferByUserId');
 
             case 11:
-            case "end":
+            case 'end':
               return _context18.stop();
           }
         }
@@ -2301,7 +2480,31 @@ function getActiveRecievedByUserId(req, res) {
 
 function editUser(req, res) {
   function editUserMethod() {
-    var isDuplictate, sameId, condition, checkDuplicate, data, updatedata, _condition, _updateUserData4, finaldata, timeStamp, db_path, extension, imgOriginalName, extensionArray, format, _result4, updata, cond, cimgOriginalName, cextensionArray, cformat, cresult, cupdata, clogo_cond, updateCImage;
+    var isDuplictate,
+      sameId,
+      condition,
+      checkDuplicate,
+      data,
+      updatedata,
+      _condition,
+      _updateUserData4,
+      finaldata,
+      timeStamp,
+      db_path,
+      extension,
+      imgOriginalName,
+      extensionArray,
+      format,
+      _result4,
+      updata,
+      cond,
+      cimgOriginalName,
+      cextensionArray,
+      cformat,
+      cresult,
+      cupdata,
+      clogo_cond,
+      updateCImage;
 
     return regeneratorRuntime.async(function editUserMethod$(_context19) {
       while (1) {
@@ -2310,8 +2513,8 @@ function editUser(req, res) {
             isDuplictate = false;
             sameId = false;
 
-            if (req.body && req.body.user_name == "null") {
-              req.body.user_name = "";
+            if (req.body && req.body.user_name == 'null') {
+              req.body.user_name = '';
             }
 
             if (!(req.body && req.body.user_name)) {
@@ -2325,7 +2528,7 @@ function editUser(req, res) {
 
           case 7:
             checkDuplicate = _context19.sent;
-            data = checkDuplicate["rows"];
+            data = checkDuplicate['rows'];
 
             if (data && data.length > 0 && data[0].id == req.body.id) {
               isDuplictate = false;
@@ -2338,7 +2541,10 @@ function editUser(req, res) {
             }
 
             isDuplictate = true;
-            return _context19.abrupt("return", res.json(Response(constant.statusCode.alreadyExist, "Username has already been registered. Try with different Username")));
+            return _context19.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.alreadyExist, 'Username has already been registered. Try with different Username'))
+            );
 
           case 13:
             if (!(!isDuplictate || !req.body.user_name)) {
@@ -2350,7 +2556,7 @@ function editUser(req, res) {
               first_name: req.body.first_name ? req.body.first_name : null,
               last_name: req.body.last_name ? req.body.last_name : null,
               company_name: req.body.companyname ? req.body.companyname : null,
-              user_name: req.body.user_name ? req.body.user_name : "",
+              user_name: req.body.user_name ? req.body.user_name : '',
               phone_number: req.body.phone_number ? req.body.phone_number : null,
               billingaddress1: req.body.billingaddress1 ? req.body.billingaddress1 : null,
               billingaddress2: req.body.billingaddress2 ? req.body.billingaddress2 : null,
@@ -2380,7 +2586,7 @@ function editUser(req, res) {
             }
 
             timeStamp = JSON.stringify(Date.now());
-            db_path = "";
+            db_path = '';
 
             if (!req.files) {
               _context19.next = 60;
@@ -2392,10 +2598,10 @@ function editUser(req, res) {
               break;
             }
 
-            extension = req.files.file.name.split(".");
+            extension = req.files.file.name.split('.');
             imgOriginalName = req.files.file.name;
-            db_path = timeStamp + "_" + imgOriginalName;
-            extensionArray = ["jpg", "jpeg", "png", "jfif"];
+            db_path = timeStamp + '_' + imgOriginalName;
+            extensionArray = ['jpg', 'jpeg', 'png', 'jfif'];
             format = extension[extension.length - 1];
 
             if (!extensionArray.includes(format)) {
@@ -2428,10 +2634,10 @@ function editUser(req, res) {
               break;
             }
 
-            cextension = req.files.clogo_file.name.split(".");
+            cextension = req.files.clogo_file.name.split('.');
             cimgOriginalName = req.files.clogo_file.name;
-            cdb_path = timeStamp + "_" + cimgOriginalName;
-            cextensionArray = ["jpg", "jpeg", "png", "jfif"];
+            cdb_path = timeStamp + '_' + cimgOriginalName;
+            cextensionArray = ['jpg', 'jpeg', 'png', 'jfif'];
             cformat = cextension[cextension.length - 1];
 
             if (!cextensionArray.includes(cformat)) {
@@ -2444,7 +2650,7 @@ function editUser(req, res) {
 
           case 48:
             cresult = _context19.sent;
-            console.log("cresult--->", cresult);
+            console.log('cresult--->', cresult);
             cupdata = {
               id: req.body.id,
               company_logo: cresult.url,
@@ -2457,24 +2663,27 @@ function editUser(req, res) {
 
           case 54:
             updateCImage = _context19.sent;
-            console.log("logo update status", updateCImage);
+            console.log('logo update status', updateCImage);
             finaldata.company_logo = cresult.url; // let updateImage1 = await common_query.updateRecord(UserModel, cupdata, clogo_cond)
 
           case 57:
-            return _context19.abrupt("return", res.json(Response(constant.statusCode.ok, "User edit successful", finaldata)));
+            return _context19.abrupt('return', res.json(Response(constant.statusCode.ok, 'User edit successful', finaldata)));
 
           case 60:
-            return _context19.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, finaldata)));
+            return _context19.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, finaldata)));
 
           case 61:
             _context19.next = 64;
             break;
 
           case 63:
-            return _context19.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context19.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 64:
-          case "end":
+          case 'end':
             return _context19.stop();
         }
       }
@@ -2520,13 +2729,16 @@ function updateprofile(req, res) {
               break;
             }
 
-            return _context20.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData)));
+            return _context20.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData)));
 
           case 9:
-            return _context20.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context20.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 10:
-          case "end":
+          case 'end':
             return _context20.stop();
         }
       }
@@ -2560,13 +2772,16 @@ function deleteUser(req, res) {
               break;
             }
 
-            return _context21.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.userDeleteSuccess, updateUserData)));
+            return _context21.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.userDeleteSuccess, updateUserData)));
 
           case 9:
-            return _context21.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context21.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 10:
-          case "end":
+          case 'end':
             return _context21.stop();
         }
       }
@@ -2583,10 +2798,10 @@ function deleteOffer(req, res) {
       while (1) {
         switch ((_context23.prev = _context23.next)) {
           case 0:
-            console.log("declinee offerrrrrr", req.body);
+            console.log('declinee offerrrrrr', req.body);
             updatedata = {
               is_deleted: false,
-              status: "decline",
+              status: 'decline',
             };
             condition = {
               id: req.body.id,
@@ -2596,16 +2811,16 @@ function deleteOffer(req, res) {
 
           case 5:
             updateUserData = _context23.sent;
-            console.log("updateUserData", updateUserData);
+            console.log('updateUserData', updateUserData);
             dateObj = new Date();
             month = dateObj.getUTCMonth() + 1; //months from 1-12
 
             day = dateObj.getUTCDate();
             year = dateObj.getUTCFullYear();
-            newdate = year + "-" + month + "-" + day;
+            newdate = year + '-' + month + '-' + day;
             data = {
               counter_id: req.body.id ? req.body.id : null,
-              status: "decline",
+              status: 'decline',
               is_deleted: false,
               product_id: req.body.product_id ? req.body.product_id : null,
               createdbyId: req.body.createdbyId ? req.body.createdbyId : null,
@@ -2621,7 +2836,9 @@ function deleteOffer(req, res) {
               o_id: req.body.id.toString(),
               p_id: req.body.product_id.toString(),
             };
-            sql = "select * from chats where message->'msg'->>\n    'offer_id'=".concat("'" + condition_chat.o_id + "'", "\nand message->'msg'->>'product_id'=").concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
+            sql = "select * from chats where message->'msg'->>\n    'offer_id'="
+              .concat("'" + condition_chat.o_id + "'", "\nand message->'msg'->>'product_id'=")
+              .concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
 
             bookshelf.knex.raw(sql).then(function _callee8(data) {
               var updatedata1, condition1, u_chat;
@@ -2643,16 +2860,16 @@ function deleteOffer(req, res) {
                       condition1 = {
                         id: data.rows[0].id,
                       };
-                      console.log("data.rows[0]data.rows[0] ", data.rows[0]);
+                      console.log('data.rows[0]data.rows[0] ', data.rows[0]);
                       _context22.next = 6;
                       return regeneratorRuntime.awrap(common_query.updateRecord(ChatModel, updatedata1, condition1));
 
                     case 6:
                       u_chat = _context22.sent;
-                      console.log("u_chat accept 43434343444 1111111111", u_chat);
+                      console.log('u_chat accept 43434343444 1111111111', u_chat);
 
                     case 8:
-                    case "end":
+                    case 'end':
                       return _context22.stop();
                   }
                 }
@@ -2664,13 +2881,16 @@ function deleteOffer(req, res) {
               break;
             }
 
-            return _context23.abrupt("return", res.json(Response(constant.statusCode.ok, "Offer Declined Successfully", updateUserData)));
+            return _context23.abrupt('return', res.json(Response(constant.statusCode.ok, 'Offer Declined Successfully', updateUserData)));
 
           case 24:
-            return _context23.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context23.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 25:
-          case "end":
+          case 'end':
             return _context23.stop();
         }
       }
@@ -2690,7 +2910,7 @@ function deleteAllOffer(req, res) {
           switch ((_context25.prev = _context25.next)) {
             case 0:
               _context25.prev = 0;
-              console.log("delete offers reqqqqqqq::::::", req.body);
+              console.log('delete offers reqqqqqqq::::::', req.body);
 
               if (!(req.body.length > 0)) {
                 _context25.next = 29;
@@ -2712,7 +2932,7 @@ function deleteAllOffer(req, res) {
 
               updatedata = {
                 // is_deleted: true,
-                status: "decline",
+                status: 'decline',
               };
               condition = {
                 id: req.body[i].id,
@@ -2722,19 +2942,19 @@ function deleteAllOffer(req, res) {
 
             case 10:
               updateUserData = _context25.sent;
-              console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuu################", updateUserData);
+              console.log('uuuuuuuuuuuuuuuuuuuuuuuuuuuuu################', updateUserData);
               dateObj = new Date();
               month = dateObj.getUTCMonth() + 1; //months from 1-12
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               data = {
                 counter_id: req.body[i].id ? req.body[i].id : null,
-                status: "decline",
+                status: 'decline',
                 is_deleted: false,
                 product_id: req.body[i].product_id ? req.body[i].product_id : null,
-                createdbyId: req.body[i].type_of == "ask" ? req.body[i].seller_id : req.body[i].bidder_id,
+                createdbyId: req.body[i].type_of == 'ask' ? req.body[i].seller_id : req.body[i].bidder_id,
                 created_at: newdate,
               };
               _orderdata = {};
@@ -2747,7 +2967,9 @@ function deleteAllOffer(req, res) {
                 o_id: req.body[i].id.toString(),
                 p_id: req.body[i].product_id.toString(),
               };
-              sql = "select * from chats where message->'msg'->>\n            'offer_id'=".concat("'" + condition_chat.o_id + "'", "\n      and message->'msg'->>'product_id'=").concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
+              sql = "select * from chats where message->'msg'->>\n            'offer_id'="
+                .concat("'" + condition_chat.o_id + "'", "\n      and message->'msg'->>'product_id'=")
+                .concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
 
               bookshelf.knex.raw(sql).then(function _callee9(data) {
                 var updatedataD, conditionD, u_chat;
@@ -2763,16 +2985,16 @@ function deleteAllOffer(req, res) {
                         conditionD = {
                           id: data.rows[0].id,
                         };
-                        console.log("data.rows[0]data.rows[0] ", data.rows[0]);
+                        console.log('data.rows[0]data.rows[0] ', data.rows[0]);
                         _context24.next = 5;
                         return regeneratorRuntime.awrap(common_query.updateRecord(ChatModel, updatedataD, conditionD));
 
                       case 5:
                         u_chat = _context24.sent;
-                        console.log("u_chat accept 43434343444 ", u_chat);
+                        console.log('u_chat accept 43434343444 ', u_chat);
 
                       case 7:
-                      case "end":
+                      case 'end':
                         return _context24.stop();
                     }
                   }
@@ -2785,7 +3007,7 @@ function deleteAllOffer(req, res) {
               break;
 
             case 28:
-              return _context25.abrupt("return", res.json(Response(constant.statusCode.ok, "Offer Declined Successfully", updateUserData)));
+              return _context25.abrupt('return', res.json(Response(constant.statusCode.ok, 'Offer Declined Successfully', updateUserData)));
 
             case 29:
               _context25.next = 34;
@@ -2793,11 +3015,11 @@ function deleteAllOffer(req, res) {
 
             case 31:
               _context25.prev = 31;
-              _context25.t0 = _context25["catch"](0);
-              console.log("err in delete", _context25.t0);
+              _context25.t0 = _context25['catch'](0);
+              console.log('err in delete', _context25.t0);
 
             case 34:
-            case "end":
+            case 'end':
               return _context25.stop();
           }
         }
@@ -2842,14 +3064,14 @@ function addTrackNo(req, res) {
             updateUserData = _context26.sent;
             notObj = {
               created_by: req.body.createdbyId,
-              content: "shipped your item",
+              content: 'shipped your item',
               destnation_user_id: req.body.createdForId,
             };
             utility.addNotification(notObj, function (err, resp) {
               if (err) {
-                console.log("Error adding notification in add tracking number", err);
+                console.log('Error adding notification in add tracking number', err);
               } else {
-                console.log("response after calling common add notification in add tracking number", resp);
+                console.log('response after calling common add notification in add tracking number', resp);
               }
             });
 
@@ -2858,7 +3080,8 @@ function addTrackNo(req, res) {
               break;
             }
 
-            sql = 'select c.*,O."track_no" from counters c\n                    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                    WHERE (c."id" = ?) and c."is_deleted" = false;';
+            sql =
+              'select c.*,O."track_no" from counters c\n                    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                    WHERE (c."id" = ?) and c."is_deleted" = false;';
             raw2 = bookshelf.knex.raw(sql, [req.body.counter_id]);
             raw2.then(function (result) {
               return res.json(Response(constant.statusCode.ok, constant.messages.trackNoAdded, result));
@@ -2867,10 +3090,13 @@ function addTrackNo(req, res) {
             break;
 
           case 17:
-            return _context26.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result)));
+            return _context26.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result))
+            );
 
           case 18:
-          case "end":
+          case 'end':
             return _context26.stop();
         }
       }
@@ -2900,14 +3126,14 @@ function addPaymentDetail(req, res) {
             updateUserData = _context27.sent;
             notObj = {
               created_by: req.body.createdbyId,
-              content: "sent payment",
+              content: 'sent payment',
               destnation_user_id: req.body.createdForId,
             };
             utility.addNotification(notObj, function (err, resp) {
               if (err) {
-                console.log("Error adding notification inp ayment offer", err);
+                console.log('Error adding notification inp ayment offer', err);
               } else {
-                console.log("response after calling common add notification in payment offer", resp);
+                console.log('response after calling common add notification in payment offer', resp);
               }
             });
 
@@ -2916,7 +3142,8 @@ function addPaymentDetail(req, res) {
               break;
             }
 
-            sql = 'select c.*,O."status",O."createdbyId",O."track_no",O."courier",O."paymentdetail" from counters c\n                    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                    WHERE (c."id" = ?) and c."is_deleted" = false;';
+            sql =
+              'select c.*,O."status",O."createdbyId",O."track_no",O."courier",O."paymentdetail" from counters c\n                    LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                    WHERE (c."id" = ?) and c."is_deleted" = false;';
             raw2 = bookshelf.knex.raw(sql, [req.body.counter_id]);
             raw2.then(function (result) {
               return res.json(Response(constant.statusCode.ok, constant.messages.paymentdetail, result));
@@ -2925,10 +3152,13 @@ function addPaymentDetail(req, res) {
             break;
 
           case 13:
-            return _context27.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result)));
+            return _context27.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result))
+            );
 
           case 14:
-          case "end":
+          case 'end':
             return _context27.stop();
         }
       }
@@ -2946,9 +3176,9 @@ function uplodeProfileImage(req, res) {
         switch ((_context29.prev = _context29.next)) {
           case 0:
             timeStamp = JSON.stringify(Date.now());
-            userid = "get_user_id";
-            db_path = "";
-            path = "";
+            userid = 'get_user_id';
+            db_path = '';
+            path = '';
             mkdirp(config.ARTICLEIMAGE).then(function _callee10(data, err) {
               var imgOriginalName, extensionArray, format, _result5, updateImage;
 
@@ -2961,7 +3191,10 @@ function uplodeProfileImage(req, res) {
                         break;
                       }
 
-                      return _context28.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err)));
+                      return _context28.abrupt(
+                        'return',
+                        res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, err))
+                      );
 
                     case 4:
                       if (!req.body) {
@@ -2969,17 +3202,17 @@ function uplodeProfileImage(req, res) {
                         break;
                       }
 
-                      extension = req.files.file.name.split(".");
+                      extension = req.files.file.name.split('.');
                       imgOriginalName = req.files.file.name;
-                      path = config.PRODUCTIMAGE + timeStamp + "_" + imgOriginalName;
-                      db_path = timeStamp + "_" + imgOriginalName;
+                      path = config.PRODUCTIMAGE + timeStamp + '_' + imgOriginalName;
+                      db_path = timeStamp + '_' + imgOriginalName;
 
-                      if (!(path != "")) {
+                      if (!(path != '')) {
                         _context28.next = 22;
                         break;
                       }
 
-                      extensionArray = ["jpg", "jpeg", "png", "jfif"];
+                      extensionArray = ['jpg', 'jpeg', 'png', 'jfif'];
                       format = extension[extension.length - 1];
 
                       if (!extensionArray.includes(format)) {
@@ -3011,19 +3244,19 @@ function uplodeProfileImage(req, res) {
                       break;
 
                     case 21:
-                      return _context28.abrupt("return", res.json(Response(constant.statusCode.unauth, constant.validateMsg.notSupportedType)));
+                      return _context28.abrupt('return', res.json(Response(constant.statusCode.unauth, constant.validateMsg.notSupportedType)));
 
                     case 22:
-                    case "end":
+                    case 'end':
                       return _context28.stop();
                   }
                 }
               });
             });
-            return _context29.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.Addproduct, savePrtoductData)));
+            return _context29.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.Addproduct, savePrtoductData)));
 
           case 6:
-          case "end":
+          case 'end':
             return _context29.stop();
         }
       }
@@ -3035,19 +3268,50 @@ function uplodeProfileImage(req, res) {
 
 function editProfil(req, res) {
   function editprofilrMethod() {
-    var _req$body, first_name, last_name, email, password, phone_number, address, city, state, country, zip_code, profile_image_id, date_of_birth, dateObj, month, day, year, data, condition, saveUserData;
+    var _req$body,
+      first_name,
+      last_name,
+      email,
+      password,
+      phone_number,
+      address,
+      city,
+      state,
+      country,
+      zip_code,
+      profile_image_id,
+      date_of_birth,
+      dateObj,
+      month,
+      day,
+      year,
+      data,
+      condition,
+      saveUserData;
 
     return regeneratorRuntime.async(function editprofilrMethod$(_context30) {
       while (1) {
         switch ((_context30.prev = _context30.next)) {
           case 0:
-            (_req$body = req.body), (first_name = _req$body.first_name), (last_name = _req$body.last_name), (email = _req$body.email), (password = _req$body.password), (phone_number = _req$body.phone_number), (address = _req$body.address), (city = _req$body.city), (state = _req$body.state), (country = _req$body.country), (zip_code = _req$body.zip_code), (profile_image_id = _req$body.profile_image_id), (date_of_birth = _req$body.date_of_birth);
+            (_req$body = req.body),
+              (first_name = _req$body.first_name),
+              (last_name = _req$body.last_name),
+              (email = _req$body.email),
+              (password = _req$body.password),
+              (phone_number = _req$body.phone_number),
+              (address = _req$body.address),
+              (city = _req$body.city),
+              (state = _req$body.state),
+              (country = _req$body.country),
+              (zip_code = _req$body.zip_code),
+              (profile_image_id = _req$body.profile_image_id),
+              (date_of_birth = _req$body.date_of_birth);
             dateObj = new Date();
             month = dateObj.getUTCMonth() + 1; //months from 1-12
 
             day = dateObj.getUTCDate();
             year = dateObj.getUTCFullYear();
-            newdate = year + "-" + month + "-" + day;
+            newdate = year + '-' + month + '-' + day;
             data = {
               first_name: first_name ? first_name : null,
               last_name: last_name ? last_name : null,
@@ -3066,7 +3330,7 @@ function editProfil(req, res) {
               updated_at: newdate,
             };
             condition = {
-              id: "user_id",
+              id: 'user_id',
             };
             _context30.next = 10;
             return regeneratorRuntime.awrap(common_query.updateRecord(UserModel, data, condition));
@@ -3079,7 +3343,7 @@ function editProfil(req, res) {
               break;
             }
 
-            return _context30.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.Registration, saveUserData)));
+            return _context30.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.Registration, saveUserData)));
 
           case 15:
             if (!(saveUserData.code == 409)) {
@@ -3087,11 +3351,11 @@ function editProfil(req, res) {
               break;
             }
 
-            console.log("saveUserData===>in else");
-            return _context30.abrupt("return", res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist)));
+            console.log('saveUserData===>in else');
+            return _context30.abrupt('return', res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist)));
 
           case 18:
-          case "end":
+          case 'end':
             return _context30.stop();
         }
       }
@@ -3127,13 +3391,16 @@ function updateUserData(req, res) {
               break;
             }
 
-            return _context31.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData)));
+            return _context31.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateUserData)));
 
           case 10:
-            return _context31.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context31.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 11:
-          case "end":
+          case 'end':
             return _context31.stop();
         }
       }
@@ -3145,7 +3412,51 @@ function updateUserData(req, res) {
 
 function saveUser(req, res) {
   function saveUserMethod() {
-    var _req$body2, first_name, last_name, email, password, phone_number, address, city, state, country, zip_code, profile_image_id, date_of_birth, user_name, billingaddress1, billingaddress2, billingcity, billingstate, billingzipcode, companyname, role, shippingaddress1, shippingaddress2, shippingcity, shippingstate, shippingzipcode, id, isDuplictate, condition, checkDuplicate, dateObj, month, day, year, data, _condition2, saveUserData, successResponcetoJson, success, updateImage, cond, getStatus, finalData, admindata, title;
+    var _req$body2,
+      first_name,
+      last_name,
+      email,
+      password,
+      phone_number,
+      address,
+      city,
+      state,
+      country,
+      zip_code,
+      profile_image_id,
+      date_of_birth,
+      user_name,
+      billingaddress1,
+      billingaddress2,
+      billingcity,
+      billingstate,
+      billingzipcode,
+      companyname,
+      role,
+      shippingaddress1,
+      shippingaddress2,
+      shippingcity,
+      shippingstate,
+      shippingzipcode,
+      id,
+      isDuplictate,
+      condition,
+      checkDuplicate,
+      dateObj,
+      month,
+      day,
+      year,
+      data,
+      _condition2,
+      saveUserData,
+      successResponcetoJson,
+      success,
+      updateImage,
+      cond,
+      getStatus,
+      finalData,
+      admindata,
+      title;
 
     return regeneratorRuntime.async(
       function saveUserMethod$(_context32) {
@@ -3195,10 +3506,10 @@ function saveUser(req, res) {
 
               isDuplictate = true;
               return _context32.abrupt(
-                "return",
+                'return',
                 res.json(
-                  Response(constant.statusCode.alreadyExist, "E-Mail Id you are trying is already been registered. Try with different Email-Id", {
-                    emailError: "emailError",
+                  Response(constant.statusCode.alreadyExist, 'E-Mail Id you are trying is already been registered. Try with different Email-Id', {
+                    emailError: 'emailError',
                   })
                 )
               );
@@ -3214,7 +3525,7 @@ function saveUser(req, res) {
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               data = {
                 first_name: first_name ? first_name : null,
                 last_name: last_name ? last_name : null,
@@ -3239,7 +3550,7 @@ function saveUser(req, res) {
                 shippingcity: shippingcity ? shippingcity : null,
                 shippingstate: shippingstate ? shippingstate : null,
                 shippingzipcode: shippingzipcode ? shippingzipcode : null,
-                role: role ? (role == "admin" ? "admin" : "user") : null,
+                role: role ? (role == 'admin' ? 'admin' : 'user') : null,
                 is_deleted: false,
                 user_id: uuidv4(),
                 user_name: user_name ? user_name : null,
@@ -3266,7 +3577,7 @@ function saveUser(req, res) {
               _context32.next = 26;
               return regeneratorRuntime.awrap(
                 common_query.saveRecord(imageModel, {
-                  imageUrl: "defult_path",
+                  imageUrl: 'defult_path',
                   userId: success.id,
                 })
               );
@@ -3281,7 +3592,7 @@ function saveUser(req, res) {
 
               cond = {
                 isdeleted: false,
-                settingname: "emailsetting",
+                settingname: 'emailsetting',
               };
               _context32.next = 31;
               return regeneratorRuntime.awrap(common_query.findAllData(settingModel, cond));
@@ -3297,25 +3608,25 @@ function saveUser(req, res) {
 
               admindata = finalData[0].settingvalue; //   email: "varuny.sdei@gmail.com"
 
-              title = req.body.first_name + " " + req.body.last_name + " Registration Activation Notification";
-              utility.readTemplateSendMailV2(admindata.email, title, admindata, "new_user", function (err, resp) {
+              title = req.body.first_name + ' ' + req.body.last_name + ' Registration Activation Notification';
+              utility.readTemplateSendMailV2(admindata.email, title, admindata, 'new_user', function (err, resp) {
                 if (err) {
-                  console.log("sign up err>>>>>", err);
+                  console.log('sign up err>>>>>', err);
                 } else if (resp) {
-                  console.log("signup up success");
+                  console.log('signup up success');
                 }
               });
-              return _context32.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.Registration, saveUserData)));
+              return _context32.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.Registration, saveUserData)));
 
             case 40:
-              return _context32.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, {})));
+              return _context32.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, {})));
 
             case 41:
               _context32.next = 44;
               break;
 
             case 43:
-              return _context32.abrupt("return", res.json(Response(constant.statusCode.internalError, constant.validateMsg.internalError)));
+              return _context32.abrupt('return', res.json(Response(constant.statusCode.internalError, constant.validateMsg.internalError)));
 
             case 44:
               _context32.next = 49;
@@ -3327,8 +3638,8 @@ function saveUser(req, res) {
                 break;
               }
 
-              console.log("saveUserData===>in else");
-              return _context32.abrupt("return", res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist)));
+              console.log('saveUserData===>in else');
+              return _context32.abrupt('return', res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist)));
 
             case 49:
               _context32.next = 53;
@@ -3336,10 +3647,10 @@ function saveUser(req, res) {
 
             case 51:
               _context32.prev = 51;
-              _context32.t0 = _context32["catch"](0);
+              _context32.t0 = _context32['catch'](0);
 
             case 53:
-            case "end":
+            case 'end':
               return _context32.stop();
           }
         }
@@ -3420,7 +3731,7 @@ function sendConfirmationMail(email) {
 }
 
 function login2(req, res) {
-  res.json("working");
+  res.json('working');
 }
 
 function login(req, res) {
@@ -3438,7 +3749,7 @@ function login(req, res) {
               };
               _context33.next = 4;
               return regeneratorRuntime.awrap(
-                common_query.findAllData(UserModel, condition)["catch"](function (err) {
+                common_query.findAllData(UserModel, condition)['catch'](function (err) {
                   throw err;
                 })
               );
@@ -3462,24 +3773,27 @@ function login(req, res) {
               params = {
                 _id: myObjStr[0].id,
               };
-              token = jwt.sign(params, "B2B");
+              token = jwt.sign(params, 'B2B');
               finalData = {
                 loginData: loginData,
                 token: token,
                 params: params,
               };
-              return _context33.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, finalData)));
+              return _context33.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, finalData)));
 
             case 15:
-              return _context33.abrupt("return", res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.invalidPassword)));
+              return _context33.abrupt('return', res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.invalidPassword)));
 
             case 16:
               _context33.next = 20;
               break;
 
             case 18:
-              console.log("loginData===>in else");
-              return _context33.abrupt("return", res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.invalidEmailOrPassword, loginData)));
+              console.log('loginData===>in else');
+              return _context33.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.invalidEmailOrPassword, loginData))
+              );
 
             case 20:
               _context33.next = 26;
@@ -3487,12 +3801,12 @@ function login(req, res) {
 
             case 22:
               _context33.prev = 22;
-              _context33.t0 = _context33["catch"](0);
-              console.log("LOG3", _context33.t0);
-              return _context33.abrupt("return", res.json(Response(constant.statusCode.internalError, _context33.t0)));
+              _context33.t0 = _context33['catch'](0);
+              console.log('LOG3', _context33.t0);
+              return _context33.abrupt('return', res.json(Response(constant.statusCode.internalError, _context33.t0)));
 
             case 26:
-            case "end":
+            case 'end':
               return _context33.stop();
           }
         }
@@ -3512,10 +3826,10 @@ function test(req, res) {
       while (1) {
         switch ((_context34.prev = _context34.next)) {
           case 0:
-            return _context34.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, "i am safe")));
+            return _context34.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, 'i am safe')));
 
           case 1:
-          case "end":
+          case 'end':
             return _context34.stop();
         }
       }
@@ -3569,23 +3883,29 @@ function forgotPassword(req, res) {
                 email: myObjStr[0].email,
                 verifying_token: updatedobj.verifying_token,
               };
-              utility.readTemplateSendMailV2(myObjStr[0].email, "Welcome to B2B MarketPlace - Verify your email address", userMailData, "reset_password", function (err, resp) {
-                if (err) {
-                  console.log("err>>>>>", err);
-                  return res.json(Response(res, "Verifying link has not sent."));
-                } else if (resp) {
-                  return res.json(Response(res, {}, "Verifying link has been sent to your email."));
+              utility.readTemplateSendMailV2(
+                myObjStr[0].email,
+                'Welcome to B2B MarketPlace - Verify your email address',
+                userMailData,
+                'reset_password',
+                function (err, resp) {
+                  if (err) {
+                    console.log('err>>>>>', err);
+                    return res.json(Response(res, 'Verifying link has not sent.'));
+                  } else if (resp) {
+                    return res.json(Response(res, {}, 'Verifying link has been sent to your email.'));
+                  }
                 }
-              });
+              );
             }
 
-            return _context35.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.forgotPasswordSuccess)));
+            return _context35.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.forgotPasswordSuccess)));
 
           case 18:
-            return _context35.abrupt("return", res.json(Response(constant.statusCode.notFound, constant.messages.invalidEmail)));
+            return _context35.abrupt('return', res.json(Response(constant.statusCode.notFound, constant.messages.invalidEmail)));
 
           case 19:
-          case "end":
+          case 'end':
             return _context35.stop();
         }
       }
@@ -3604,12 +3924,12 @@ function resetpassword(req, res) {
           case 0:
             console.log(req.body.verifying_token);
 
-            if (!(req.body.password == "" || req.body.verifying_token == "")) {
+            if (!(req.body.password == '' || req.body.verifying_token == '')) {
               _context36.next = 5;
               break;
             }
 
-            return _context36.abrupt("return", response.invalidPassword(res));
+            return _context36.abrupt('return', response.invalidPassword(res));
 
           case 5:
             condition = {
@@ -3633,7 +3953,7 @@ function resetpassword(req, res) {
             };
             updatedobj = {
               password: crypto.encrypt(req.body.password),
-              verifying_token: "",
+              verifying_token: '',
             };
             _context36.next = 16;
             return regeneratorRuntime.awrap(common_query.updateRecord(UserModel, updatedobj, cond));
@@ -3646,20 +3966,20 @@ function resetpassword(req, res) {
               break;
             }
 
-            return _context36.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.resetPasswordSuccess)));
+            return _context36.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.resetPasswordSuccess)));
 
           case 21:
-            return _context36.abrupt("return", response.InternalServer(res, err));
+            return _context36.abrupt('return', response.InternalServer(res, err));
 
           case 22:
             _context36.next = 25;
             break;
 
           case 24:
-            return _context36.abrupt("return", res.json(Response(constant.statusCode.notFound, constant.messages.invalidToken)));
+            return _context36.abrupt('return', res.json(Response(constant.statusCode.notFound, constant.messages.invalidToken)));
 
           case 25:
-          case "end":
+          case 'end':
             return _context36.stop();
         }
       }
@@ -3687,7 +4007,7 @@ function getUser(req, res) {
                   var resData = data.rows[0].id == req.body.id ? data.rows[0] : data.rows[1].id;
                   return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, resData));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context37.next = 8;
@@ -3695,11 +4015,11 @@ function getUser(req, res) {
 
             case 5:
               _context37.prev = 5;
-              _context37.t0 = _context37["catch"](0);
-              return _context37.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context37.t0 = _context37['catch'](0);
+              return _context37.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 8:
-            case "end":
+            case 'end':
               return _context37.stop();
           }
         }
@@ -3728,7 +4048,7 @@ function getEmailBlastUser(req, res) {
                 .then(function (data) {
                   return res.json(Response(constant.statusCode.ok, constant.messages.recordFetchedSuccessfully, data.rows));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context38.next = 8;
@@ -3736,11 +4056,11 @@ function getEmailBlastUser(req, res) {
 
             case 5:
               _context38.prev = 5;
-              _context38.t0 = _context38["catch"](0);
-              return _context38.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context38.t0 = _context38['catch'](0);
+              return _context38.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 8:
-            case "end":
+            case 'end':
               return _context38.stop();
           }
         }
@@ -3774,7 +4094,7 @@ function getOfferById(req, res) {
                   .then(function (result) {
                     return res.json(Response(constant.statusCode.ok, constant.messages.offerFetchedSuccessfully, result));
                   })
-                  ["catch"](function (err) {
+                  ['catch'](function (err) {
                     console.log(err);
                     return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.emailAlreadyExist));
                   });
@@ -3785,11 +4105,11 @@ function getOfferById(req, res) {
 
             case 5:
               _context39.prev = 5;
-              _context39.t0 = _context39["catch"](0);
-              return _context39.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context39.t0 = _context39['catch'](0);
+              return _context39.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 8:
-            case "end":
+            case 'end':
               return _context39.stop();
           }
         }
@@ -3843,7 +4163,7 @@ function cancelOffer(req, res) {
               };
               _context40.next = 8;
               return regeneratorRuntime.awrap(
-                common_query.updateRecord(ChatModel, chat_update, chat_con)["catch"](function (err) {
+                common_query.updateRecord(ChatModel, chat_update, chat_con)['catch'](function (err) {
                   throw err;
                 })
               );
@@ -3851,7 +4171,7 @@ function cancelOffer(req, res) {
             case 8:
               _context40.next = 10;
               return regeneratorRuntime.awrap(
-                common_query.updateRecord(OrderModel, up_counter, orderCon)["catch"](function (err) {
+                common_query.updateRecord(OrderModel, up_counter, orderCon)['catch'](function (err) {
                   throw err;
                 })
               );
@@ -3859,7 +4179,7 @@ function cancelOffer(req, res) {
             case 10:
               _context40.next = 12;
               return regeneratorRuntime.awrap(
-                common_query.updateRecord(CounterModel, up_counter, coniter_con)["catch"](function (err) {
+                common_query.updateRecord(CounterModel, up_counter, coniter_con)['catch'](function (err) {
                   throw err;
                 })
               );
@@ -3872,10 +4192,13 @@ function cancelOffer(req, res) {
                 break;
               }
 
-              return _context40.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.offerAccepted, {})));
+              return _context40.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.offerAccepted, {})));
 
             case 17:
-              return _context40.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+              return _context40.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+              );
 
             case 18:
               _context40.next = 23;
@@ -3883,11 +4206,11 @@ function cancelOffer(req, res) {
 
             case 20:
               _context40.prev = 20;
-              _context40.t0 = _context40["catch"](0);
-              return _context40.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context40.t0 = _context40['catch'](0);
+              return _context40.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 23:
-            case "end":
+            case 'end':
               return _context40.stop();
           }
         }
@@ -3916,7 +4239,7 @@ function acceptOffer(req, res) {
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               data = {
                 counter_id: req.body.counter_id ? req.body.counter_id : null,
                 status: req.body.status ? req.body.status : null,
@@ -3925,7 +4248,7 @@ function acceptOffer(req, res) {
                 createdbyId: req.body.createdbyId ? req.body.createdbyId : null,
                 created_at: newdate,
               };
-              console.log("req body in accept offer ", req.body);
+              console.log('req body in accept offer ', req.body);
               updateCounterStatus(req);
               _orderdata2 = {};
               _context43.next = 12;
@@ -3935,7 +4258,7 @@ function acceptOffer(req, res) {
               _orderdata2 = _context43.sent;
               notObj = {
                 created_by: data.createdbyId,
-                content: "accepted your offer",
+                content: 'accepted your offer',
                 destnation_user_id: req.body.createdForId,
               };
               console.log(notObj);
@@ -3943,7 +4266,9 @@ function acceptOffer(req, res) {
                 o_id: req.body.counter_id.toString(),
                 p_id: req.body.product_id.toString(),
               };
-              sql = "select * from chats where message->'msg'->>\n      'offer_id'=".concat("'" + condition_chat.o_id + "'", "\nand message->'msg'->>'product_id'=").concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
+              sql = "select * from chats where message->'msg'->>\n      'offer_id'="
+                .concat("'" + condition_chat.o_id + "'", "\nand message->'msg'->>'product_id'=")
+                .concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
 
               bookshelf.knex.raw(sql).then(function _callee11(res) {
                 var updatedata, condition, u_chat;
@@ -3965,7 +4290,7 @@ function acceptOffer(req, res) {
                         condition = {
                           id: res.rows[0].id,
                         };
-                        console.log("res = > " + res); // console.log('data.rows[0]data.rows[0]', res.rows[0])
+                        console.log('res = > ' + res); // console.log('data.rows[0]data.rows[0]', res.rows[0])
 
                         chat_room_id = res.rows[0].room_id;
 
@@ -3979,10 +4304,10 @@ function acceptOffer(req, res) {
 
                       case 8:
                         u_chat = _context41.sent;
-                        console.log("u_chat accept 1233333asunc ", u_chat);
+                        console.log('u_chat accept 1233333asunc ', u_chat);
 
                       case 10:
-                      case "end":
+                      case 'end':
                         return _context41.stop();
                     }
                   }
@@ -4007,14 +4332,14 @@ function acceptOffer(req, res) {
 
             case 23:
               u_chat = _context43.sent;
-              console.log("u_chat accept", u_chat);
+              console.log('u_chat accept', u_chat);
 
             case 25:
               utility.addNotification(notObj, function (err, resp) {
                 if (err) {
-                  console.log("Error adding notification in accept offer", err);
+                  console.log('Error adding notification in accept offer', err);
                 } else {
-                  console.log("response after calling common add notification in accept offer", resp);
+                  console.log('response after calling common add notification in accept offer', resp);
                 }
               });
 
@@ -4033,10 +4358,10 @@ function acceptOffer(req, res) {
                   while (1) {
                     switch ((_context42.prev = _context42.next)) {
                       case 0:
-                        return _context42.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.offerAccepted, _orderdata2)));
+                        return _context42.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.offerAccepted, _orderdata2)));
 
                       case 1:
-                      case "end":
+                      case 'end':
                         return _context42.stop();
                     }
                   }
@@ -4046,15 +4371,18 @@ function acceptOffer(req, res) {
               break;
 
             case 31:
-              return _context43.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.offerAccepted, _orderdata2)));
+              return _context43.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.offerAccepted, _orderdata2)));
 
             case 32:
               _context43.next = 36;
               break;
 
             case 34:
-              console.log("else acceot offer record", _orderdata2);
-              return _context43.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+              console.log('else acceot offer record', _orderdata2);
+              return _context43.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+              );
 
             case 36:
               _context43.next = 42;
@@ -4062,12 +4390,12 @@ function acceptOffer(req, res) {
 
             case 38:
               _context43.prev = 38;
-              _context43.t0 = _context43["catch"](0);
-              console.log("accept offer  catch err===>", _context43.t0);
-              return _context43.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context43.t0 = _context43['catch'](0);
+              console.log('accept offer  catch err===>', _context43.t0);
+              return _context43.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 42:
-            case "end":
+            case 'end':
               return _context43.stop();
           }
         }
@@ -4098,7 +4426,7 @@ function updateCounterStatus(req) {
             return regeneratorRuntime.awrap(common_query.updateRecord(CounterModel, updatedata, condition));
 
           case 4:
-          case "end":
+          case 'end':
             return _context44.stop();
         }
       }
@@ -4118,13 +4446,13 @@ function declineOffer(req, res) {
           switch ((_context47.prev = _context47.next)) {
             case 0:
               _context47.prev = 0;
-              console.log("declineOffer", req.body);
+              console.log('declineOffer', req.body);
               dateObj = new Date();
               month = dateObj.getUTCMonth() + 1; //months from 1-12
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               data = {
                 counter_id: req.body.counter_id ? req.body.counter_id : null,
                 status: req.body.status ? req.body.status : null,
@@ -4138,7 +4466,9 @@ function declineOffer(req, res) {
                 o_id: req.body.counter_id.toString(),
                 p_id: req.body.product_id.toString(),
               };
-              sql = "select * from chats where message->'msg'->>\n      'offer_id'=".concat("'" + condition_chat.o_id + "'", "\nand message->'msg'->>'product_id'=").concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
+              sql = "select * from chats where message->'msg'->>\n      'offer_id'="
+                .concat("'" + condition_chat.o_id + "'", "\nand message->'msg'->>'product_id'=")
+                .concat("'" + condition_chat.p_id + "'"); // console.log('queryyyyyyyyyyyyyy_______________--', sql)
 
               bookshelf.knex.raw(sql).then(function _callee13(data) {
                 var updatedata, condition, u_chat;
@@ -4160,17 +4490,17 @@ function declineOffer(req, res) {
                         condition = {
                           id: data.rows[0].id,
                         };
-                        console.log("data.rows[0]data.rows[0] 434343434343", data.rows[0]);
+                        console.log('data.rows[0]data.rows[0] 434343434343', data.rows[0]);
                         chat_room_id = data.rows[0].room_id;
                         _context45.next = 7;
                         return regeneratorRuntime.awrap(common_query.updateRecord(ChatModel, updatedata, condition));
 
                       case 7:
                         u_chat = _context45.sent;
-                        console.log("u_chat accept 43434343444 ", u_chat);
+                        console.log('u_chat accept 43434343444 ', u_chat);
 
                       case 9:
-                      case "end":
+                      case 'end':
                         return _context45.stop();
                     }
                   }
@@ -4195,7 +4525,7 @@ function declineOffer(req, res) {
 
             case 17:
               u_chat = _context47.sent;
-              console.log("u_chat decline", u_chat);
+              console.log('u_chat decline', u_chat);
 
             case 19:
               _orderdata3 = {};
@@ -4206,14 +4536,14 @@ function declineOffer(req, res) {
               _orderdata3 = _context47.sent;
               notObj = {
                 created_by: data.createdbyId,
-                content: "decline your offer",
+                content: 'decline your offer',
                 destnation_user_id: req.body.createdForId,
               };
               utility.addNotification(notObj, function (err, resp) {
                 if (err) {
-                  console.log("Error adding notification in decline offer", err);
+                  console.log('Error adding notification in decline offer', err);
                 } else {
-                  console.log("response after calling common add notification in decline offer", resp);
+                  console.log('response after calling common add notification in decline offer', resp);
                 }
               });
 
@@ -4232,10 +4562,10 @@ function declineOffer(req, res) {
                   while (1) {
                     switch ((_context46.prev = _context46.next)) {
                       case 0:
-                        return _context46.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.offerDecline, _orderdata3)));
+                        return _context46.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.offerDecline, _orderdata3)));
 
                       case 1:
-                      case "end":
+                      case 'end':
                         return _context46.stop();
                     }
                   }
@@ -4245,14 +4575,17 @@ function declineOffer(req, res) {
               break;
 
             case 30:
-              return _context47.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.offerDecline, _orderdata3)));
+              return _context47.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.offerDecline, _orderdata3)));
 
             case 31:
               _context47.next = 34;
               break;
 
             case 33:
-              return _context47.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+              return _context47.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+              );
 
             case 34:
               _context47.next = 39;
@@ -4260,11 +4593,11 @@ function declineOffer(req, res) {
 
             case 36:
               _context47.prev = 36;
-              _context47.t0 = _context47["catch"](0);
-              return _context47.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context47.t0 = _context47['catch'](0);
+              return _context47.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 39:
-            case "end":
+            case 'end':
               return _context47.stop();
           }
         }
@@ -4301,14 +4634,14 @@ function confirmDelivery(req, res) {
               _updateUserData5 = _context48.sent;
               notObj = {
                 created_by: req.body.createdbyId,
-                content: "confirmed delivery for your offer",
+                content: 'confirmed delivery for your offer',
                 destnation_user_id: req.body.createdForId,
               };
               utility.addNotification(notObj, function (err, resp) {
                 if (err) {
-                  console.log("Error adding notification inc confirm delivery offer", err);
+                  console.log('Error adding notification inc confirm delivery offer', err);
                 } else {
-                  console.log("response after calling common add notification in confirm delivery offer", resp);
+                  console.log('response after calling common add notification in confirm delivery offer', resp);
                 }
               });
 
@@ -4317,7 +4650,8 @@ function confirmDelivery(req, res) {
                 break;
               }
 
-              sql = 'select c.*,O."status",O."createdbyId",O."track_no",O."courier",O."paymentdetail", O."delivered" from counters c\n                      LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                      WHERE (c."id" = ?) and c."is_deleted" = false;';
+              sql =
+                'select c.*,O."status",O."createdbyId",O."track_no",O."courier",O."paymentdetail", O."delivered" from counters c\n                      LEFT OUTER JOIN orders O on c.id = O."counter_id"\n                      WHERE (c."id" = ?) and c."is_deleted" = false;';
               raw2 = bookshelf.knex.raw(sql, [req.body.counter_id]);
               raw2.then(function (result) {
                 return res.json(Response(constant.statusCode.ok, constant.messages.confirmdelivery, result));
@@ -4326,7 +4660,10 @@ function confirmDelivery(req, res) {
               break;
 
             case 14:
-              return _context48.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result)));
+              return _context48.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result))
+              );
 
             case 15:
               _context48.next = 20;
@@ -4334,11 +4671,11 @@ function confirmDelivery(req, res) {
 
             case 17:
               _context48.prev = 17;
-              _context48.t0 = _context48["catch"](0);
-              return _context48.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context48.t0 = _context48['catch'](0);
+              return _context48.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 20:
-            case "end":
+            case 'end':
               return _context48.stop();
           }
         }
@@ -4365,26 +4702,29 @@ function getAllUsers(req, res) {
               page = req.body.currentPage - 1 || 0;
               isdeleted = req.body.isdeleted;
               offset = limit * page;
-              columnName = req.body.columnName || "first_name"; // let sortingOrder =req.body.sortingOrder + " " + "NULL LAST"|| "ASC NULL LA|| "ASC ";
+              columnName = req.body.columnName || 'first_name'; // let sortingOrder =req.body.sortingOrder + " " + "NULL LAST"|| "ASC NULL LA|| "ASC ";
 
-              sortingOrder = req.body.sortingOrder || "ASC";
+              sortingOrder = req.body.sortingOrder || 'ASC';
 
-              if (req.body.sortingOrder == "NORMAL") {
-                sortingOrder = "ASC";
-                columnName = "first_name";
+              if (req.body.sortingOrder == 'NORMAL') {
+                sortingOrder = 'ASC';
+                columnName = 'first_name';
               }
 
               if (req.body.searchChar) {
-                searchChar = '("user_name" ilike \'%'.concat(req.body.searchChar, "%' or \"first_name\" ilike '%").concat(req.body.searchChar, "%' or \"last_name\" ilike '%").concat(req.body.searchChar, "%') and ");
+                searchChar = '("user_name" ilike \'%'
+                  .concat(req.body.searchChar, '%\' or "first_name" ilike \'%')
+                  .concat(req.body.searchChar, '%\' or "last_name" ilike \'%')
+                  .concat(req.body.searchChar, "%') and ");
               }
 
-              sql = "SELECT *, count(*) OVER()\n      AS full_count FROM users WHERE "
-                .concat(searchChar ? searchChar : "", "is_deleted=")
+              sql = 'SELECT *, count(*) OVER()\n      AS full_count FROM users WHERE '
+                .concat(searchChar ? searchChar : '', 'is_deleted=')
                 .concat(isdeleted, '\n       AND ("role"=\'user\' OR "role" IS NULL) ORDER BY "')
                 .concat(columnName, '" ')
-                .concat(sortingOrder, " OFFSET ")
-                .concat(offset, " LIMIT ")
-                .concat(limit, ";"); // let sql = `SELECT *, count(*) OVER() AS full_count FROM users WHERE is_deleted=? ORDER BY ${columnName} OFFSET ? LIMIT ?;`
+                .concat(sortingOrder, ' OFFSET ')
+                .concat(offset, ' LIMIT ')
+                .concat(limit, ';'); // let sql = `SELECT *, count(*) OVER() AS full_count FROM users WHERE is_deleted=? ORDER BY ${columnName} OFFSET ? LIMIT ?;`
               // bookshelf.knex.raw(sql).then(data => {
               //   return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data));
               // })
@@ -4394,7 +4734,7 @@ function getAllUsers(req, res) {
                 .then(function (data) {
                   return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context49.next = 16;
@@ -4402,11 +4742,11 @@ function getAllUsers(req, res) {
 
             case 13:
               _context49.prev = 13;
-              _context49.t0 = _context49["catch"](0);
-              return _context49.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context49.t0 = _context49['catch'](0);
+              return _context49.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 16:
-            case "end":
+            case 'end':
               return _context49.stop();
           }
         }
@@ -4429,13 +4769,14 @@ function exportTransactionList(req, res) {
           switch ((_context50.prev = _context50.next)) {
             case 0:
               _context50.prev = 0;
-              sql = '\n      Select  P."id" as "Product_id", P."productName" as "Productname", C."type_of" as "Type", CONCAT(S.first_name,\' \',S.last_name) as "Seller_name", CONCAT(B.first_name,\' \',B.last_name) as "Bidder_name", C."total_amount" as "Amount"\n      from orders O\n      LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n      LEFT OUTER JOIN products P ON O."product_id" = P.id\n      LEFT OUTER JOIN images I ON P.id = I."productId"\n      LEFT OUTER JOIN users S ON S.id = C."seller_id"\n      LEFT OUTER JOIN users B ON B.id = C."bidder_id"\n      where O.is_deleted = false and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n      ORDER BY P."productName" ASC\n      ';
+              sql =
+                '\n      Select  P."id" as "Product_id", P."productName" as "Productname", C."type_of" as "Type", CONCAT(S.first_name,\' \',S.last_name) as "Seller_name", CONCAT(B.first_name,\' \',B.last_name) as "Bidder_name", C."total_amount" as "Amount"\n      from orders O\n      LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n      LEFT OUTER JOIN products P ON O."product_id" = P.id\n      LEFT OUTER JOIN images I ON P.id = I."productId"\n      LEFT OUTER JOIN users S ON S.id = C."seller_id"\n      LEFT OUTER JOIN users B ON B.id = C."bidder_id"\n      where O.is_deleted = false and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n      ORDER BY P."productName" ASC\n      ';
               bookshelf.knex
                 .raw(sql)
                 .then(function (data) {
                   return res.json(Response(constant.statusCode.ok, constant.messages.transactionList, data));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context50.next = 8;
@@ -4443,11 +4784,11 @@ function exportTransactionList(req, res) {
 
             case 5:
               _context50.prev = 5;
-              _context50.t0 = _context50["catch"](0);
-              return _context50.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context50.t0 = _context50['catch'](0);
+              return _context50.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 8:
-            case "end":
+            case 'end':
               return _context50.stop();
           }
         }
@@ -4474,12 +4815,12 @@ function getTransactionList(req, res) {
               page = req.body.currentPage - 1 || 0;
               isdeleted = req.body.isdeleted;
               offset = limit * page;
-              columnName = req.body.columnName || "productName";
-              sortingOrder = req.body.sortingOrder || "ASC";
+              columnName = req.body.columnName || 'productName';
+              sortingOrder = req.body.sortingOrder || 'ASC';
 
-              if (req.body.sortingOrder == "NORMAL") {
-                sortingOrder = "ASC";
-                columnName = "productName";
+              if (req.body.sortingOrder == 'NORMAL') {
+                sortingOrder = 'ASC';
+                columnName = 'productName';
               }
 
               if (req.body.searchChar) {
@@ -4487,17 +4828,20 @@ function getTransactionList(req, res) {
               } // let sql = `SELECT *, count(*) OVER() AS full_count FROM users WHERE  ${searchChar ? searchChar : ''}is_deleted=${isdeleted} AND ("role"='user' OR "role" IS NULL) ORDER BY "${columnName}" ${sortingOrder} OFFSET ${offset} LIMIT ${limit};`
 
               sql = '\n      Select O.*,C."type_of", C."total_amount", count(*) OVER() AS full_count, P."productName", I."imageUrl", CONCAT(S.first_name,\' \',S.last_name) as "seller_name", CONCAT(B.first_name,\' \',B.last_name) as "bidder_name"\n      from orders O\n      LEFT OUTER JOIN counters C ON O."counter_id" = C.id\n      LEFT OUTER JOIN products P ON O."product_id" = P.id\n      LEFT OUTER JOIN images I ON P.id = I."productId"\n      LEFT OUTER JOIN users S ON S.id = C."seller_id"\n      LEFT OUTER JOIN users B ON B.id = C."bidder_id"\n      where '
-                .concat(searchChar ? searchChar : "", ' O.is_deleted = false and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n      Group By O.id, C."type_of", C."total_amount", P."productName", I."imageUrl", S."first_name", S."last_name", B.first_name, B.last_name\n      ORDER BY "')
+                .concat(
+                  searchChar ? searchChar : '',
+                  ' O.is_deleted = false and O."status" LIKE \'%accept%\' and O."track_no" is not NULL and O.delivered = true\n      Group By O.id, C."type_of", C."total_amount", P."productName", I."imageUrl", S."first_name", S."last_name", B.first_name, B.last_name\n      ORDER BY "'
+                )
                 .concat(columnName, '" ')
-                .concat(sortingOrder, " OFFSET ")
-                .concat(offset, " LIMIT ")
-                .concat(limit, ";\n      ");
+                .concat(sortingOrder, ' OFFSET ')
+                .concat(offset, ' LIMIT ')
+                .concat(limit, ';\n      ');
               bookshelf.knex
                 .raw(sql)
                 .then(function (data) {
                   return res.json(Response(constant.statusCode.ok, constant.messages.transactionList, data));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context51.next = 16;
@@ -4505,11 +4849,11 @@ function getTransactionList(req, res) {
 
             case 13:
               _context51.prev = 13;
-              _context51.t0 = _context51["catch"](0);
-              return _context51.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context51.t0 = _context51['catch'](0);
+              return _context51.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 16:
-            case "end":
+            case 'end':
               return _context51.stop();
           }
         }
@@ -4537,13 +4881,13 @@ function userdetails(req, res, next) {
 
             getDraftListDecryptedResult = [];
             conditions = {
-              "users.id": 34,
+              'users.id': 34,
             };
             new UserModel()
               .where(conditions)
               .query(_filter)
               .query(function (qb) {
-                qb.columns(["users.*", "images.imageUrl"]);
+                qb.columns(['users.*', 'images.imageUrl']);
               })
               .fetchAll()
               .then(function (getDraftListResult) {
@@ -4551,7 +4895,7 @@ function userdetails(req, res, next) {
                 console.log(getDraftListResult);
                 return res.json(Response(constant.statusCode.ok, constant.messages.loginSuccess, getDraftListResult));
               })
-              ["catch"](function (err) {
+              ['catch'](function (err) {
                 console.log(err);
 
                 __debug(err);
@@ -4559,12 +4903,12 @@ function userdetails(req, res, next) {
                 res.json({
                   status: config.statusCode.error,
                   data: [],
-                  message: i18n.__("INTERNAL_ERROR"),
+                  message: i18n.__('INTERNAL_ERROR'),
                 });
               });
 
           case 4:
-          case "end":
+          case 'end':
             return _context52.stop();
         }
       }
@@ -4584,7 +4928,21 @@ function userdetails(req, res, next) {
 
 function AddWatchList(req, res) {
   function saveWatchListMethod() {
-    var dateObj, month, day, year, userId, productId, sql, watchlistData, array1, watchRecord, updatedata, condition, updateWatchListData, watchlistdata, saveWatchListData;
+    var dateObj,
+      month,
+      day,
+      year,
+      userId,
+      productId,
+      sql,
+      watchlistData,
+      array1,
+      watchRecord,
+      updatedata,
+      condition,
+      updateWatchListData,
+      watchlistdata,
+      saveWatchListData;
     return regeneratorRuntime.async(
       function saveWatchListMethod$(_context53) {
         while (1) {
@@ -4596,10 +4954,10 @@ function AddWatchList(req, res) {
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               userId = parseInt(req.body.userId);
               productId = parseInt(req.body.productId);
-              sql = 'select * from watchlists where "user_id"='.concat(userId, ' and "product_id"=').concat(productId, ";");
+              sql = 'select * from watchlists where "user_id"='.concat(userId, ' and "product_id"=').concat(productId, ';');
               _context53.next = 11;
               return regeneratorRuntime.awrap(bookshelf.knex.raw(sql));
 
@@ -4638,10 +4996,16 @@ function AddWatchList(req, res) {
                 break;
               }
 
-              return _context53.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateWatchListData.success)));
+              return _context53.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, updateWatchListData.success))
+              );
 
             case 27:
-              return _context53.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+              return _context53.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+              );
 
             case 28:
               _context53.next = 40;
@@ -4667,10 +5031,13 @@ function AddWatchList(req, res) {
                 break;
               }
 
-              return _context53.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.Registration, saveWatchListData.success)));
+              return _context53.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.ok, constant.messages.Registration, saveWatchListData.success))
+              );
 
             case 39:
-              return _context53.abrupt("return", res.json(Response(constant.statusCode.internalError, constant.validateMsg.internalError)));
+              return _context53.abrupt('return', res.json(Response(constant.statusCode.internalError, constant.validateMsg.internalError)));
 
             case 40:
               _context53.next = 45;
@@ -4678,11 +5045,11 @@ function AddWatchList(req, res) {
 
             case 42:
               _context53.prev = 42;
-              _context53.t0 = _context53["catch"](0);
+              _context53.t0 = _context53['catch'](0);
               console.log(_context53.t0);
 
             case 45:
-            case "end":
+            case 'end':
               return _context53.stop();
           }
         }
@@ -4707,7 +5074,7 @@ function getWatchListData(req, res) {
               _context54.prev = 0;
               userId = parseInt(req.body.userId);
               productId = parseInt(req.body.productId);
-              sql = 'select * from watchlists where "user_id"='.concat(userId, ' and "product_id"=').concat(productId, ";");
+              sql = 'select * from watchlists where "user_id"='.concat(userId, ' and "product_id"=').concat(productId, ';');
               _context54.next = 6;
               return regeneratorRuntime.awrap(bookshelf.knex.raw(sql));
 
@@ -4726,10 +5093,10 @@ function getWatchListData(req, res) {
                 break;
               }
 
-              return _context54.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, watchRecord[0])));
+              return _context54.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, watchRecord[0])));
 
             case 14:
-              return _context54.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              return _context54.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 15:
               _context54.next = 20;
@@ -4737,11 +5104,11 @@ function getWatchListData(req, res) {
 
             case 17:
               _context54.prev = 17;
-              _context54.t0 = _context54["catch"](0);
+              _context54.t0 = _context54['catch'](0);
               console.log(_context54.t0);
 
             case 20:
-            case "end":
+            case 'end':
               return _context54.stop();
           }
         }
@@ -4781,17 +5148,17 @@ function getAllWatchListData(req, res) {
                 var output1 = JSON.parse(output);
                 watchRecord.push(output1);
               });
-              console.log("Products---->", watchRecord);
+              console.log('Products---->', watchRecord);
 
               if (!(watchlistData.rowCount > 0)) {
                 _context55.next = 14;
                 break;
               }
 
-              return _context55.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, watchRecord)));
+              return _context55.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, watchRecord)));
 
             case 14:
-              return _context55.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
+              return _context55.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError)));
 
             case 15:
               _context55.next = 20;
@@ -4799,11 +5166,11 @@ function getAllWatchListData(req, res) {
 
             case 17:
               _context55.prev = 17;
-              _context55.t0 = _context55["catch"](0);
+              _context55.t0 = _context55['catch'](0);
               console.log(_context55.t0);
 
             case 20:
-            case "end":
+            case 'end':
               return _context55.stop();
           }
         }
@@ -4830,25 +5197,27 @@ function getAllAdminUsers(req, res) {
               page = req.body.currentPage - 1 || 0;
               isdeleted = req.body.isdeleted;
               offset = limit * page;
-              columnName = req.body.columnName || "first_name";
-              sortingOrder = req.body.sortingOrder || "ASC";
+              columnName = req.body.columnName || 'first_name';
+              sortingOrder = req.body.sortingOrder || 'ASC';
 
-              if (req.body.sortingOrder == "NORMAL") {
-                sortingOrder = "ASC";
-                columnName = "first_name";
+              if (req.body.sortingOrder == 'NORMAL') {
+                sortingOrder = 'ASC';
+                columnName = 'first_name';
               }
 
               if (req.body.searchChar) {
-                searchChar = '("first_name" ilike \'%'.concat(req.body.searchChar, "%' or \"last_name\" ilike '%").concat(req.body.searchChar, "%') and ");
+                searchChar = '("first_name" ilike \'%'
+                  .concat(req.body.searchChar, '%\' or "last_name" ilike \'%')
+                  .concat(req.body.searchChar, "%') and ");
               }
 
-              sql = "SELECT *, count(*) OVER() AS full_count FROM users WHERE "
-                .concat(searchChar ? searchChar : "", "is_deleted=")
+              sql = 'SELECT *, count(*) OVER() AS full_count FROM users WHERE '
+                .concat(searchChar ? searchChar : '', 'is_deleted=')
                 .concat(isdeleted, " and role='admin' ORDER BY \"")
                 .concat(columnName, '" ')
-                .concat(sortingOrder, " OFFSET ")
-                .concat(offset, " LIMIT ")
-                .concat(limit, ";"); // let sql = `SELECT *, count(*) OVER() AS full_count FROM users WHERE is_deleted=? ORDER BY ${columnName} OFFSET ? LIMIT ?;`
+                .concat(sortingOrder, ' OFFSET ')
+                .concat(offset, ' LIMIT ')
+                .concat(limit, ';'); // let sql = `SELECT *, count(*) OVER() AS full_count FROM users WHERE is_deleted=? ORDER BY ${columnName} OFFSET ? LIMIT ?;`
               // bookshelf.knex.raw(sql).then(data => {
               //   return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data));
               // })
@@ -4858,7 +5227,7 @@ function getAllAdminUsers(req, res) {
                 .then(function (data) {
                   return res.json(Response(constant.statusCode.ok, constant.messages.categoryFetchedSuccessfully, data));
                 })
-                ["catch"](function (err) {
+                ['catch'](function (err) {
                   return res.json(Response(constant.statusCode.notFound, constant.validateMsg.noRecordFound));
                 });
               _context56.next = 16;
@@ -4866,11 +5235,11 @@ function getAllAdminUsers(req, res) {
 
             case 13:
               _context56.prev = 13;
-              _context56.t0 = _context56["catch"](0);
-              return _context56.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context56.t0 = _context56['catch'](0);
+              return _context56.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 16:
-            case "end":
+            case 'end':
               return _context56.stop();
           }
         }
@@ -4898,7 +5267,7 @@ function addNotification(req, res) {
 
               day = dateObj.getUTCDate();
               year = dateObj.getUTCFullYear();
-              newdate = year + "-" + month + "-" + day;
+              newdate = year + '-' + month + '-' + day;
               data = {
                 created_by: req.body.created_by ? req.body.created_by : null,
                 content: req.body.content ? req.body.content : null,
@@ -4917,11 +5286,14 @@ function addNotification(req, res) {
                 break;
               }
 
-              return _context57.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.notificationAddSuccess, orderdata)));
+              return _context57.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.notificationAddSuccess, orderdata)));
 
             case 14:
-              console.log("else in notification data", orderdata);
-              return _context57.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+              console.log('else in notification data', orderdata);
+              return _context57.abrupt(
+                'return',
+                res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+              );
 
             case 16:
               _context57.next = 22;
@@ -4929,12 +5301,12 @@ function addNotification(req, res) {
 
             case 18:
               _context57.prev = 18;
-              _context57.t0 = _context57["catch"](0);
-              console.log("add notification catch err===>", _context57.t0);
-              return _context57.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context57.t0 = _context57['catch'](0);
+              console.log('add notification catch err===>', _context57.t0);
+              return _context57.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 22:
-            case "end":
+            case 'end':
               return _context57.stop();
           }
         }
@@ -4956,31 +5328,42 @@ function getNotificationByUserId(req, res) {
         while (1) {
           switch ((_context58.prev = _context58.next)) {
             case 0:
-              console.log("get notification function calling at backend*******", req.body);
+              console.log('get notification function calling at backend*******', req.body);
               _context58.prev = 1;
 
               if (req.body && req.body.loggedUser) {
                 userId = parseInt(req.body.loggedUser);
-                console.log("req.body in get notificatins====>", req.body.loggedUser);
+                console.log('req.body in get notificatins====>', req.body.loggedUser);
                 limit = req.body.pagePerLimit || 10;
                 page = req.body.currentPage - 1 || 0;
-                is_read = req.body.is_read || "false";
+                is_read = req.body.is_read || 'false';
                 offset = limit * page;
-                columnName = req.body.columnName || "created_at";
-                sortingOrder = req.body.sortingOrder || "DESC";
+                columnName = req.body.columnName || 'created_at';
+                sortingOrder = req.body.sortingOrder || 'DESC';
 
-                if (req.body.sortingOrder == "NORMAL") {
-                  sortingOrder = "DESC";
-                  columnName = "created_at";
+                if (req.body.sortingOrder == 'NORMAL') {
+                  sortingOrder = 'DESC';
+                  columnName = 'created_at';
                 }
 
-                if (req.body.is_read == "all") {
-                  sql = 'select n.*,count(*) OVER() AS full_count,u.first_name as sendby_firstname,u.last_name as sentby_lastname from notifications n LEFT OUTER JOIN users u on u.id = n."created_by" where n."is_deleted"=false  and n."destnation_user_id"='.concat(userId, ' ORDER BY "').concat(columnName, '" ').concat(sortingOrder, " OFFSET ").concat(offset, " LIMIT ").concat(limit);
+                if (req.body.is_read == 'all') {
+                  sql = 'select n.*,count(*) OVER() AS full_count,u.first_name as sendby_firstname,u.last_name as sentby_lastname from notifications n LEFT OUTER JOIN users u on u.id = n."created_by" where n."is_deleted"=false  and n."destnation_user_id"='
+                    .concat(userId, ' ORDER BY "')
+                    .concat(columnName, '" ')
+                    .concat(sortingOrder, ' OFFSET ')
+                    .concat(offset, ' LIMIT ')
+                    .concat(limit);
                 } else {
-                  sql = 'select n.*,count(*) OVER() AS full_count,u.first_name as sendby_firstname,u.last_name as sentby_lastname from notifications n LEFT OUTER JOIN users u on u.id = n."created_by" where n."is_deleted"=false and n."is_read"='.concat(is_read, ' and n."destnation_user_id"=').concat(userId, ' ORDER BY "').concat(columnName, '" ').concat(sortingOrder, " OFFSET ").concat(offset, " LIMIT ").concat(limit);
+                  sql = 'select n.*,count(*) OVER() AS full_count,u.first_name as sendby_firstname,u.last_name as sentby_lastname from notifications n LEFT OUTER JOIN users u on u.id = n."created_by" where n."is_deleted"=false and n."is_read"='
+                    .concat(is_read, ' and n."destnation_user_id"=')
+                    .concat(userId, ' ORDER BY "')
+                    .concat(columnName, '" ')
+                    .concat(sortingOrder, ' OFFSET ')
+                    .concat(offset, ' LIMIT ')
+                    .concat(limit);
                 }
 
-                countsql = "select * from notifications where destnation_user_id =".concat(userId, " and is_deleted =false and is_read=false;");
+                countsql = 'select * from notifications where destnation_user_id ='.concat(userId, ' and is_deleted =false and is_read=false;');
                 raw2 = bookshelf.knex.raw(sql); // console.log('query result in get notificatins=====>', raw2)
 
                 raw2
@@ -4989,16 +5372,16 @@ function getNotificationByUserId(req, res) {
                     countquery
                       .then(function (countresult) {
                         var totalCount = countresult.rowCount;
-                        console.log("Total unread count is====", totalCount);
+                        console.log('Total unread count is====', totalCount);
                         result.totalNotifiCount = totalCount;
                         return res.json(Response(constant.statusCode.ok, constant.messages.notificationFetchedSuccess, result));
                       })
-                      ["catch"](function (err) {
+                      ['catch'](function (err) {
                         console.log(err);
                         return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.commonError));
                       });
                   })
-                  ["catch"](function (err) {
+                  ['catch'](function (err) {
                     console.log(err);
                     return res.json(Response(constant.statusCode.alreadyExist, constant.validateMsg.commonError));
                   });
@@ -5009,11 +5392,11 @@ function getNotificationByUserId(req, res) {
 
             case 5:
               _context58.prev = 5;
-              _context58.t0 = _context58["catch"](1);
-              return _context58.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
+              _context58.t0 = _context58['catch'](1);
+              return _context58.abrupt('return', res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.commonError)));
 
             case 8:
-            case "end":
+            case 'end':
               return _context58.stop();
           }
         }
@@ -5051,13 +5434,16 @@ function readNotification(req, res) {
               break;
             }
 
-            return _context59.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.notificationReadSuccess, updateUserData)));
+            return _context59.abrupt('return', res.json(Response(constant.statusCode.ok, constant.messages.notificationReadSuccess, updateUserData)));
 
           case 9:
-            return _context59.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context59.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 10:
-          case "end":
+          case 'end':
             return _context59.stop();
         }
       }
@@ -5091,13 +5477,19 @@ function deleteNotification(req, res) {
               break;
             }
 
-            return _context60.abrupt("return", res.json(Response(constant.statusCode.ok, constant.messages.notificationDeleteSuccess, updateUserData)));
+            return _context60.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.ok, constant.messages.notificationDeleteSuccess, updateUserData))
+            );
 
           case 9:
-            return _context60.abrupt("return", res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body)));
+            return _context60.abrupt(
+              'return',
+              res.json(Response(constant.statusCode.internalservererror, constant.validateMsg.internalError, result.req.body))
+            );
 
           case 10:
-          case "end":
+          case 'end':
             return _context60.stop();
         }
       }

@@ -1,4 +1,4 @@
-var bookshelf = __rootRequire('app/config/bookshelf');
+var bookshelf = require('app/config/bookshelf');
 
 module.exports = {
   getMyOffers,

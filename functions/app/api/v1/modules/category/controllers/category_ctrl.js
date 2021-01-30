@@ -1,24 +1,24 @@
-var bookshelf = __rootRequire("app/config/bookshelf");
-var config = __rootRequire("app/config/constant");
-var Joi = require("joi");
-var moment = require("moment");
-var crypto = __rootRequire("app/utils/crypto");
-var loader = __rootRequire("app/api/v1/loader");
-var santize = __rootRequire("app/utils/santize");
-var i18n = require("i18n");
-var _ = require("lodash");
-var __ = require("underscore");
-var text = __rootRequire("app/utils/text");
-var async = require("async");
-var CategoryModel = loader.loadModel("/category/models/category_models");
+var bookshelf = require('app/config/bookshelf');
+var config = require('app/config/constant');
+var Joi = require('joi');
+var moment = require('moment');
+var crypto = require('app/utils/crypto');
+var loader = require('app/api/v1/loader');
+var santize = require('app/utils/santize');
+var i18n = require('i18n');
+var _ = require('lodash');
+var __ = require('underscore');
+var text = require('app/utils/text');
+var async = require('async');
+var CategoryModel = loader.loadModel('/category/models/category_models');
 // var AddressModel = loader.loadModel('/address/models/address_models');
-var jwt = require("jsonwebtoken");
+var jwt = require('jsonwebtoken');
 // var MetricesSettingProviderModel = loader.loadModel('/metrices_setting_provider/models/metrices_setting_provider_model');
 // var MetricesSettingModel = loader.loadModel('/metrices_setting/models/metrices_setting_model');
-var constant = require("../../../../../utils/constants");
-var common_query = require("../../../../../utils/commonQuery");
-var Response = require("../../../../../utils/response");
-const uuidv4 = require("uuid/v4");
+var constant = require('../../../../../utils/constants');
+var common_query = require('../../../../../utils/commonQuery');
+var Response = require('../../../../../utils/response');
+const uuidv4 = require('uuid/v4');
 
 module.exports = {
   saveCategory: saveCategory,
@@ -100,7 +100,7 @@ function saveCategory(req, res) {
     let checkDuplicate = await bookshelf.knex.raw(condition);
     if (checkDuplicate.rowCount > 0) {
       isDuplictate = true;
-      return res.json(Response(constant.statusCode.alreadyExist, "Sub Category Name is already present, choose another Sub Category Name"));
+      return res.json(Response(constant.statusCode.alreadyExist, 'Sub Category Name is already present, choose another Sub Category Name'));
     }
     if (!isDuplictate) {
       var dateObj = new Date();
@@ -109,7 +109,7 @@ function saveCategory(req, res) {
       var year = dateObj.getUTCFullYear();
       console.log(req.user._id);
 
-      newdate = year + "-" + month + "-" + day;
+      newdate = year + '-' + month + '-' + day;
       let data = {
         categoryName: categoryName ? categoryName : null,
         priority: priority ? priority : null,
@@ -166,15 +166,15 @@ function getAllCategorys(req, res) {
       let page = req.body.currentPage - 1 || 0;
       let isdeleted = req.body.isdeleted || false;
       let offset = limit * page;
-      let columnName = req.body.columnName || "categoryName";
-      let sortingOrder = req.body.sortingOrder || "ASC";
+      let columnName = req.body.columnName || 'categoryName';
+      let sortingOrder = req.body.sortingOrder || 'ASC';
       let searchChar;
       if (req.body.searchChar) {
         searchChar = `"categoryName" ilike '%${req.body.searchChar}%' and `;
       }
       // let sql = `SELECT *, count(*) OVER() AS full_count FROM category WHERE ${searchChar?searchChar:''} isdeleted=? ORDER BY "${columnName}" ${sortingOrder} OFFSET ? LIMIT ?;`
 
-      let sql = `select *, count(*) OVER() AS full_count from category where ${searchChar ? searchChar : ""} isdeleted=? 
+      let sql = `select *, count(*) OVER() AS full_count from category where ${searchChar ? searchChar : ''} isdeleted=? 
 order by  
 CASE WHEN priority  is not null THEN priority  end asc ,
 CASE WHEN priority  is null  THEN  "${columnName}"  end ${sortingOrder} OFFSET ? LIMIT ?;`;

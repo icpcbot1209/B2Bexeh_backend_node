@@ -1,6 +1,6 @@
 module.exports = function (router) {
-  var auth = __rootRequire('app/utils/crypto');
-  // var auth = __rootRequire('./../../../../utils/crypto');
+  var auth = require('app/utils/crypto');
+  // var auth = require('./../../../../utils/crypto');
   var middlewares = [auth.ensureAuthorized];
 
   var ctrl = require('./controllers/offers_ctrl');

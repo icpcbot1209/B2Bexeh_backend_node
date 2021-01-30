@@ -4,24 +4,31 @@ var config = require('app/config/constant');
 var moment = require('moment');
 var Joi = require('joi');
 
-var Orders = bookshelf.Model.extend({
-  tableName: 'orders',
+var Offer = bookshelf.Model.extend({
+  tableName: 'offers',
   initialize: function () {
     this.on('creating', this.onCreating);
   },
   onCreating: function () {
     let self = this;
     self.attributes = santize.striptags(self.attributes);
-    self.attributes.created = moment.utc().format(config.MOMENT_DATE_TIME_FORMAT);
+    self.attributes.timestamp = Date.now();
     var validate = Joi.object().keys({
-      bid_ask_id: Joi.any(),
-      status: Joi.any(),
-      product_id: Joi.any(),
+      seller_id: Joi.string(),
+      buyer_id: Joi.string(),
+      offer_type: Joi.string(),
+      product_id: Joi.string(),
       is_deleted: Joi.boolean(),
-      track_no: Joi.any(),
-      courier: Joi.any(),
-      paymentdetail: Joi.any(),
-      delivered: Joi.boolean(),
+      is_read: Joi.boolean(),
+      shipment_date: Joi.date(),
+      payment_date: Joi.date(),
+      payment_method: Joi.string(),
+      expiry_date: Joi.date(),
+      qty: Joi.number(),
+      amount: Joi.number(),
+      note: Joi.string(),
+      parent_id: Joi.string(),
+      timestamp: Joi.number(),
     });
     Joi.validate(self.attributes, validate, {}, (err, value) => {
       if (err) throw err.details[0].message;
@@ -29,4 +36,4 @@ var Orders = bookshelf.Model.extend({
   },
 });
 
-module.exports = bookshelf.model('orders', Orders);
+module.exports = bookshelf.model('offers', Offer);
