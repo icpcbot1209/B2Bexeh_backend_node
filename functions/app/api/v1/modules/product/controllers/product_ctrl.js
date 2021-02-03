@@ -168,7 +168,6 @@ function createCounter(req, res) {
        */
       let reqType = Array.isArray(req.body);
       if (reqType) {
-        console.log('array');
         let orderArr = [];
         async.forEachOf(
           req.body,
@@ -228,7 +227,6 @@ function createCounter(req, res) {
             data.expiry_date = expiredAt;
             data.created_at = createdAt;
             data.total_amount = qty * amount;
-            console.log('data---', data);
 
             let counterData = await common_query.saveRecord(CounterModel, data).catch((err) => {
               throw err;

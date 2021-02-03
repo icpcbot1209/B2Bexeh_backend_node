@@ -6,8 +6,8 @@ var Joi = require('joi');
 var uuidv4 = require('uuid/v4');
 
 var model = bookshelf.Model.extend({
-  tableName: 'offers',
   hasTimestamps: true,
+  tableName: 'hopes',
   initialize: function () {
     this.on('creating', this.onCreating);
   },
@@ -15,18 +15,14 @@ var model = bookshelf.Model.extend({
     let self = this;
     self.attributes = santize.striptags(self.attributes);
     self.attributes.id = uuidv4();
-
     var validate = Joi.object().keys({
       id: Joi.any(),
-      hopeId: Joi.string(),
-      qty: Joi.number(),
-      price: Joi.number(),
-      creatorId: Joi.string(),
+      isAsk: Joi.boolean(),
       note: Joi.string(),
-      payment: Joi.any(),
-      shipment: Joi.any(),
-      isActive: Joi.boolean(),
-      isAccepted: Joi.boolean(),
+      creatorId: Joi.string(),
+      productId: Joi.string(),
+      price: Joi.number(),
+      unit: Joi.string(),
       created_at: Joi.date(),
       updated_at: Joi.date(),
     });
@@ -36,4 +32,4 @@ var model = bookshelf.Model.extend({
   },
 });
 
-module.exports = bookshelf.model('offers', model);
+module.exports = bookshelf.model('hopes', model);

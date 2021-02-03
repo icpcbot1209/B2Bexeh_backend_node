@@ -10,7 +10,6 @@ async function createOffer(req, res, next) {
   try {
     const user0_id = req.user._id;
     const { request, product, productType, unit, qty, price, text } = req.body;
-    const offer_type = request;
 
     const query = `INSERT INTO bid_and_ask (
       "productId", 

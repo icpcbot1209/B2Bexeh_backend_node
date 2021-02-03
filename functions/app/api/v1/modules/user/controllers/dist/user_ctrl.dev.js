@@ -5148,7 +5148,6 @@ function getAllWatchListData(req, res) {
                 var output1 = JSON.parse(output);
                 watchRecord.push(output1);
               });
-              console.log('Products---->', watchRecord);
 
               if (!(watchlistData.rowCount > 0)) {
                 _context55.next = 14;

@@ -2797,7 +2797,6 @@ function getAllWatchListData(req, res) {
         watchRecord.push(output1);
       });
 
-      console.log('Products---->', watchRecord);
       if (watchlistData.rowCount > 0) {
         return res.json(Response(constant.statusCode.ok, constant.messages.UpdateSuccess, watchRecord));
       } else {

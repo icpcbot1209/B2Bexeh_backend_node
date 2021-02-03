@@ -12,8 +12,11 @@ module.exports = function (express) {
   router.post('/user/getUserById', middlewares, user.getUserById);
   router.post('/user/getTenUsers', middlewares, user.getTenUsers);
 
-  const offer = require('./controllers/offer');
-  router.post('/offer/createOffer', middlewares, offer.createOffer);
+  const hope = require('./controllers/hope');
+  router.post('/hope/createOne', middlewares, hope.createOne);
+
+  // const offer = require('./controllers/offer');
+  // router.post('/offer/createOffer', middlewares, offer.createOffer);
 
   return router;
 };
