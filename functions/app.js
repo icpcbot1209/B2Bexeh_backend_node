@@ -1,3 +1,9 @@
+console.log('*********************');
+console.log(__dirname);
+console.log('*********************');
+
+require('app-module-path').addPath(__dirname);
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var expressJwt = require('express-jwt');
@@ -15,8 +21,6 @@ var fileupload = require('express-fileupload');
 // const formidable = require('formidable');
 
 require('dotenv').config();
-
-require('app-module-path').addPath(__dirname);
 
 global.__debug = function () {
   if (!process.env.NODE_ENV || process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'aws') {
@@ -62,7 +66,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'local'; //local server
 // const expressLogger = expressPino({ logger });
 
 // app.use(expressLogger);
-
 const config = require('./app/config/config.js').get(process.env.NODE_ENV);
 // const config = require('./app/config/config.js').get('default');
 
@@ -104,36 +107,3 @@ app.get('/timestamp', (req, res) => {
 });
 
 module.exports = app;
-
-// var port = process.env.PORT || config.port;
-
-// app.listen(port).timeout = 1800000; //30 min
-// console.log("Available on:", config.baseUrl);
-
-// //socket
-// var socketport = process.env.SOCKETPORT || 5900;
-// console.log("socketport No is", socketport);
-// var socket = require("http").Server(app);
-// // var socket = require('http').Server(app);
-
-// socket.listen(socketport);
-// var io = require("socket.io")(socket, { origins: "*:*" });
-
-// io.on("connection", function (socket) {
-//   console.log("connected socket!");
-
-//   socket.on("disconnect", function () {
-//     console.log("Socket disconnected");
-//   });
-// });
-
-// app.set("io", io);
-// require("./app/api/v1/modules/chat/controllers/chat").chatConfig(io);
-// require("./app/utils/fileUpload").listBuckets();
-
-/**
- * active offers sent, buy doesn't make sense- sf 13
-active offers section message doesn't properly carry over and you're not showing shipping address- sf 14
-transaction count doesn't increase for a user - sf38
-testing for collective child mobile end for live deployement
- */

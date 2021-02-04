@@ -3,7 +3,6 @@ var santize = require('app/utils/santize');
 var config = require('app/config/constant');
 var moment = require('moment');
 var Joi = require('joi');
-var uuidv4 = require('uuid/v4');
 
 var model = bookshelf.Model.extend({
   hasTimestamps: true,
@@ -14,15 +13,16 @@ var model = bookshelf.Model.extend({
   onCreating: function () {
     let self = this;
     self.attributes = santize.striptags(self.attributes);
-    self.attributes.id = uuidv4();
     var validate = Joi.object().keys({
       id: Joi.any(),
-      isAsk: Joi.boolean(),
+      is_ask: Joi.boolean(),
       note: Joi.string(),
-      creatorId: Joi.string(),
-      productId: Joi.string(),
+      creator_id: Joi.string(),
+      product_id: Joi.string(),
+      qty: Joi.number(),
       price: Joi.number(),
       unit: Joi.string(),
+      deal_method: Joi.string(),
       created_at: Joi.date(),
       updated_at: Joi.date(),
     });

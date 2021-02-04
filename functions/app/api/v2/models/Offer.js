@@ -17,16 +17,17 @@ var model = bookshelf.Model.extend({
     self.attributes.id = uuidv4();
 
     var validate = Joi.object().keys({
-      id: Joi.any(),
-      hopeId: Joi.string(),
+      id: Joi.number(),
+      hope_id: Joi.number(),
+      product_id: Joi.number(),
+      creator_id: Joi.number(),
       qty: Joi.number(),
       price: Joi.number(),
-      creatorId: Joi.string(),
       note: Joi.string(),
-      payment: Joi.any(),
-      shipment: Joi.any(),
-      isActive: Joi.boolean(),
-      isAccepted: Joi.boolean(),
+      payment_method: Joi.number(),
+      payment_timing: Joi.number(),
+      is_active: Joi.boolean(),
+      is_accepted: Joi.boolean(),
       created_at: Joi.date(),
       updated_at: Joi.date(),
     });

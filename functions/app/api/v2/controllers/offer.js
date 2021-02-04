@@ -3,8 +3,27 @@ var moment = require('moment');
 const Offer = require('../models/Offer');
 
 module.exports = {
-  createOffer,
+  createOne,
 };
+
+async function createOne(req, res, next) {
+  try {
+    const creator_id = req.user._id;
+    const offerData = req.body;
+    const is_active = true;
+    const is_accepted = false;
+
+    const data = await bookshelf
+      .knex('offers')
+      .insert({ ...offerData, creator_id, is_accepted, is_active })
+      .returning('*');
+
+    res.status(200).json(data[0]);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
 
 async function createOffer(req, res, next) {
   try {

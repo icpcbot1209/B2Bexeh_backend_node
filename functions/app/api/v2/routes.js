@@ -14,9 +14,10 @@ module.exports = function (express) {
 
   const hope = require('./controllers/hope');
   router.post('/hope/createOne', middlewares, hope.createOne);
+  router.post('/hope/readByProductId', middlewares, hope.readByProductId);
 
-  // const offer = require('./controllers/offer');
-  // router.post('/offer/createOffer', middlewares, offer.createOffer);
+  const offer = require('./controllers/offer');
+  router.post('/offer/createOne', middlewares, offer.createOne);
 
   return router;
 };
