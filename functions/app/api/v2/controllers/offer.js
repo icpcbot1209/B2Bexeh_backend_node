@@ -1,11 +1,43 @@
 var bookshelf = require('app/config/bookshelf');
 
 module.exports = {
+  getMyOffers,
   createOne,
   getOne,
   accept,
   decline,
 };
+
+async function getMyOffers(req, res, next) {
+  try {
+    const user_id = req.user._id;
+    const { tag } = req.body;
+    let rows = await bookshelf
+      .knex('offers')
+      .where({ 'offers.seller_id': user_id })
+      .orWhere({ 'offers.buyer_id': user_id })
+      .select('offers.*')
+      .innerJoin('products', 'offers.product_id', '=', 'products.id')
+      .select('products.productName as product_name')
+      .innerJoin('hopes', 'hopes.id', '=', 'offers.hope_id')
+      .select('hopes.unit as hope_unit');
+
+    if (tag === 'active-received') {
+      rows = rows.filter((x) => x.is_active && x.creator_id != user_id);
+    } else if (tag === 'closed-received') {
+      rows = rows.filter((x) => !x.is_active && x.creator_id != user_id);
+    } else if (tag === 'active-sent') {
+      rows = rows.filter((x) => x.is_active && x.creator_id == user_id);
+    } else if (tag === 'closed-sent') {
+      rows = rows.filter((x) => !x.is_active && x.creator_id == user_id);
+    }
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
 
 async function createOne(req, res, next) {
   try {

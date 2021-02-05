@@ -21,6 +21,7 @@ module.exports = function (express) {
   router.post('/hope/getByCategory', middlewares, hope.getByCategory);
 
   const offer = require('./controllers/offer');
+  router.post('/offer/getMyOffers', middlewares, offer.getMyOffers);
   router.post('/offer/createOne', middlewares, offer.createOne);
   router.post('/offer/getOne', middlewares, offer.getOne);
   router.post('/offer/accept', middlewares, offer.accept);

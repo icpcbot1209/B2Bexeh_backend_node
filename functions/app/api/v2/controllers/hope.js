@@ -30,7 +30,7 @@ async function readByProductId(req, res, next) {
       .from('hopes')
       .where({ 'hopes.product_id': product_id })
       .innerJoin('users', 'hopes.creator_id', 'users.id')
-      .select('hopes.*', 'users.user_name');
+      .select('hopes.*', 'users.user_name as dealer_name');
     res.status(200).json(arr);
   } catch (err) {
     console.log(err);
