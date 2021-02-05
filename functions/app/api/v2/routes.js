@@ -12,9 +12,13 @@ module.exports = function (express) {
   router.post('/user/getUserById', middlewares, user.getUserById);
   router.post('/user/getTenUsers', middlewares, user.getTenUsers);
 
+  const product = require('./controllers/product');
+  router.post('/product/getByCategory', middlewares, product.getByCategory);
+
   const hope = require('./controllers/hope');
   router.post('/hope/createOne', middlewares, hope.createOne);
   router.post('/hope/readByProductId', middlewares, hope.readByProductId);
+  router.post('/hope/getByCategory', middlewares, hope.getByCategory);
 
   const offer = require('./controllers/offer');
   router.post('/offer/createOne', middlewares, offer.createOne);

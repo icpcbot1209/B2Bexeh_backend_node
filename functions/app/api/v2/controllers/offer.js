@@ -1,6 +1,4 @@
 var bookshelf = require('app/config/bookshelf');
-var moment = require('moment');
-const Offer = require('../models/Offer');
 
 module.exports = {
   createOne,
@@ -46,7 +44,7 @@ async function getOne(req, res, next) {
       )
       .innerJoin('products', 'offers.product_id', '=', 'products.id')
       .select('products.productName AS procut_name');
-
+    console.log(data[0]);
     res.status(200).json(data[0]);
   } catch (err) {
     console.error(err);
@@ -72,54 +70,6 @@ async function decline(req, res, next) {
     const { offerId } = req.body;
     await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_accepted: true });
     res.status(200).json({ message: 'OK' });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Internal error.' });
-  }
-}
-
-async function createOffer(req, res, next) {
-  try {
-    const user0_id = req.user._id;
-    const { request, product, productType, unit, qty, price, text } = req.body;
-
-    const query = `INSERT INTO bid_and_ask (
-      "productId", 
-      producttype,
-      amount,
-      isdeleted,
-      "createdAt",
-      "createdbyId", 
-      request, 
-      note, 
-      "maxQuantity", 
-      "minQuantity", 
-      type,
-      isactive, 
-      isaddtocart, 
-      "isPrivate"
-    ) VALUES (
-      '${product.id}', 
-      '${productType}', 
-      '${price}', 
-      'false',
-      '${createdAt}',
-      '${user0_id}',
-      '${request}',
-      '${text}',
-      '${qty}',
-      '${qty}',
-      '${unit}',
-      'false',
-      'false',
-      'false'
-    )
-    RETURNING *;`;
-
-    let data = await bookshelf.knex.raw(query);
-    const arr = data['rows'];
-    if (!arr || arr.length === 0) return;
-    res.status(200).json(arr[0]);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });

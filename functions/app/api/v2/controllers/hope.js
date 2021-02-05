@@ -1,10 +1,9 @@
 var bookshelf = require('app/config/bookshelf');
-var moment = require('moment');
-const Hope = require('../models/Hope');
 
 module.exports = {
   createOne,
   readByProductId,
+  getByCategory,
 };
 
 async function createOne(req, res, next) {
@@ -32,6 +31,22 @@ async function readByProductId(req, res, next) {
       .where({ 'hopes.product_id': product_id })
       .innerJoin('users', 'hopes.creator_id', 'users.id')
       .select('hopes.*', 'users.user_name');
+    res.status(200).json(arr);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function getByCategory(req, res, next) {
+  try {
+    const { category_id, subcategory_id } = req.body;
+    const arr = await bookshelf.knex
+      .from('hopes')
+      .innerJoin('products', 'hopes.product_id', '=', 'products.id')
+      .where({ 'products.categoryId': category_id, 'products.subcategoryId': subcategory_id })
+      .innerJoin('users', 'hopes.creator_id', 'users.id')
+      .select('hopes.*', 'users.user_name as dealer_name', 'products.productName as product_name', 'products.releaseDate as release_date');
     res.status(200).json(arr);
   } catch (err) {
     console.log(err);

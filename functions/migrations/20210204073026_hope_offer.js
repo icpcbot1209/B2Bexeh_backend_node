@@ -4,9 +4,9 @@ exports.up = function (knex) {
   // return bookshelf.knex.schema
   return knex.schema
     .createTable('hopes', (table) => {
-      table.increments('id').primary();
-      table.integer('creator_id');
-      table.integer('product_id');
+      table.bigIncrements('id').primary().index();
+      table.bigInteger('creator_id');
+      table.bigInteger('product_id');
       table.integer('qty').notNullable();
       table.double('price').notNullable();
       table.string('note');
@@ -16,12 +16,12 @@ exports.up = function (knex) {
       table.timestamps(true, true);
     })
     .createTable('offers', (table) => {
-      table.increments('id').primary();
-      table.integer('hope_id');
-      table.integer('product_id');
-      table.integer('creator_id');
-      table.integer('seller_id');
-      table.integer('buyer_id');
+      table.bigIncrements('id').primary().index();
+      table.bigInteger('hope_id');
+      table.bigInteger('product_id');
+      table.bigInteger('creator_id');
+      table.bigInteger('seller_id');
+      table.bigInteger('buyer_id');
       table.integer('qty').notNullable();
       table.double('price').notNullable();
       table.string('note');
