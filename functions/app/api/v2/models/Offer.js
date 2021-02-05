@@ -21,6 +21,8 @@ var model = bookshelf.Model.extend({
       hope_id: Joi.number(),
       product_id: Joi.number(),
       creator_id: Joi.number(),
+      seller_id: Joi.number(),
+      buyer_id: Joi.number(),
       qty: Joi.number(),
       price: Joi.number(),
       note: Joi.string(),

@@ -18,6 +18,6 @@ module.exports = function (express) {
 
   const offer = require('./controllers/offer');
   router.post('/offer/createOne', middlewares, offer.createOne);
-
+  router.post('/offer/getOne', middlewares, offer.getOne);
   return router;
 };

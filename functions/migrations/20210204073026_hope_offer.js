@@ -20,6 +20,8 @@ exports.up = function (knex) {
       table.integer('hope_id');
       table.integer('product_id');
       table.integer('creator_id');
+      table.integer('seller_id');
+      table.integer('buyer_id');
       table.integer('qty').notNullable();
       table.double('price').notNullable();
       table.string('note');
