@@ -19,5 +19,8 @@ module.exports = function (express) {
   const offer = require('./controllers/offer');
   router.post('/offer/createOne', middlewares, offer.createOne);
   router.post('/offer/getOne', middlewares, offer.getOne);
+  router.post('/offer/accept', middlewares, offer.accept);
+  router.post('/offer/decline', middlewares, offer.decline);
+
   return router;
 };
