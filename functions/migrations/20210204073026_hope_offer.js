@@ -5,31 +5,47 @@ exports.up = function (knex) {
   return knex.schema
     .createTable('hopes', (table) => {
       table.bigIncrements('id').primary().index();
+      table.timestamps(true, true);
+
       table.bigInteger('creator_id');
       table.bigInteger('product_id');
+
+      table.boolean('is_ask').notNullable();
+
       table.integer('qty').notNullable();
       table.double('price').notNullable();
-      table.string('note');
       table.string('unit');
       table.string('deal_method');
-      table.boolean('is_ask').notNullable();
-      table.timestamps(true, true);
+      table.string('note');
     })
     .createTable('offers', (table) => {
       table.bigIncrements('id').primary().index();
+      table.timestamps(true, true);
+
+      table.string('status');
+
       table.bigInteger('hope_id');
       table.bigInteger('product_id');
       table.bigInteger('creator_id');
       table.bigInteger('seller_id');
       table.bigInteger('buyer_id');
+
+      // status = sent
       table.integer('qty').notNullable();
       table.double('price').notNullable();
+      table.string('unit');
+      table.string('deal_method');
       table.string('note');
-      table.integer('payment_method').notNullable();
-      table.integer('payment_timing').notNullable();
-      table.boolean('is_active').notNullable();
-      table.boolean('is_accepted').notNullable();
-      table.timestamps(true, true);
+      table.string('payment_terms').notNullable();
+      table.string('shipping_terms').notNullable();
+
+      // status = accepted
+      table.boolean('is_paid');
+      table.boolean('is_shipped');
+
+      // status = completed
+      table.string('feedback2seller');
+      table.string('feedback2buyer');
     });
 };
 

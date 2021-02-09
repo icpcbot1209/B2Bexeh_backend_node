@@ -8,6 +8,10 @@ module.exports = function (express) {
   var auth = require('app/utils/crypto');
   var middlewares = [auth.ensureAuthorized];
 
+  const configs = require('./controllers/configs');
+  router.post('/configs/createOne', middlewares, configs.createOne);
+  router.post('/configs/readAll', middlewares, configs.readAll);
+
   const user = require('./controllers/user');
   router.post('/user/getUserById', middlewares, user.getUserById);
   router.post('/user/getTenUsers', middlewares, user.getTenUsers);
