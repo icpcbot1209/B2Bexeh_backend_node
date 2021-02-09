@@ -36,8 +36,8 @@ exports.up = function (knex) {
       table.string('unit');
       table.string('deal_method');
       table.string('note');
-      table.string('payment_terms').notNullable();
-      table.string('shipping_terms').notNullable();
+      table.string('payment_terms');
+      table.string('shipping_terms');
 
       // status = accepted
       table.boolean('is_paid');

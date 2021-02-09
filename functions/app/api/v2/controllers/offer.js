@@ -43,12 +43,10 @@ async function createOne(req, res, next) {
   try {
     const creator_id = req.user._id;
     const offerData = req.body;
-    const is_active = true;
-    const is_accepted = false;
 
     const data = await bookshelf
       .knex('offers')
-      .insert({ ...offerData, creator_id, is_accepted, is_active })
+      .insert({ ...offerData, creator_id })
       .returning('*');
 
     res.status(200).json(data[0]);

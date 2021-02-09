@@ -11,8 +11,8 @@ async function createOne(req, res, next) {
     const creator_id = req.user._id;
     const hopeData = req.body;
 
-    const data = await bookshelf.knex
-      .from('hopes')
+    const data = await bookshelf
+      .knex('hopes')
       .insert({ ...hopeData, creator_id })
       .returning('*');
 
