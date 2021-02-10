@@ -23,13 +23,13 @@ async function getMyOffers(req, res, next) {
       .select('hopes.unit as hope_unit');
 
     if (tag === 'active-received') {
-      rows = rows.filter((x) => x.is_active && x.creator_id != user_id);
+      rows = rows.filter((x) => (x.status == 'sent' || x.status == 'agreed') && x.creator_id != user_id);
     } else if (tag === 'closed-received') {
-      rows = rows.filter((x) => !x.is_active && x.creator_id != user_id);
+      rows = rows.filter((x) => !(x.status == 'sent' || x.status == 'agreed') && x.creator_id != user_id);
     } else if (tag === 'active-sent') {
-      rows = rows.filter((x) => x.is_active && x.creator_id == user_id);
+      rows = rows.filter((x) => (x.status == 'sent' || x.status == 'agreed') && x.creator_id == user_id);
     } else if (tag === 'closed-sent') {
-      rows = rows.filter((x) => !x.is_active && x.creator_id == user_id);
+      rows = rows.filter((x) => !(x.status == 'sent' || x.status == 'agreed') && x.creator_id == user_id);
     }
 
     res.status(200).json(rows);
