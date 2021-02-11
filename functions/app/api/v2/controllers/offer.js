@@ -6,7 +6,13 @@ module.exports = {
   getOne,
   accept,
   decline,
+  markAsPaid,
+  markAsShipped,
 };
+
+function isActiveOffer(x) {
+  return !x.is_deleted && !x.is_completed && !x.is_canceled;
+}
 
 async function getMyOffers(req, res, next) {
   try {
@@ -23,13 +29,13 @@ async function getMyOffers(req, res, next) {
       .select('hopes.unit as hope_unit');
 
     if (tag === 'active-received') {
-      rows = rows.filter((x) => (x.status == 'sent' || x.status == 'agreed') && x.creator_id != user_id);
+      rows = rows.filter((x) => isActiveOffer(x) && x.creator_id != user_id);
     } else if (tag === 'closed-received') {
-      rows = rows.filter((x) => !(x.status == 'sent' || x.status == 'agreed') && x.creator_id != user_id);
+      rows = rows.filter((x) => !isActiveOffer(x) && x.creator_id != user_id);
     } else if (tag === 'active-sent') {
-      rows = rows.filter((x) => (x.status == 'sent' || x.status == 'agreed') && x.creator_id == user_id);
+      rows = rows.filter((x) => isActiveOffer(x) && x.creator_id == user_id);
     } else if (tag === 'closed-sent') {
-      rows = rows.filter((x) => !(x.status == 'sent' || x.status == 'agreed') && x.creator_id == user_id);
+      rows = rows.filter((x) => !isActiveOffer(x) && x.creator_id == user_id);
     }
 
     res.status(200).json(rows);
@@ -73,8 +79,7 @@ async function getOne(req, res, next) {
         'hopes.price AS hope_price'
       )
       .innerJoin('products', 'offers.product_id', '=', 'products.id')
-      .select('products.productName AS procut_name');
-    console.log(data[0]);
+      .select('products.productName AS product_name');
     res.status(200).json(data[0]);
   } catch (err) {
     console.error(err);
@@ -98,7 +103,31 @@ async function decline(req, res, next) {
   try {
     const userId = req.user._id;
     const { offerId } = req.body;
-    await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_accepted: true });
+    await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_canceled: true });
+    res.status(200).json({ message: 'OK' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function markAsPaid(req, res, next) {
+  try {
+    const userId = req.user._id;
+    const { offerId } = req.body;
+    await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_paid: true });
+    res.status(200).json({ message: 'OK' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function markAsShipped(req, res, next) {
+  try {
+    const userId = req.user._id;
+    const { offerId } = req.body;
+    await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_shipped: true });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
     console.log(err);

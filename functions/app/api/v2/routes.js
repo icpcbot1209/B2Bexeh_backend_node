@@ -30,6 +30,8 @@ module.exports = function (express) {
   router.post('/offer/getOne', middlewares, offer.getOne);
   router.post('/offer/accept', middlewares, offer.accept);
   router.post('/offer/decline', middlewares, offer.decline);
+  router.post('/offer/markAsPaid', middlewares, offer.markAsPaid);
+  router.post('/offer/markAsShipped', middlewares, offer.markAsShipped);
 
   return router;
 };
