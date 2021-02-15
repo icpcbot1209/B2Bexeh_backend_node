@@ -32,6 +32,9 @@ module.exports = function (express) {
   router.post('/offer/decline', middlewares, offer.decline);
   router.post('/offer/markAsPaid', middlewares, offer.markAsPaid);
   router.post('/offer/markAsShipped', middlewares, offer.markAsShipped);
+  router.post('/offer/giveFeedback2Seller', middlewares, offer.giveFeedback2Seller);
+  router.post('/offer/giveFeedback2Buyer', middlewares, offer.giveFeedback2Buyer);
+  router.post('/offer/changeTerms', middlewares, offer.changeTerms);
 
   return router;
 };

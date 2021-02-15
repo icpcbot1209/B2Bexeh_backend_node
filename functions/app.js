@@ -1,8 +1,10 @@
-console.log('*********************');
-console.log(__dirname);
-console.log('*********************');
-
 require('app-module-path').addPath(__dirname);
+
+var serviceAccount = require('superfractor-5e4df-e229a0f1a1a3.json');
+var fs = require('firebase-admin');
+fs.initializeApp({
+  credential: fs.credential.cert(serviceAccount),
+});
 
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -18,7 +20,6 @@ var validator = require('express-validator');
 var cookieParser = require('cookie-parser');
 var cors = require('cors');
 var fileupload = require('express-fileupload');
-// const formidable = require('formidable');
 
 require('dotenv').config();
 

@@ -34,7 +34,7 @@
     "express-pino-logger": "^5.0.0",
     "express-session": "^1.17.1",
     "express-validator": "^5.3.1",
-    "firebase-admin": "^9.2.0",
+    "firebase-admin": "^9.5.0",
     "firebase-functions": "^3.11.0",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
