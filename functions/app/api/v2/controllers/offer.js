@@ -122,8 +122,9 @@ async function decline(req, res, next) {
 async function markAsPaid(req, res, next) {
   try {
     const userId = req.user._id;
-    const { offerId } = req.body;
-    await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_paid: true });
+    const { offer_id, paid_info } = req.body;
+    const paid_at = new Date();
+    await bookshelf.knex('offers').where({ 'offers.id': offer_id }).update({ is_paid: true, paid_at, paid_info });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
     console.log(err);
@@ -134,8 +135,9 @@ async function markAsPaid(req, res, next) {
 async function markAsShipped(req, res, next) {
   try {
     const userId = req.user._id;
-    const { offerId } = req.body;
-    await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_shipped: true });
+    const { offer_id, shipped_info } = req.body;
+    const shipped_at = new Date();
+    await bookshelf.knex('offers').where({ 'offers.id': offer_id }).update({ is_shipped: true, shipped_at, shipped_info });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
     console.log(err);
