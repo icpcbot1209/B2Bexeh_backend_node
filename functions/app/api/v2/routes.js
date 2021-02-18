@@ -15,6 +15,7 @@ module.exports = function (express) {
   const user = require('./controllers/user');
   router.post('/user/getUserById', middlewares, user.getUserById);
   router.post('/user/getTenUsers', middlewares, user.getTenUsers);
+  router.post('/user/updateUser', middlewares, user.updateUser);
 
   const product = require('./controllers/product');
   router.post('/product/getByCategory', middlewares, product.getByCategory);
