@@ -29,7 +29,6 @@
     "dotenv": "^5.0.1",
     "ejs": "^2.7.4",
     "express": "^4.17.1",
-    "express-fileupload": "^1.2.0",
     "express-jwt": "^5.3.3",
     "express-pino-logger": "^5.0.0",
     "express-session": "^1.17.1",

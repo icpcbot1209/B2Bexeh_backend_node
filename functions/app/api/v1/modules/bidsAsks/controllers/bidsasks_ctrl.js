@@ -20,7 +20,7 @@ var ChatofferModel = require('../../chat/models/chat_offer_models');
 var common_query = require('../../../../../utils/commonQuery');
 var Response = require('../../../../../utils/response');
 var constant = require('../../../../../utils/constants');
-var s3file_upload = require('../../../../../utils/fileUpload');
+
 const uuidv4 = require('uuid/v4');
 const randomize = require('randomatic');
 

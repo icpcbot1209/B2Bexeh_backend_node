@@ -32,7 +32,6 @@ var jwt = require('jsonwebtoken');
 var constant = require('../../../../../utils/constants');
 var common_query = require('../../../../../utils/commonQuery');
 var Response = require('../../../../../utils/response');
-var s3file_upload = require('../../../../../utils/fileUpload');
 // var config = require('../../../../../config/config');
 // require('')
 // const uuidv4 = require('uuid/v4');
