@@ -7,7 +7,7 @@ module.exports = {
 
 async function createOne(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const { json_key, json_value } = req.body;
 
     const rows = await bookshelf.knex('configs').insert({ creator_id, json_key, json_value }).returning('*');

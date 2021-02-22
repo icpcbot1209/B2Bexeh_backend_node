@@ -1,12 +1,6 @@
-'use strict';
-const baseUrl1 = 'http://localhost:9013/user/resetPassword/{verifying_token}';
 const config = {
   default: {
     port: 9013,
-    baseUrl: 'https://qa2.b2bexch.com/',
-    ARTICLEIMAGE: '../../../../../uploads/articleImages', //local
-    PRODUCTIMAGE: '../backend/app/uploads/productImages/',
-    BULKUPLOADPATH: './app/uploads/bulkUpload/',
 
     db: {
       client: 'pg',
@@ -21,6 +15,6 @@ const config = {
     },
   },
 };
-module.exports.get = function get(env) {
+module.exports.get = function get(env = 'local') {
   return config[env] || config.default;
 };

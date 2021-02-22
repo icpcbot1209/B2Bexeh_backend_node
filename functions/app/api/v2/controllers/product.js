@@ -6,7 +6,7 @@ module.exports = {
 
 async function getByCategory(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const { category_id, subcategory_id } = req.body;
 
     var sql = `select P.*, i."imageUrl", 
@@ -31,7 +31,7 @@ group by P.id, i."imageUrl" order by P."productName" ;`;
 
 async function createOne(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const hopeData = req.body;
 
     const data = await bookshelf.knex

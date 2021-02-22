@@ -31,7 +31,7 @@ async function getTenUsers(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    const userId = req.user._id;
+    const userId = req.user.uid;
     const userData = req.body;
     await bookshelf
       .knex('users')

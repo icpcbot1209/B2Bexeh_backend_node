@@ -1,18 +1,8 @@
 var jwt = require('jsonwebtoken');
 var crypto = require('crypto');
-var config = require('../config/config');
-var bookshelf = require('../config/bookshelf');
-var loader = require('../api/v1/loader');
-var async = require('async');
-var fs = require('fs');
-var i18n = require('i18n');
 var constant = require('../config/constant');
-var text = require('./text');
 var algorithm = constant.CONFIG.cryptoAlgorithm;
 var password = constant.CONFIG.cryptoPassword;
-var UserModel = loader.loadModel('/user/models/user_models');
-
-var allowed = ['/launch', '/gettoken', '/speciality/getSpeciality', '/user/saveUser', '/media/getImages', '/case/fetchCase'];
 
 module.exports = {
   ensureAuthorized: function (req, res, next) {

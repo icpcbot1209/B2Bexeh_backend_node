@@ -1,10 +1,10 @@
 require('app-module-path').addPath(__dirname);
 require('dotenv').config();
 
-var serviceAccount = require('my-firebase.json');
-var fs = require('firebase-admin');
-fs.initializeApp({
-  credential: fs.credential.cert(serviceAccount),
+var serviceAccount = require(process.env.FIREBASE_FILE);
+var firebase = require('firebase-admin');
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
 });
 
 var express = require('express');

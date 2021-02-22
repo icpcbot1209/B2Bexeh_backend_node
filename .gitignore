@@ -67,3 +67,6 @@ node_modules/
 
 # my-firebase credentials
 functions/my-firebase.json
+
+# knex posgresql config
+functions/knexfile.js

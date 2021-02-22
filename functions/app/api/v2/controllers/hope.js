@@ -11,7 +11,7 @@ module.exports = {
 
 async function createOne(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const hopeData = req.body;
 
     const data = await bookshelf
@@ -28,7 +28,7 @@ async function createOne(req, res, next) {
 
 async function updateOne(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const { hopeData, hopeId } = req.body;
 
     const data = await bookshelf
@@ -46,7 +46,7 @@ async function updateOne(req, res, next) {
 
 async function deleteOne(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const { hopeId } = req.body;
 
     await bookshelf.knex('hopes').where('hopes.id', '=', hopeId).delete();
@@ -91,7 +91,7 @@ async function getByCategory(req, res, next) {
 
 async function getMyHopes(req, res, next) {
   try {
-    const creator_id = req.user._id;
+    const creator_id = req.user.uid;
     const { is_ask } = req.body;
     const arr = await bookshelf.knex
       .from('hopes')
