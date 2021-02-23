@@ -2,11 +2,11 @@
 
 exports.up = function (knex) {
   // return bookshelf.knex.schema
-  return knex.schema.createTable('profiles', (table) => {
+  return knex.schema.createTable('users', (table) => {
     table.bigIncrements('id').primary().index();
     table.timestamps(true, true);
 
-    table.string('user_uid').notNullable();
+    table.string('user_uid').notNullable(); // firebase uid
     table.string('role').notNullable();
     table.string('status').notNullable(); // active, pending, deleted
 
@@ -31,5 +31,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTable('profiles');
+  return knex.schema.dropTable('users');
 };

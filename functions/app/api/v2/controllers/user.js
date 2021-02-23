@@ -1,28 +1,45 @@
 var bookshelf = require('app/config/bookshelf');
 
 module.exports = {
+  createUser,
+  getUserByUid,
   getUserById,
-  getTenUsers,
   updateUser,
 };
 
-async function getUserById(req, res, next) {
+async function createUser(req, res, next) {
   try {
-    const userId = req.body.userId;
-    const query = `SELECT * FROM users WHERE id=${userId} LIMIT 1`;
-    let data = await bookshelf.knex.raw(query);
-    res.status(200).json({ data });
+    const userData = req.body;
+    let rows = await bookshelf.knex('users').insert(userData).returning('*');
+    if (rows.length > 0) res.status(200).json(rows[0]);
+    else res.status(400).json('Failed to create a new user row');
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
 
-async function getTenUsers(req, res, next) {
+async function getUserByUid(req, res, next) {
   try {
-    const query = `SELECT * FROM users LIMIT 300`;
-    let data = await bookshelf.knex.raw(query);
-    res.status(200).json({ data });
+    const user_uid = req.body.user_uid;
+
+    let rows = await bookshelf.knex('users').where({ 'users.user_uid': user_uid }).select('*');
+
+    if (rows.length > 0) res.status(200).json(rows[0]);
+    else res.status(404).json('No user row found');
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function getUserById(req, res, next) {
+  try {
+    const userId = req.body.id;
+    let rows = await bookshelf.knex('users').where({ 'users.id': userId }).select('*');
+
+    if (rows.length > 0) res.status(200).json(rows[0]);
+    else res.status(404).json('No user row found');
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });
@@ -31,11 +48,11 @@ async function getTenUsers(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    const userId = req.user.uid;
+    const uid = req.user.uid;
     const userData = req.body;
     await bookshelf
       .knex('users')
-      .where({ 'users.id': userId })
+      .where({ 'users.user_uid': uid })
       .update({ ...userData });
     res.status(200).json({ message: 'OK' });
   } catch (err) {

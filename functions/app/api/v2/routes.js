@@ -7,8 +7,11 @@ module.exports = function (express) {
   router.post('/configs/createOne', authMiddleware, configs.createOne);
   router.post('/configs/readAll', authMiddleware, configs.readAll);
 
-  const profile = require('./controllers/profile');
-  router.post('/profile/getByUserUid', authMiddleware, profile.getByUserUid);
+  const user = require('./controllers/user');
+  router.post('/user/createUser', user.createUser);
+  router.post('/user/getUserByUid', user.getUserByUid);
+  router.post('/user/getUserById', user.getUserById);
+  router.post('/user/updateUser', authMiddleware, user.updateUser);
 
   const product = require('./controllers/product');
   router.post('/product/getByCategory', authMiddleware, product.getByCategory);

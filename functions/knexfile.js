@@ -8,7 +8,7 @@ module.exports = {
       port: 5432,
       user: 'postgres',
       password: 'uy9E9dMpvHO567EDvoiQWFJ8324',
-      database: 'postgres',
+      database: 'superfractor',
       charset: 'utf8',
       debug: true,
       timezone: 'UTC',
