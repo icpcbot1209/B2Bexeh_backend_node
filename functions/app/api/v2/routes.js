@@ -1,16 +1,16 @@
 module.exports = function (express) {
   var router = express.Router();
 
-  const authMiddleware = require('./auth-middleware');
+  const authMiddleware = require('../auth-middleware');
 
   const configs = require('./controllers/configs');
   router.post('/configs/createOne', authMiddleware, configs.createOne);
   router.post('/configs/readAll', authMiddleware, configs.readAll);
 
   const user = require('./controllers/user');
-  router.post('/user/createUser', user.createUser);
-  router.post('/user/getUserByUid', user.getUserByUid);
-  router.post('/user/getUserById', user.getUserById);
+  router.post('/user/createUser', authMiddleware, user.createUser);
+  router.post('/user/getUserByUid', authMiddleware, user.getUserByUid);
+  router.post('/user/getUserById', authMiddleware, user.getUserById);
   router.post('/user/updateUser', authMiddleware, user.updateUser);
 
   const product = require('./controllers/product');

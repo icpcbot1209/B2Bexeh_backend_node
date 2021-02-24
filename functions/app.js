@@ -1,11 +1,7 @@
 require('app-module-path').addPath(__dirname);
 require('dotenv').config();
 
-var serviceAccount = require(process.env.FIREBASE_FILE);
-var firebase = require('firebase-admin');
-firebase.initializeApp({
-  credential: firebase.credential.cert(serviceAccount),
-});
+var firebase = require('app/config/my-firebase');
 
 var express = require('express');
 var app = express();
@@ -24,5 +20,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/dist')));
 
 app.use('/api/v2', require('./app/api/v2/routes')(express));
+app.use('/api/admin', require('./app/api/admin/routes')(express));
 
 module.exports = app;

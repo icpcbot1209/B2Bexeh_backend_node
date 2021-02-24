@@ -1,4 +1,4 @@
-const firebase = require('firebase-admin');
+const firebase = require('app/config/my-firebase');
 
 function authMiddleware(request, response, next) {
   const headerToken = request.headers.authorization;
@@ -18,7 +18,10 @@ function authMiddleware(request, response, next) {
       request.user = decoded;
       next();
     })
-    .catch(() => response.send({ message: 'Could not authorize' }).status(403));
+    .catch((err) => {
+      console.log(err);
+      response.send({ message: 'Could not authorize' }).status(403);
+    });
 }
 
 module.exports = authMiddleware;

@@ -7,8 +7,8 @@ exports.up = function (knex) {
     table.timestamps(true, true);
 
     table.string('user_uid').notNullable(); // firebase uid
-    table.string('role').notNullable();
-    table.string('status').notNullable(); // active, pending, deleted
+    table.string('role').notNullable(); // admin, user, pending
+    table.string('status');
 
     table.string('photo_url');
     table.string('email');
