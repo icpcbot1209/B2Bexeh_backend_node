@@ -5,6 +5,7 @@ exports.up = function (knex) {
   return knex.schema.createTable('hopes', (table) => {
     table.bigIncrements('id').primary().index();
     table.timestamps(true, true);
+    table.string('status');
 
     table.bigInteger('creator_id');
     table.bigInteger('product_id');

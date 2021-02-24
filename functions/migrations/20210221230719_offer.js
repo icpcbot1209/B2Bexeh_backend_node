@@ -5,7 +5,6 @@ exports.up = function (knex) {
   return knex.schema.createTable('offers', (table) => {
     table.bigIncrements('id').primary().index();
     table.timestamps(true, true);
-
     table.string('status');
 
     table.bigInteger('hope_id');
@@ -34,7 +33,6 @@ exports.up = function (knex) {
     table.string('feedback2buyer');
 
     table.boolean('is_canceled');
-    table.boolean('is_deleted');
   });
 };
 
