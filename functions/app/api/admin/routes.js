@@ -26,5 +26,9 @@ module.exports = function (express) {
   router.post('/products/updateItem', authMiddleware, product.updateItem);
   router.post('/products/deleteItem', authMiddleware, product.deleteItem);
 
+  const transaction = require('./controllers/transaction');
+  router.post('/transactions/readItems', authMiddleware, transaction.readItems);
+  router.post('/transactions/updateItem', authMiddleware, transaction.updateItem);
+
   return router;
 };

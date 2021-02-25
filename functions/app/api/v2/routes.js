@@ -14,7 +14,10 @@ module.exports = function (express) {
   router.post('/user/updateUser', authMiddleware, user.updateUser);
 
   const product = require('./controllers/product');
+  router.post('/product/getCategories', authMiddleware, product.getCategories);
+  router.post('/product/getSubcategories', authMiddleware, product.getSubcategories);
   router.post('/product/getByCategory', authMiddleware, product.getByCategory);
+  router.post('/product/getById', authMiddleware, product.getById);
 
   const hope = require('./controllers/hope');
   router.post('/hope/createOne', authMiddleware, hope.createOne);

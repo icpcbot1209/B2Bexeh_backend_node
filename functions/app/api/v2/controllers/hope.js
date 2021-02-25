@@ -11,15 +11,9 @@ module.exports = {
 
 async function createOne(req, res, next) {
   try {
-    const creator_id = req.user.uid;
     const hopeData = req.body;
-
-    const data = await bookshelf
-      .knex('hopes')
-      .insert({ ...hopeData, creator_id })
-      .returning('*');
-
-    res.status(200).json(data[0]);
+    const rows = await bookshelf.knex('hopes').insert(hopeData).returning('*');
+    if (rows.length > 0) res.status(200).json(rows[0]);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });
@@ -28,7 +22,6 @@ async function createOne(req, res, next) {
 
 async function updateOne(req, res, next) {
   try {
-    const creator_id = req.user.uid;
     const { hopeData, hopeId } = req.body;
 
     const data = await bookshelf
@@ -46,7 +39,6 @@ async function updateOne(req, res, next) {
 
 async function deleteOne(req, res, next) {
   try {
-    const creator_id = req.user.uid;
     const { hopeId } = req.body;
 
     await bookshelf.knex('hopes').where('hopes.id', '=', hopeId).delete();

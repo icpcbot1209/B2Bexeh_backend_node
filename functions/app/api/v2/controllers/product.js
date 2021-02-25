@@ -1,28 +1,82 @@
 var bookshelf = require('app/config/bookshelf');
 
 module.exports = {
+  getCategories,
+  getSubcategories,
   getByCategory,
+  getById,
 };
+
+async function getCategories(req, res, next) {
+  try {
+    let rows = await bookshelf.knex('categories').select('*').returning('*');
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Error' });
+  }
+}
+
+async function getSubcategories(req, res, next) {
+  try {
+    const { category_id } = req.body;
+    let rows = await bookshelf
+      .knex('categorymap as CM')
+      .where({ 'CM.category_id': category_id })
+      .innerJoin('subcategories as SC', 'SC.id', '=', 'CM.subcategory_id')
+      .select('SC.id as id', 'SC.name as name')
+      .returning('*');
+
+    console.log(rows);
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Error' });
+  }
+}
 
 async function getByCategory(req, res, next) {
   try {
     const creator_id = req.user.uid;
     const { category_id, subcategory_id } = req.body;
 
-    var sql = `select P.*, i."imageUrl", 
-MIN(CASE WHEN t.is_ask=true and t.unit='Box' THEN t.price END) as BoxLowestAsk,
-MAX(CASE WHEN t.is_ask=false and t.unit='Box' THEN t.price END) as BoxHighestBid,
-MIN(CASE WHEN t.is_ask=true and t.unit='Case' THEN t.price END) as CaseLowestAsk,
-MAX(CASE WHEN t.is_ask=false and t.unit='Case' THEN t.price END) as CaseHighestBid
-from products P
-LEFT OUTER JOIN hopes t on P.id = t.product_id
-LEFT OUTER JOIN images i on P.id = i."productId"
-where (P."categoryId"= ? AND P."subcategoryId"=? AND P."isdeleted" = false) 
-group by P.id, i."imageUrl" order by P."productName" ;`;
+    var sql = `select p.*, 
+    MIN(CASE WHEN h.is_ask=true and h.unit='box' THEN h.price END) as boxlowestask,
+    MAX(CASE WHEN h.is_ask=false and h.unit='box' THEN h.price END) as boxhighestbid,
+    MIN(CASE WHEN h.is_ask=true and h.unit='case' THEN h.price END) as caselowestask,
+    MAX(CASE WHEN h.is_ask=false and h.unit='case' THEN h.price END) as casehighestbid
+    FROM products p 
+    LEFT OUTER JOIN hopes h ON p.id = h.product_id
+    WHERE (p.category_id= ? AND p.subcategory_id=?) 
+    GROUP BY p.id ORDER BY p.name;`;
 
     const data = await bookshelf.knex.raw(sql, [category_id, subcategory_id]);
 
-    res.status(200).json({ data });
+    res.status(200).json(data.rows);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function getById(req, res, next) {
+  try {
+    const creator_id = req.user.uid;
+    const { id } = req.body;
+
+    var sql = `select p.*, 
+    MIN(CASE WHEN h.is_ask=true and h.unit='box' THEN h.price END) as boxlowestask,
+    MAX(CASE WHEN h.is_ask=false and h.unit='box' THEN h.price END) as boxhighestbid,
+    MIN(CASE WHEN h.is_ask=true and h.unit='case' THEN h.price END) as caselowestask,
+    MAX(CASE WHEN h.is_ask=false and h.unit='case' THEN h.price END) as casehighestbid
+    FROM products p 
+    LEFT OUTER JOIN hopes h ON p.id = h.product_id
+    WHERE p.id= ? 
+    GROUP BY p.id ORDER BY p.name;`;
+
+    const data = await bookshelf.knex.raw(sql, [id]);
+    if (data.rows.length > 0) res.status(200).json(data.rows[0]);
+    else res.status(200).json(null);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });
