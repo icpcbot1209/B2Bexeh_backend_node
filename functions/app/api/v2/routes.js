@@ -3,10 +3,6 @@ module.exports = function (express) {
 
   const authMiddleware = require('../auth-middleware');
 
-  const configs = require('./controllers/configs');
-  router.post('/configs/createOne', authMiddleware, configs.createOne);
-  router.post('/configs/readAll', authMiddleware, configs.readAll);
-
   const user = require('./controllers/user');
   router.post('/user/createUser', authMiddleware, user.createUser);
   router.post('/user/getUserByUid', authMiddleware, user.getUserByUid);
@@ -18,6 +14,10 @@ module.exports = function (express) {
   router.post('/product/getSubcategories', authMiddleware, product.getSubcategories);
   router.post('/product/getByCategory', authMiddleware, product.getByCategory);
   router.post('/product/getById', authMiddleware, product.getById);
+  router.post('/product/getWatchlist', authMiddleware, product.getWatchlist);
+  router.post('/product/existInWatchlist', authMiddleware, product.existInWatchlist);
+  router.post('/product/addToWatchlist', authMiddleware, product.addToWatchlist);
+  router.post('/product/removeFromWatchlist', authMiddleware, product.removeFromWatchlist);
 
   const hope = require('./controllers/hope');
   router.post('/hope/createOne', authMiddleware, hope.createOne);

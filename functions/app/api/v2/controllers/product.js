@@ -5,6 +5,10 @@ module.exports = {
   getSubcategories,
   getByCategory,
   getById,
+  getWatchlist,
+  existInWatchlist,
+  addToWatchlist,
+  removeFromWatchlist,
 };
 
 async function getCategories(req, res, next) {
@@ -83,32 +87,65 @@ async function getById(req, res, next) {
   }
 }
 
-async function createOne(req, res, next) {
+async function getWatchlist(req, res, next) {
   try {
-    const creator_id = req.user.uid;
-    const hopeData = req.body;
+    const { user_id } = req.body;
 
-    const data = await bookshelf.knex
-      .from('hopes')
-      .insert({ ...hopeData, creator_id })
-      .returning('*');
+    var sql = `select p.*,
+    MIN(CASE WHEN h.is_ask=true and h.unit='box' THEN h.price END) as boxlowestask,
+    MAX(CASE WHEN h.is_ask=false and h.unit='box' THEN h.price END) as boxhighestbid,
+    MIN(CASE WHEN h.is_ask=true and h.unit='case' THEN h.price END) as caselowestask,
+    MAX(CASE WHEN h.is_ask=false and h.unit='case' THEN h.price END) as casehighestbid
+    FROM watchlist w
+    INNER JOIN products p ON w.product_id = p.id
+    LEFT OUTER JOIN hopes h ON p.id = h.product_id
+    WHERE w.user_id= ? 
+    GROUP BY p.id, w.updated_at ORDER BY w.updated_at;`;
 
-    res.status(200).json(data[0]);
+    const data = await bookshelf.knex.raw(sql, [user_id]);
+
+    res.status(200).json(data.rows);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
 
-async function readByProductId(req, res, next) {
+async function existInWatchlist(req, res, next) {
   try {
-    const product_id = req.body.product_id;
-    const arr = await bookshelf.knex
-      .from('hopes')
-      .where({ 'hopes.product_id': product_id })
-      .innerJoin('users', 'hopes.creator_id', 'users.id')
-      .select('hopes.*', 'users.user_name');
-    res.status(200).json(arr);
+    const { user_id, product_id } = req.body;
+
+    const rows = await bookshelf.knex('watchlist').where({ user_id, product_id }).returning('*');
+    res.status(200).json(rows.length > 0);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function addToWatchlist(req, res, next) {
+  try {
+    const { user_id, product_id } = req.body;
+    const rows = await bookshelf.knex('watchlist').where({ user_id, product_id }).returning('*');
+
+    if (rows.length > 0) return res.status(200).json({ message: 'OK' });
+
+    await bookshelf.knex('watchlist').insert({ user_id, product_id });
+
+    res.status(200).json({ message: 'OK' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal error.' });
+  }
+}
+
+async function removeFromWatchlist(req, res, next) {
+  try {
+    const { user_id, product_id } = req.body;
+
+    await bookshelf.knex('watchlist').where({ user_id, product_id }).delete();
+
+    res.status(200).json({ message: 'OK' });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });
