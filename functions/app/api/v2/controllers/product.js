@@ -31,7 +31,6 @@ async function getSubcategories(req, res, next) {
       .select('SC.id as id', 'SC.name as name')
       .returning('*');
 
-    console.log(rows);
     res.status(200).json(rows);
   } catch (err) {
     console.error(err);
@@ -58,7 +57,7 @@ async function getByCategory(req, res, next) {
 
     res.status(200).json(data.rows);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -82,7 +81,7 @@ async function getById(req, res, next) {
     if (data.rows.length > 0) res.status(200).json(data.rows[0]);
     else res.status(200).json(null);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -106,7 +105,7 @@ async function getWatchlist(req, res, next) {
 
     res.status(200).json(data.rows);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -118,7 +117,7 @@ async function existInWatchlist(req, res, next) {
     const rows = await bookshelf.knex('watchlist').where({ user_id, product_id }).returning('*');
     res.status(200).json(rows.length > 0);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -134,7 +133,7 @@ async function addToWatchlist(req, res, next) {
 
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -147,7 +146,7 @@ async function removeFromWatchlist(req, res, next) {
 
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }

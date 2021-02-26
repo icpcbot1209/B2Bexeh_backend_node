@@ -4,9 +4,9 @@ module.exports = function (express) {
   const authMiddleware = require('../auth-middleware');
 
   const user = require('./controllers/user');
-  router.post('/user/createUser', authMiddleware, user.createUser);
-  router.post('/user/getUserByUid', authMiddleware, user.getUserByUid);
-  router.post('/user/getUserById', authMiddleware, user.getUserById);
+  router.post('/user/createUser', user.createUser);
+  router.post('/user/getUserByUid', user.getUserByUid);
+  router.post('/user/getUserById', user.getUserById);
   router.post('/user/updateUser', authMiddleware, user.updateUser);
 
   const product = require('./controllers/product');

@@ -20,17 +20,15 @@ function isActiveOffer(x, user_id) {
 
 async function getMyOffers(req, res, next) {
   try {
-    const user_id = req.user.uid;
-    const { tag } = req.body;
+    const { user_id, tag } = req.body;
     let rows = await bookshelf
       .knex('offers')
       .where({ 'offers.seller_id': user_id })
       .orWhere({ 'offers.buyer_id': user_id })
       .select('offers.*')
       .innerJoin('products', 'offers.product_id', '=', 'products.id')
-      .select('products.productName as product_name')
-      .innerJoin('hopes', 'hopes.id', '=', 'offers.hope_id')
-      .select('hopes.unit as hope_unit');
+      .select('products.name as product_name')
+      .innerJoin('hopes', 'hopes.id', '=', 'offers.hope_id');
 
     if (tag === 'active-received') {
       rows = rows.filter((x) => isActiveOffer(x, user_id) && x.creator_id != user_id);
@@ -51,21 +49,17 @@ async function getMyOffers(req, res, next) {
 
 async function createOne(req, res, next) {
   try {
-    const creator_id = req.user.uid;
     const offerData = req.body;
 
-    const data = await bookshelf
-      .knex('offers')
-      .insert({ ...offerData, creator_id })
-      .returning('*');
+    const rows = await bookshelf.knex('offers').insert(offerData).returning('*');
 
-    const offer = data[0];
+    const offer = rows[0];
 
     // notifService.onCreateOffer();
 
     res.status(200).json(offer);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -102,7 +96,7 @@ async function accept(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_accepted: true });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -114,7 +108,7 @@ async function decline(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ is_canceled: true });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -127,7 +121,7 @@ async function markAsPaid(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offer_id }).update({ is_paid: true, paid_at, paid_info });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -140,7 +134,7 @@ async function markAsShipped(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offer_id }).update({ is_shipped: true, shipped_at, shipped_info });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -152,7 +146,7 @@ async function giveFeedback2Seller(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ feedback2seller });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -164,7 +158,7 @@ async function giveFeedback2Buyer(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ feedback2buyer });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
@@ -176,7 +170,7 @@ async function changeTerms(req, res, next) {
     await bookshelf.knex('offers').where({ 'offers.id': offerId }).update({ price, qty });
     res.status(200).json({ message: 'OK' });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: 'Internal error.' });
   }
 }
