@@ -11,10 +11,10 @@ async function readItems(req, res, next) {
   try {
     const { sortDirection, filter, pageIndex, pageSize } = req.body;
 
-    let countFiltered = (await bookshelf.knex('subcategories').where('name', 'LIKE', `%${filter}%`).count())[0].count;
+    let countFiltered = (await bookshelf.knex('dealmethods').where('name', 'LIKE', `%${filter}%`).count())[0].count;
 
     let items = await bookshelf
-      .knex('subcategories')
+      .knex('dealmethods')
       .where('name', 'LIKE', `%${filter}%`)
       .orderBy('priority', sortDirection)
       .offset(pageIndex * pageSize)
@@ -32,8 +32,7 @@ async function createItem(req, res, next) {
   try {
     const { itemData } = req.body;
 
-    let items = await bookshelf.knex('subcategories').insert(itemData).returning('*');
-
+    let items = await bookshelf.knex('dealmethods').insert(itemData).returning('*');
     if (items.length > 0) res.status(200).json(items[0]);
     else res.staus(404).json({ message: 'No item found.' });
   } catch (err) {
@@ -46,7 +45,7 @@ async function updateItem(req, res, next) {
   try {
     const { itemId, itemData } = req.body;
 
-    let items = await bookshelf.knex('subcategories').where('id', '=', itemId).update(itemData).returning('*');
+    let items = await bookshelf.knex('dealmethods').where('id', '=', itemId).update(itemData).returning('*');
 
     if (items.length > 0) res.status(200).json(items[0]);
     else res.staus(404).json({ message: 'No item found.' });
@@ -60,7 +59,7 @@ async function deleteItem(req, res, next) {
   try {
     const { item } = req.body;
 
-    await bookshelf.knex('subcategories').where('id', '=', item.id).delete();
+    await bookshelf.knex('dealmethods').where('id', '=', item.id).delete();
 
     res.status(200).json({ message: 'OK' });
   } catch (err) {

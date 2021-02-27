@@ -2,7 +2,8 @@ var bookshelf = require('app/config/bookshelf');
 
 module.exports = {
   getCategories,
-  getSubcategories,
+  getSubategories,
+  getSubcategoriesByCate,
   getByCategory,
   getById,
   getWatchlist,
@@ -21,7 +22,17 @@ async function getCategories(req, res, next) {
   }
 }
 
-async function getSubcategories(req, res, next) {
+async function getSubategories(req, res, next) {
+  try {
+    let rows = await bookshelf.knex('subcategories').select('*').returning('*');
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Error' });
+  }
+}
+
+async function getSubcategoriesByCate(req, res, next) {
   try {
     const { category_id } = req.body;
     let rows = await bookshelf

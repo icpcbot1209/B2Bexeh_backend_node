@@ -8,6 +8,12 @@ module.exports = function (express) {
   router.post('/users/updateItem', authMiddleware, user.updateItem);
   router.post('/users/deleteItem', authMiddleware, user.deleteItem);
 
+  const dealmethod = require('./controllers/dealmethod');
+  router.post('/dealmethods/readItems', authMiddleware, dealmethod.readItems);
+  router.post('/dealmethods/createItem', authMiddleware, dealmethod.createItem);
+  router.post('/dealmethods/updateItem', authMiddleware, dealmethod.updateItem);
+  router.post('/dealmethods/deleteItem', authMiddleware, dealmethod.deleteItem);
+
   const category = require('./controllers/category');
   router.post('/categories/readItems', authMiddleware, category.readItems);
   router.post('/categories/createItem', authMiddleware, category.createItem);

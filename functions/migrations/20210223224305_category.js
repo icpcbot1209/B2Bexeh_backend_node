@@ -8,7 +8,7 @@ exports.up = function (knex) {
     table.string('status');
 
     table.string('name');
-    table.integer('priority');
+    table.bigInteger('priority');
   });
 };
 

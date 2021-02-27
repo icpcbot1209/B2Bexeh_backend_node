@@ -2,7 +2,7 @@
 
 exports.up = function (knex) {
   // return bookshelf.knex.schema
-  return knex.schema.createTable('subcategories', (table) => {
+  return knex.schema.createTable('dealmethods', (table) => {
     table.bigIncrements('id').primary().index();
     table.timestamps(true, true);
     table.string('status');
@@ -13,5 +13,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTable('subcategories');
+  return knex.schema.dropTable('dealmethods');
 };

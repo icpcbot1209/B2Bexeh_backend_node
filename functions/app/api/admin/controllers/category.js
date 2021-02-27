@@ -16,7 +16,7 @@ async function readItems(req, res, next) {
     let items = await bookshelf
       .knex('categories')
       .where('name', 'LIKE', `%${filter}%`)
-      .orderBy('name', sortDirection)
+      .orderBy('priority', sortDirection)
       .offset(pageIndex * pageSize)
       .limit(pageSize)
       .select('*');

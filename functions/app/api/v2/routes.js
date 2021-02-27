@@ -9,9 +9,13 @@ module.exports = function (express) {
   router.post('/user/getUserById', user.getUserById);
   router.post('/user/updateUser', authMiddleware, user.updateUser);
 
+  const consts = require('./controllers/consts');
+  router.post('/consts/getDealmethods', consts.getDealmethods);
+
   const product = require('./controllers/product');
   router.post('/product/getCategories', authMiddleware, product.getCategories);
-  router.post('/product/getSubcategories', authMiddleware, product.getSubcategories);
+  router.post('/product/getSubategories', authMiddleware, product.getSubategories);
+  router.post('/product/getSubcategoriesByCate', authMiddleware, product.getSubcategoriesByCate);
   router.post('/product/getByCategory', authMiddleware, product.getByCategory);
   router.post('/product/getById', authMiddleware, product.getById);
   router.post('/product/getWatchlist', authMiddleware, product.getWatchlist);
