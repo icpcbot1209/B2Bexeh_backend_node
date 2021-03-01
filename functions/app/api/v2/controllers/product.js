@@ -3,6 +3,7 @@ var bookshelf = require('app/config/bookshelf');
 module.exports = {
   getCategories,
   getSubategories,
+  getCatemaps,
   getSubcategoriesByCate,
   getByCategory,
   getById,
@@ -14,7 +15,7 @@ module.exports = {
 
 async function getCategories(req, res, next) {
   try {
-    let rows = await bookshelf.knex('categories').select('*').returning('*');
+    let rows = await bookshelf.knex('categories').orderBy('priority', 'ASC').select('*').returning('*');
     res.status(200).json(rows);
   } catch (err) {
     console.error(err);
@@ -24,7 +25,17 @@ async function getCategories(req, res, next) {
 
 async function getSubategories(req, res, next) {
   try {
-    let rows = await bookshelf.knex('subcategories').select('*').returning('*');
+    let rows = await bookshelf.knex('subcategories').orderBy('priority', 'ASC').select('*').returning('*');
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Error' });
+  }
+}
+
+async function getCatemaps(req, res, next) {
+  try {
+    let rows = await bookshelf.knex('categorymap').select('*').returning('*');
     res.status(200).json(rows);
   } catch (err) {
     console.error(err);
@@ -40,6 +51,7 @@ async function getSubcategoriesByCate(req, res, next) {
       .where({ 'CM.category_id': category_id })
       .innerJoin('subcategories as SC', 'SC.id', '=', 'CM.subcategory_id')
       .select('SC.id as id', 'SC.name as name')
+      .orderBy('SC.priority', 'ASC')
       .returning('*');
 
     res.status(200).json(rows);

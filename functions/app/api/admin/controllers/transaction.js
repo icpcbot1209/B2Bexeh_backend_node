@@ -8,16 +8,25 @@ module.exports = {
 async function readItems(req, res, next) {
   try {
     const { sortDirection, filter, pageIndex, pageSize } = req.body;
-
-    let countFiltered = (await bookshelf.knex('transactions').where('name', 'LIKE', `%${filter}%`).count())[0].count;
+    let countFiltered = (
+      await bookshelf.knex('offers AS o').innerJoin('products AS p', 'p.id', '=', 'o.product_id').where('p.name', 'LIKE', `%${filter}%`).count()
+    )[0].count;
 
     let items = await bookshelf
-      .knex('transactions')
-      .where('name', 'LIKE', `%${filter}%`)
-      .orderBy('name', sortDirection)
-      .offset(pageIndex * pageSize)
-      .limit(pageSize)
-      .select('*');
+      .knex('offers AS o')
+      .innerJoin('products AS p', 'o.product_id', '=', 'p.id')
+      .select('o.*', 'p.name AS product_name')
+      .where({ 'o.is_paid': true, 'o.is_shipped': true })
+      .andWhere('p.name', 'LIKE', `%${filter}%`)
+      .orderBy('o.updated_at', sortDirection)
+      .offset(pageSize * pageIndex)
+      .limit(pageSize);
+
+    for (let i = 0; i < items.length; i++) {
+      let item = items[i];
+      item.seller_name = (await bookshelf.knex('users').select('user_name').where({ id: item.seller_id }))[0].user_name;
+      item.buyer_name = (await bookshelf.knex('users').select('user_name').where({ id: item.buyer_id }))[0].user_name;
+    }
 
     res.status(200).json({ items, countFiltered });
   } catch (err) {

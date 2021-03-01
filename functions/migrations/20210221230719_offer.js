@@ -18,7 +18,7 @@ exports.up = function (knex) {
     table.string('unit');
     table.string('deal_method');
     table.string('note');
-    table.string('payment_terms');
+    table.string('payment_timing');
     table.string('shipping_terms');
     table.string('paid_info');
     table.date('paid_at');

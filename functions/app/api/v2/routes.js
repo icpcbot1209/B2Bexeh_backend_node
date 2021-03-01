@@ -15,6 +15,7 @@ module.exports = function (express) {
   const product = require('./controllers/product');
   router.post('/product/getCategories', authMiddleware, product.getCategories);
   router.post('/product/getSubategories', authMiddleware, product.getSubategories);
+  router.post('/product/getCatemaps', authMiddleware, product.getCatemaps);
   router.post('/product/getSubcategoriesByCate', authMiddleware, product.getSubcategoriesByCate);
   router.post('/product/getByCategory', authMiddleware, product.getByCategory);
   router.post('/product/getById', authMiddleware, product.getById);
