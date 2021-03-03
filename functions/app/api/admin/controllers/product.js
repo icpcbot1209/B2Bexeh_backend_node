@@ -28,20 +28,24 @@ async function readItems(req, res, next) {
   }
 }
 
+async function updateCatemap(itemData) {
+  // category-map
+  let existings = await bookshelf
+    .knex('categorymap')
+    .where({ category_id: itemData.category_id, subcategory_id: itemData.subcategory_id })
+    .returning('*');
+  if (existings.length === 0) {
+    await bookshelf.knex('categorymap').insert({ category_id: itemData.category_id, subcategory_id: itemData.subcategory_id });
+  }
+}
+
 async function createItem(req, res, next) {
   try {
     const { itemData } = req.body;
 
     let items = await bookshelf.knex('products').insert(itemData).returning('*');
     if (items.length > 0) {
-      // category-map
-      let existings = await bookshelf
-        .knex('categorymap')
-        .where({ category_id: itemData.category_id, subcategory_id: itemData.subcategory_id })
-        .returning('*');
-      if (existings.length === 0) {
-        await bookshelf.knex('categorymap').insert({ category_id: itemData.category_id, subcategory_id: itemData.subcategory_id });
-      }
+      await updateCatemap(itemData);
 
       res.status(200).json(items[0]);
     } else {
@@ -59,8 +63,10 @@ async function updateItem(req, res, next) {
 
     let items = await bookshelf.knex('products').where('id', '=', itemId).update(itemData).returning('*');
 
-    if (items.length > 0) res.status(200).json(items[0]);
-    else res.staus(404).json({ message: 'No item found.' });
+    if (items.length > 0) {
+      await updateCatemap(items[0]);
+      res.status(200).json(items[0]);
+    } else res.staus(404).json({ message: 'No item found.' });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: 'Internal error.' });

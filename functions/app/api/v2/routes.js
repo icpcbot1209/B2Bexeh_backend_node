@@ -1,4 +1,6 @@
 module.exports = function (express) {
+  // require('./notif').sendMsg();
+
   var router = express.Router();
 
   const authMiddleware = require('../auth-middleware');

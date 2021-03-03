@@ -1,8 +1,6 @@
 require('app-module-path').addPath(__dirname);
 require('dotenv').config();
 
-var firebase = require('app/config/my-firebase');
-
 var express = require('express');
 var app = express();
 
