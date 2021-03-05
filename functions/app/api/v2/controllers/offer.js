@@ -27,7 +27,7 @@ async function getMyOffers(req, res, next) {
       .orWhere({ 'offers.buyer_id': user_id })
       .select('offers.*')
       .innerJoin('products', 'offers.product_id', '=', 'products.id')
-      .select('products.name as product_name')
+      .select('products.name as product_name', 'products.category_id', 'products.subcategory_id')
       .innerJoin('hopes', 'hopes.id', '=', 'offers.hope_id');
 
     if (tag === 'active-received') {

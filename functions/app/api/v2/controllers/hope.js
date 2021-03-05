@@ -73,7 +73,14 @@ async function getByCategory(req, res, next) {
       .innerJoin('products', 'hopes.product_id', '=', 'products.id')
       .where({ 'products.category_id': category_id, 'products.subcategory_id': subcategory_id })
       .innerJoin('users', 'hopes.creator_id', 'users.id')
-      .select('hopes.*', 'users.user_name as dealer_name', 'products.name as product_name', 'products.release_date as release_date');
+      .select(
+        'hopes.*',
+        'users.user_name as dealer_name',
+        'products.name as product_name',
+        'products.release_date as release_date',
+        'products.category_id',
+        'products.subcategory_id'
+      );
     res.status(200).json(arr);
   } catch (err) {
     console.error(err);
@@ -88,7 +95,7 @@ async function getMyHopes(req, res, next) {
       .from('hopes')
       .where({ 'hopes.creator_id': user_id, 'hopes.is_ask': is_ask })
       .innerJoin('products', 'hopes.product_id', '=', 'products.id')
-      .select('hopes.*', 'products.name as product_name', 'products.release_date as release_date');
+      .select('hopes.*', 'products.name as product_name', 'products.category_id', 'products.subcategory_id', 'products.release_date as release_date');
     res.status(200).json(arr);
   } catch (err) {
     console.error(err);
